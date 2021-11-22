@@ -1,5 +1,12 @@
 ## How to run
 
+### Install npm dependencies after installing (Git or manual download)
+
+```bash
+cd server
+npm install
+```
+
 ### Running API server locally
 
 ```bash
