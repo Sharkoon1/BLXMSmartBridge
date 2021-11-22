@@ -403,7 +403,7 @@ pragma solidity ^0.6.7;
 
 
 
-contract ADEXByJeevanjot is Ownable {
+contract DEXPool is Ownable {
     using SafeMath for uint256;
 
     string public purpose = "Swapping BLXM";
