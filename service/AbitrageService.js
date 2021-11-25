@@ -15,9 +15,9 @@ class AbitrageService {
     }
 
     init() {
-        let pool_bsc_abi = require(__path.join(__dirname, '../abi/pool_bsc_abi.json'));
-        let pool_eth_abi = require(__path.join(__dirname, '../abi/pool_eth_abi.json'));
-        let erc20_abi = require(__path.join(__dirname, '../abi/erc20_abi.json'));
+        const pool_bsc_abi = require(__path.join(__dirname, '../abi/pool_bsc_abi.json'));
+        const pool_eth_abi = require(__path.join(__dirname, '../abi/pool_eth_abi.json'));
+        const erc20_abi = require(__path.join(__dirname, '../abi/erc20_abi.json'));
 
         this.wallet_BSC = new ethers.Wallet(process.env.PRIVATE_KEY, constants.PROVIDER_BSC);
         this.wallet_ETH = new ethers.Wallet(process.env.PRIVATE_KEY, constants.PROVIDER_ETH);
@@ -25,11 +25,11 @@ class AbitrageService {
         this.contract_pool_bsc = new ethers.Contract(constants.POOL_BSC, pool_bsc_abi, this.wallet_BSC);
         this.contract_pool_eth = new ethers.Contract(constants.POOL_ETH, pool_eth_abi, this.wallet_ETH);
 
-        this.contract_blxm_token_bsc = new ethers.Contract(constants.BLXM_TOKEN_ADDRESS_BSC, erc20_abi, this.wallet_ETH);
-        this.contract_usd_token_bsc = new ethers.Contract(constants.USD_TOKEN_ADRESS_BSC, erc20_abi, this.wallet_ETH);
+        this.contract_blxm_token_bsc = new ethers.Contract(constants.BLXM_TOKEN_ADDRESS_BSC, erc20_abi, this.wallet_BSC);
+        this.contract_usd_token_bsc = new ethers.Contract(constants.USD_TOKEN_ADRESS_BSC, erc20_abi, this.wallet_BSC);
 
         this.contract_blxm_token_eth = new ethers.Contract(constants.BLXM_TOKEN_ADDRESS_ETH, erc20_abi, this.wallet_ETH);
-        this.contract_usd_token_bsc = new ethers.Contract(constants.USD_TOKEN_ADRESS_ETH, erc20_abi, this.wallet_ETH);
+        this.contract_usd_token_eth = new ethers.Contract(constants.USD_TOKEN_ADRESS_ETH, erc20_abi, this.wallet_ETH);
 
         this._registerSwapEvents();
     }
