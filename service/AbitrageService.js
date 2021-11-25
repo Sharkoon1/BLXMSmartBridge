@@ -1,6 +1,7 @@
 const { ethers } = require('ethers');
 const __path = require('path');
-var constants = require('../constants');
+const constants = require('../constants');
+const TransformationService = require('../TransformationService');
 
 class AbitrageService {
 
@@ -25,11 +26,11 @@ class AbitrageService {
         this.contract_pool_bsc = new ethers.Contract(constants.POOL_BSC, pool_bsc_abi, this.wallet_BSC);
         this.contract_pool_eth = new ethers.Contract(constants.POOL_ETH, pool_eth_abi, this.wallet_ETH);
 
-        this.contract_blxm_token_bsc = new ethers.Contract(constants.BLXM_TOKEN_ADDRESS_BSC, erc20_abi, this.wallet_BSC);
-        this.contract_usd_token_bsc = new ethers.Contract(constants.USD_TOKEN_ADRESS_BSC, erc20_abi, this.wallet_BSC);
+        this.contract_blxm_token_bsc = new ethers.Contract(constants.BLXM_TOKEN_ADDRESS_BSC, erc20_abi, this.wallet_BSC); 
+        this.contract_usd_token_bsc = new ethers.Contract(constants.USD_TOKEN_ADRESS_BSC, erc20_abi, this.wallet_BSC); 
 
-        this.contract_blxm_token_eth = new ethers.Contract(constants.BLXM_TOKEN_ADDRESS_ETH, erc20_abi, this.wallet_ETH);
-        this.contract_usd_token_eth = new ethers.Contract(constants.USD_TOKEN_ADRESS_ETH, erc20_abi, this.wallet_ETH);
+        this.contract_blxm_token_eth = new ethers.Contract(constants.BLXM_TOKEN_ADDRESS_ETH, erc20_abi, this.wallet_ETH); 
+        this.contract_usd_token_eth = new ethers.Contract(constants.USD_TOKEN_ADRESS_ETH, erc20_abi, this.wallet_ETH); 
 
         this._registerSwapEvents();
     }
@@ -44,12 +45,85 @@ class AbitrageService {
         })
     }
 
-    _startAbitrageCycleBSC(transferEventData) {
+    async _startAbitrageCycleBSC(transferEventData) {
         let price_bsc = this.getPoolPriceBSC();
-        let price_ETH = this.getPoolPriceBSC();
+        let price_eth = this.getPoolPriceBSC();
+
+        if(price_bsc > price_eth) {
+            let abitrage_balance_blxm_eth = this.getAbitrageBalanceBlxmETH();
+
+            let balanceBlxmBSC = await this.getPoolBalanceBlxmBSC();
+            let balanceUsdcBSC = await this.getPoolBalanceUSDBSC();
+            let balanceBlxmETH = await this.getPoolBalanceBlxmETH();
+            let balanceUsdcETH = await this.getPoolBalanceUSDETH();
+
+            let adjustmentValue = TransformationService.getAdjustmentValue(balanceBlxmETH, balanceUsdcETH, balanceBlxmBSC, balanceUsdcBSC);
+
+            if(adjustmentValue >= abitrage_balance_blxm_eth) {
+                /*
+                    TODO: Bridge Service Aufruf
+                */
+
+                /*
+
+                    TODO: swap logic liquidity pool next days
+
+                */
+              
+            }
+
+        }
     }
 
     _startAbitrageCycleETH(transferEventData) {
+        let price_bsc = this.getPoolPriceBSC();
+        let price_eth = this.getPoolPriceBSC();
+
+        if(price_bsc < price_eth) {
+            let abitrage_balance_blxm_bsc = this.getAbitrageBalanceBlxmBSC();
+
+            let balanceBlxmBSC = await this.getPoolBalanceBlxmBSC();
+            let balanceUsdcBSC = await this.getPoolBalanceUSDBSC();
+            let balanceBlxmETH = await this.getPoolBalanceBlxmETH();
+            let balanceUsdcETH = await this.getPoolBalanceUSDETH();
+
+            let adjustmentValue = TransformationService.getAdjustmentValue(balanceBlxmBSC, balanceUsdcBSC, balanceBlxmETH, balanceUsdcETH);
+
+            if(adjustmentValue >= abitrage_balance_blxm_bsc) {
+                /*
+                    TODO: Bridge Service Aufruf
+                */
+                
+                /*
+
+                    TODO: swap logic liquidity pool next days
+
+                */
+              
+            }
+
+        }
+    }
+
+    async getPoolBalanceBlxmBSC() {
+        return await this.contract_blxm_token_bsc.balanceOf(constants.POOL_ADDRESS_BSC);
+    }
+    async getPoolBalanceUSDBSC() {
+        return await this.contract_usd_token_bsc.balanceOf(constants.POOL_ADDRESS_BSC);
+    }
+    async getPoolBalanceBlxmETH() {
+        return await this.contract_blxm_token_eth.balanceOf(constants.POOL_ADDRESS_ETH);
+    }
+    async getPoolBalanceUSDETH() {
+        return await this.contract_usd_token_eth.balanceOf(constants.POOL_ADDRESS_ETH);
+    }
+
+    async getAbitrageBalanceBlxmETH() {
+        return await this.contract_blxm_token_eth.balanceOf(constants.ABITRAGE_WALLET_ADRESS);
+    }
+
+    async getAbitrageBalanceBlxmBSC() {
+        return await this.contract_blxm_token_bsc.balanceOf(constants.ABITRAGE_WALLET_ADRESS);
     }
 
     async _swapTokenToStables_BSC(amount) {
@@ -70,15 +144,15 @@ class AbitrageService {
 
 
     getPoolPriceBSC() {
-        let balanceWeiBlXM = await this.contract_blxm_token_bsc.balanceOf(constants.POOL_ADDRESS_BSC);
-        let balanceWeiUSD = await this.contract_usd_token_bsc.balanceOf(constants.POOL_ADDRESS_BSC);
+        let balanceWeiBlXM = await this.getPoolBalanceBlxmBSC();
+        let balanceWeiUSD = await this.getPoolBalanceUSDBSC();
 
         return ethers.utils.formatEther(balanceWeiUSD) / ethers.utils.formatEther(balanceWeiBlXM);
     }
 
-    getPoolPriceETH() {
-        let balanceWeiBlXM = await this.contract_blxm_token_eth.balanceOf(constants.POOL_ADDRESS_ETH);
-        let balanceWeiUSD = await this.contract_usd_token_eth.balanceOf(constants.POOL_ADDRESS_ETH);
+    async getPoolPriceETH() {
+        let balanceWeiBlXM = await this.getPoolBalanceBlxmETH();
+        let balanceWeiUSD = await this.getPoolBalanceUSDETH();
 
         return ethers.utils.formatEther(balanceWeiUSD) / ethers.utils.formatEther(balanceWeiBlXM);
     }
