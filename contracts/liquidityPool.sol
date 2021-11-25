@@ -403,7 +403,7 @@ pragma solidity ^0.6.7;
 
 
 
-contract DEXPool is Ownable {
+contract ADEXPool_RINKEBY is Ownable {
     using SafeMath for uint256;
 
     string public purpose = "Swapping BLXM";
@@ -416,7 +416,7 @@ contract DEXPool is Ownable {
         blxm = IERC20(tokenAddress_blxm);
         stables = IERC20(tokenAddress_stable);
     }
-
+    
     uint256 public totalLiquidity_blxm;
     uint256 public totalLiquidity_stables;
 
@@ -446,18 +446,18 @@ contract DEXPool is Ownable {
         return totalLiquidity_blxm;
     }
 
-    function price(
-        uint256 input_amount,
-        uint256 input_reserve,
-        uint256 output_reserve
+    function price( 
+        uint256 input_amount, // = 5
+        uint256 input_reserve, // = 95
+        uint256 output_reserve // = 100
     ) public pure returns (uint256) {
-        uint256 input_amount_with_fee = input_amount.mul(997);
-        uint256 numerator = input_amount_with_fee.mul(output_reserve);
-        uint256 denominator = input_reserve.mul(1000).add(
+        uint256 input_amount_with_fee = input_amount.mul(997); // = 4985
+        uint256 numerator = input_amount_with_fee.mul(output_reserve); //  4985 * 100 = 498500
+        uint256 denominator = input_reserve.mul(1000).add( //  95 * 1000 + 4985  = 99985
             input_amount_with_fee
         );
-        return numerator / denominator;
-    }
+        return numerator / denominator; // 498500 / 99985 = 5
+    } 
 
     function stablesToToken(uint256 tokens) public returns (uint256) {
         uint256 token_reserve = blxm.balanceOf(address(this));
