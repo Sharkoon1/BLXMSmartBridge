@@ -66,6 +66,7 @@ class AbitrageService {
 
                 /*
 
+                    TODO: swap logic liquidity pool next days
 
                 */
               
@@ -95,6 +96,7 @@ class AbitrageService {
                 
                 /*
 
+                    TODO: swap logic liquidity pool next days
 
                 */
               
