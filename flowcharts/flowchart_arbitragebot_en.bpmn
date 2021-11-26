@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_08iuzs7" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.1.0">
+  <bpmn:process id="Process_0bwztw5" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="Wait for trade at  BLXM/USDC LP in BSC/ETH Network">
+      <bpmn:outgoing>SequenceFlow_1du45ln</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="Task_1qo1jy5" name="Collect price data on BLXM/USDC pair in both LP">
+      <bpmn:incoming>SequenceFlow_1du45ln</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1x37img</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="SequenceFlow_1du45ln" sourceRef="StartEvent_1" targetRef="Task_1qo1jy5" />
+    <bpmn:sequenceFlow id="SequenceFlow_1x37img" sourceRef="Task_1qo1jy5" targetRef="ExclusiveGateway_0o7v98e" />
+    <bpmn:exclusiveGateway id="ExclusiveGateway_0o7v98e" name="Price difference?">
+      <bpmn:incoming>SequenceFlow_1x37img</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_06ys53t</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_13x74t4</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="EndEvent_1oe3hs4" name="sleep">
+      <bpmn:incoming>SequenceFlow_06ys53t</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_06ys53t" name="no" sourceRef="ExclusiveGateway_0o7v98e" targetRef="EndEvent_1oe3hs4" />
+    <bpmn:task id="Task_0anc2s0" name="Use ValueAdjustmentAlgorithm to calculate BLXM abitrage amount">
+      <bpmn:incoming>SequenceFlow_13x74t4</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1s0fisj</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="SequenceFlow_13x74t4" sourceRef="ExclusiveGateway_0o7v98e" targetRef="Task_0anc2s0" />
+    <bpmn:exclusiveGateway id="ExclusiveGateway_078opcn" name="Is enough liquidity of cheep_BLXM in the arbitrage pool available?">
+      <bpmn:incoming>SequenceFlow_1s0fisj</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0i6cqu9</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_1s0fisj" sourceRef="Task_0anc2s0" targetRef="ExclusiveGateway_078opcn" />
+    <bpmn:task id="Task_0bnt05u" name="Swap calculated amount to expensive_BLXM_Network via bridge">
+      <bpmn:incoming>SequenceFlow_0i6cqu9</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_12fq27e</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="SequenceFlow_0i6cqu9" name="yes" sourceRef="ExclusiveGateway_078opcn" targetRef="Task_0bnt05u" />
+    <bpmn:task id="Task_1b7crfj" name="Add bridged cheap_BLXM to expensive_BLXM LP">
+      <bpmn:incoming>SequenceFlow_12fq27e</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0cwm2va</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="SequenceFlow_12fq27e" sourceRef="Task_0bnt05u" targetRef="Task_1b7crfj" />
+    <bpmn:task id="Task_1ejfkvn" name="Withdraw corresponding USDC">
+      <bpmn:incoming>SequenceFlow_0cwm2va</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_04tjg8m</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="SequenceFlow_0cwm2va" sourceRef="Task_1b7crfj" targetRef="Task_1ejfkvn" />
+    <bpmn:task id="Task_0sfs2f2" name="Calculate ROI">
+      <bpmn:incoming>SequenceFlow_04tjg8m</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_13cyd58</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="SequenceFlow_04tjg8m" sourceRef="Task_1ejfkvn" targetRef="Task_0sfs2f2" />
+    <bpmn:task id="Task_1qfmgxh" name="Calculate distributable profit for arbitrage pool liquidity provider">
+      <bpmn:incoming>SequenceFlow_13cyd58</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1aja472</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="SequenceFlow_13cyd58" sourceRef="Task_0sfs2f2" targetRef="Task_1qfmgxh" />
+    <bpmn:endEvent id="EndEvent_0ucs26f" name="sleep">
+      <bpmn:incoming>SequenceFlow_18nr152</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:task id="Task_09p1m9j" name="Reinvest remaining USDC">
+      <bpmn:incoming>SequenceFlow_1aja472</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_18nr152</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="SequenceFlow_1aja472" sourceRef="Task_1qfmgxh" targetRef="Task_09p1m9j" />
+    <bpmn:sequenceFlow id="SequenceFlow_18nr152" sourceRef="Task_09p1m9j" targetRef="EndEvent_0ucs26f" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_0bwztw5">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="112" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="156" y="155" width="82" height="66" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_1qo1jy5_di" bpmnElement="Task_1qo1jy5">
+        <dc:Bounds x="265" y="90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1du45ln_di" bpmnElement="SequenceFlow_1du45ln">
+        <di:waypoint x="215" y="130" />
+        <di:waypoint x="265" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1x37img_di" bpmnElement="SequenceFlow_1x37img">
+        <di:waypoint x="365" y="130" />
+        <di:waypoint x="436" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0o7v98e_di" bpmnElement="ExclusiveGateway_0o7v98e" isMarkerVisible="true">
+        <dc:Bounds x="436" y="105" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="419" y="81" width="83" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1oe3hs4_di" bpmnElement="EndEvent_1oe3hs4">
+        <dc:Bounds x="443" y="229" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="447" y="272" width="28" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_06ys53t_di" bpmnElement="SequenceFlow_06ys53t">
+        <di:waypoint x="461" y="155" />
+        <di:waypoint x="461" y="229" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="437" y="181" width="13" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Task_0anc2s0_di" bpmnElement="Task_0anc2s0">
+        <dc:Bounds x="557" y="90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_13x74t4_di" bpmnElement="SequenceFlow_13x74t4">
+        <di:waypoint x="486" y="130" />
+        <di:waypoint x="557" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_078opcn_di" bpmnElement="ExclusiveGateway_078opcn" isMarkerVisible="true">
+        <dc:Bounds x="728" y="105" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="711" y="162" width="86" height="66" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1s0fisj_di" bpmnElement="SequenceFlow_1s0fisj">
+        <di:waypoint x="657" y="130" />
+        <di:waypoint x="728" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Task_0bnt05u_di" bpmnElement="Task_0bnt05u">
+        <dc:Bounds x="850" y="90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0i6cqu9_di" bpmnElement="SequenceFlow_0i6cqu9">
+        <di:waypoint x="778" y="130" />
+        <di:waypoint x="850" y="130" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="806" y="112" width="17" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Task_1b7crfj_di" bpmnElement="Task_1b7crfj">
+        <dc:Bounds x="1022" y="90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_12fq27e_di" bpmnElement="SequenceFlow_12fq27e">
+        <di:waypoint x="950" y="130" />
+        <di:waypoint x="1022" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Task_1ejfkvn_di" bpmnElement="Task_1ejfkvn">
+        <dc:Bounds x="1194" y="90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0cwm2va_di" bpmnElement="SequenceFlow_0cwm2va">
+        <di:waypoint x="1122" y="130" />
+        <di:waypoint x="1194" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Task_0sfs2f2_di" bpmnElement="Task_0sfs2f2">
+        <dc:Bounds x="1366" y="90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_04tjg8m_di" bpmnElement="SequenceFlow_04tjg8m">
+        <di:waypoint x="1294" y="130" />
+        <di:waypoint x="1366" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Task_1qfmgxh_di" bpmnElement="Task_1qfmgxh">
+        <dc:Bounds x="1538" y="90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_13cyd58_di" bpmnElement="SequenceFlow_13cyd58">
+        <di:waypoint x="1466" y="130" />
+        <di:waypoint x="1538" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_0ucs26f_di" bpmnElement="EndEvent_0ucs26f">
+        <dc:Bounds x="1836" y="112" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1840" y="155" width="28" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_09p1m9j_di" bpmnElement="Task_09p1m9j">
+        <dc:Bounds x="1692" y="90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1aja472_di" bpmnElement="SequenceFlow_1aja472">
+        <di:waypoint x="1638" y="130" />
+        <di:waypoint x="1692" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_18nr152_di" bpmnElement="SequenceFlow_18nr152">
+        <di:waypoint x="1792" y="130" />
+        <di:waypoint x="1836" y="130" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
