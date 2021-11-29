@@ -20,7 +20,25 @@ class BridgeService {
         this.contract_blxm_token_eth = new ethers.Contract(constants.BLXM_TOKEN_ADDRESS_ETH, erc20_abi, this.wallet_ETH);
         this.contract_usd_token_eth = new ethers.Contract(constants.USD_TOKEN_ADRESS_ETH, erc20_abi, this.wallet_ETH);
     }
+
+    swapBLXMTokenETH() {
+
+    }
+
+    swapBLXMTokenBSC() {
+
+    }
+
+    swapUSDTokenETH() {
+
+    }
+
+    swapUSDTokenBSC() {
+
+    }
 }
 
 
 module.exports = BridgeService;
+
+console.log(ethers.utils.parseEther((15.2).toString()).toString());

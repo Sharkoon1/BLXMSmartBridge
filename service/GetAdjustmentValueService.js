@@ -3,14 +3,14 @@
 *  takes Values from the monitoring service and processes it with the pq-formular
 */
 
-function getAdjustmentValue (BLXM_CHEAP, USD_CHEAP, BLXM_EXPANSIVE, USD_EXPANSIVE){
+function getAdjustmentValue (BLXM_CHEAP, USD_CHEAP, BLXM_EXPENSIVE, USD_EXPENSIVE){
 
     let p;
     let q;
     
-    p = BLXM_EXPANSIVE*2;
-    q = Math.pow(BLXM_EXPANSIVE, 2)
-    q = q-(BLXM_EXPANSIVE*USD_EXPANSIVE)/(USD_CHEAP/BLXM_CHEAP)
+    p = BLXM_EXPENSIVE*2;
+    q = Math.pow(BLXM_EXPENSIVE, 2)
+    q = q-(BLXM_EXPENSIVE*USD_EXPENSIVE)/(USD_CHEAP/BLXM_CHEAP)
     
     let root1, root2;
     
