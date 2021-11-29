@@ -10,8 +10,9 @@ var cors = require("cors");
 require('dotenv').config();
 
 // DB connection
-/*var MONGODB_URL = process.env.MONGODB_URL;
+/*
 var mongoose = require("mongoose");
+var MONGODB_URL = process.env.MONGODB_URL;
 mongoose.connect(MONGODB_URL, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
 	//don't show the log when it is test
 	if(process.env.NODE_ENV !== "test") {
@@ -28,7 +29,10 @@ var db = mongoose.connection;
 */
 
 var app = express();
-
+/*
+const profit = require("./routes/profit");
+app.use("/profit",profit);
+*/
 //don't show the log when it is test
 if(process.env.NODE_ENV !== "test") {
 	app.use(logger("dev"));
