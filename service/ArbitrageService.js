@@ -183,6 +183,25 @@ class ArbitrageService {
         return await this._swapTokenToStables_BSC(swapAmount);
     }
 
+    calculateAbitrageProfit(swapAmount_blxm, startPrice,  usdcProfit,  swapTo) {
+        
+        let capital_loss = 0; 
+
+        //Calculate how much the abitrage costs us 
+        let input_factor = swapAmount_blxm * startPrice;
+
+        //Calculate the loss that happens because of changed price in our abitrage wallet 
+        if(swapTo === "BSC") {
+            capital_loss = (startPrice - this.getPoolPriceBSC()) * this.getArbitrageBalanceBlxmBSC();
+        } else {
+            capital_loss = (startPrice - this.getPoolPriceETH()) * this.getArbitrageBalanceBlxmETH();
+        }
+
+        let absolute_abitrage_profit = usdcProfit - input_factor - capital_loss;
+        
+        return absolute_abitrage_profit;
+    }
+
     async getPoolBalanceBlxmBSC() {
         return await ethers.utils.formatEther(this.contract_blxm_token_bsc.balanceOf(constants.POOL_ADDRESS_BSC));
     }
