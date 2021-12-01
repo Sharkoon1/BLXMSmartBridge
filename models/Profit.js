@@ -5,4 +5,4 @@ const Profit = new mongoose.Schema({
     DateTime: { type: Date, defaul: Date.now() }
 })
 
-module.exports = mongoose.model("Profit",Profit)
+module.exports = mongoose.model("Profit", Profit)
