@@ -1,7 +1,8 @@
 const { ethers } = require('ethers');
 const __path = require('path');
 const constants = require('../constants');
-const TransformationService = require('../TransformationService');
+const AdjustmentValueService = require('./AdjustmentValueService');
+const Utility = require('../helpers/utility');
 
 class ArbitrageService {
 
@@ -17,8 +18,11 @@ class ArbitrageService {
         const pool_eth_abi = require(__path.join(__dirname, '../abi/pool_eth_abi.json'));
         const erc20_abi = require(__path.join(__dirname, '../abi/erc20_abi.json'));
 
-        this.wallet_BSC = new ethers.Wallet(process.env.PRIVATE_KEY, constants.PROVIDER_BSC);
-        this.wallet_ETH = new ethers.Wallet(process.env.PRIVATE_KEY, constants.PROVIDER_ETH);
+        let provider_eth = new ethers.providers.JsonRpcProvider(constants.PROVIDER_ETH);
+        let provider_bsc = new ethers.providers.JsonRpcProvider(constants.PROVIDER_BSC);
+
+        this.wallet_BSC = new ethers.Wallet(process.env.PRIVATE_KEY, provider_bsc);
+        this.wallet_ETH = new ethers.Wallet(process.env.PRIVATE_KEY, provider_eth);
 
         this.contract_pool_bsc = new ethers.Contract(constants.POOL_BSC, pool_bsc_abi, this.wallet_BSC);
         this.contract_pool_eth = new ethers.Contract(constants.POOL_ETH, pool_eth_abi, this.wallet_ETH);
@@ -63,7 +67,7 @@ class ArbitrageService {
             let balanceBlxmETH = await this.getPoolBalanceBlxmETH();
             let balanceUsdcETH = await this.getPoolBalanceUSDETH();
 
-            let adjustmentValue = TransformationService.getAdjustmentValue(balanceBlxmETH, balanceUsdcETH, balanceBlxmBSC, balanceUsdcBSC);
+            let adjustmentValue = AdjustmentValueService.getAdjustmentValue(balanceBlxmETH, balanceUsdcETH, balanceBlxmBSC, balanceUsdcBSC);
 
             // is liqudity avaible ? 
             if (arbitrage_balance_blxm_eth > 0) {
@@ -120,7 +124,7 @@ class ArbitrageService {
             let balanceBlxmETH = await this.getPoolBalanceBlxmETH();
             let balanceUsdcETH = await this.getPoolBalanceUSDETH();
 
-            let adjustmentValue = TransformationService.getAdjustmentValue(balanceBlxmBSC, balanceUsdcBSC, balanceBlxmETH, balanceUsdcETH);
+            let adjustmentValue = AdjustmentValueService.getAdjustmentValue(balanceBlxmBSC, balanceUsdcBSC, balanceBlxmETH, balanceUsdcETH);
 
             // is liqudity avaible ? 
             if (arbitrage_balance_blxm_bsc > 0) {
@@ -164,8 +168,8 @@ class ArbitrageService {
     }
 
     async _bridgeAndSwapETH(amount, abitrageBalance) {
-        // bridge
-        let bridgeResult = await this.BridgeService.swapBLXMTokenETH(amount);
+        // bridge result
+        let bridgeResult = await this.BridgeService.swapBLXMTokenBscToEth(amount);
 
         // swap exact amount, if abitrage pool has enough tokens, swap minimal avaible otherwise
         let swapAmount = Math.min(amount, abitrageBalance);
@@ -174,8 +178,8 @@ class ArbitrageService {
     }
 
     async _bridgeAndSwapBSC(amount, abitrageBalance) {
-        // bridge
-        let bridgeResult = await this.BridgeService.swapBLXMTokenBSC(amount);
+        // bridge result
+        let bridgeResult = await this.BridgeService.swapBLXMTokenEthToBsc(amount);
 
         // swap exact amount, if abitrage pool has enough tokens, swap minimal avaible otherwise
         let swapAmount = Math.min(amount, abitrageBalance);
@@ -233,19 +237,19 @@ class ArbitrageService {
 
 
     async _swapTokenToStables_BSC(amount) {
-        return await contract_pool_bsc.tokenToStables(this._toWeiString(amount));
+        return await contract_pool_bsc.tokenToStables(Utility.toWei(amount));
     }
 
     async _swapStablesToToken_BSC(amount) {
-        return await contract_pool_bsc.tokenToStables(this._toWeiString(amount));
+        return await contract_pool_bsc.tokenToStables(Utility.toWei(amount));
     }
 
     async _swapTokenToStables_ETH(amount) {
-        return await contract_pool_eth.tokenToStables(this._toWeiString(amount));
+        return await contract_pool_eth.tokenToStables(Utility.toWei(amount));
     }
 
     async _swapStablesToToken_ETH(amount) {
-        return await contract_pool_eth.tokenToStables(this._toWeiString(amount));
+        return await contract_pool_eth.tokenToStables(Utility.toWei(amount));
     }
 
 
@@ -261,10 +265,6 @@ class ArbitrageService {
         let balanceWeiUSD = await this.getPoolBalanceUSDETH();
 
         return balanceWeiUSD / balanceWeiBlXM;
-    }
-
-    _toWeiString(amount) {
-        return ethers.utils.parseEther(amount.toString()).toString();
     }
 }
 
