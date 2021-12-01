@@ -135,7 +135,7 @@ class ArbitrageService {
             // swap and bridge usd
             else {
                 let arbitrage_balance_usd_bsc = await this.getArbitrageBalanceUSDBSC();
-                let arbitrage_balance_usd_eth = await this.getArbitrageBalanceUSDETH();
+                let  = await this.getArbitrageBalanceUSDETH();
     
                 // provide liquidity from cheap network via usd
                 if(arbitrage_balance_usd_bsc > 0) {
