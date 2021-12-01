@@ -168,8 +168,8 @@ class ArbitrageService {
     }
 
     async _bridgeAndSwapETH(amount, abitrageBalance) {
-        // bridge
-        let bridgeResult = await this.BridgeService.swapBLXMTokenETH(amount);
+        // bridge result
+        let bridgeResult = await this.BridgeService.swapBLXMTokenBscToEth(amount);
 
         // swap exact amount, if abitrage pool has enough tokens, swap minimal avaible otherwise
         let swapAmount = Math.min(amount, abitrageBalance);
@@ -178,8 +178,8 @@ class ArbitrageService {
     }
 
     async _bridgeAndSwapBSC(amount, abitrageBalance) {
-        // bridge
-        let bridgeResult = await this.BridgeService.swapBLXMTokenBSC(amount);
+        // bridge result
+        let bridgeResult = await this.BridgeService.swapBLXMTokenEthToBsc(amount);
 
         // swap exact amount, if abitrage pool has enough tokens, swap minimal avaible otherwise
         let swapAmount = Math.min(amount, abitrageBalance);

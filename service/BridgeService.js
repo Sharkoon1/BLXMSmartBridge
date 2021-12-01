@@ -31,13 +31,9 @@ class BridgeService {
         this.bridge_wallet_contract_usd_token_eth = new ethers.Contract(constants.USD_TOKEN_ADRESS_ETH, this.erc20_abi, this.bridge_wallet_ETH); 
     }
 
-    async swapBLXMTokenETH() {
-        var contract = new ethers.Contract(contractAddress, abi, wallet);
-
-        var numberOfTokens = ethers.utils.parseUnits('10.0',numberOfDecimals);
-        var options = { gasLimit: 1500000, gasPrice: ethers.utils.parseUnits('1.0', 'gwei') };
-        
-        var tx = await contract.transferFrom(fromAddress, targetAddress,numberOfTokens,options);
+    async swapBLXMTokenEthToBsc() {
+        await this.contract_blxm_token_eth.transfer(constants.BRIDGE_WALLET_ADDRESS, utility.toWei(amount));    
+        await this.bridge_wallet_contract_blxm_token_bsc.transfer(constants.ARBITRAGE_WALLT_ADDRESS, utility.toWei(amount));   
     }
  
     async swapBLXMTokenBscToEth() {
