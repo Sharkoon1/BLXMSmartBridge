@@ -18,11 +18,11 @@ class ArbitrageService {
         const pool_eth_abi = require(__path.join(__dirname, '../abi/pool_eth_abi.json'));
         const erc20_abi = require(__path.join(__dirname, '../abi/erc20_abi.json'));
 
-        let provider_eth = new ethers.providers.JsonRpcProvider(constants.PROVIDER_ETH);
-        let provider_bsc = new ethers.providers.JsonRpcProvider(constants.PROVIDER_BSC);
+        this.provider_eth = new ethers.providers.JsonRpcProvider(constants.PROVIDER_ETH);
+        this.provider_bsc = new ethers.providers.JsonRpcProvider(constants.PROVIDER_BSC);
 
-        this.wallet_BSC = new ethers.Wallet(process.env.PRIVATE_KEY, provider_bsc);
-        this.wallet_ETH = new ethers.Wallet(process.env.PRIVATE_KEY, provider_eth);
+        this.wallet_BSC = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider_bsc);
+        this.wallet_ETH = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider_eth);
 
         this.contract_pool_bsc = new ethers.Contract(constants.POOL_BSC, pool_bsc_abi, this.wallet_BSC);
         this.contract_pool_eth = new ethers.Contract(constants.POOL_ETH, pool_eth_abi, this.wallet_ETH);
@@ -45,13 +45,13 @@ class ArbitrageService {
         this._registerSwapEvents();
     }
 
-    _registerSwapEvents() {
+     _registerSwapEvents() {
         this.contract_pool_bsc.on(this.swapTransferFunctionName, (from, to, amount) => {
-            await this._startArbitrageCycleBSC();
+             this._startArbitrageCycleBSC();
         })
 
         this.contract_pool_eth.on(this.swapTransferFunctionName, (from, to, amount) => {
-            await this._startArbitrageCycleETH();
+             this._startArbitrageCycleETH();
         })
     }
 
@@ -207,32 +207,48 @@ class ArbitrageService {
     }
 
     async getPoolBalanceBlxmBSC() {
-        return await ethers.utils.formatEther(this.contract_blxm_token_bsc.balanceOf(constants.POOL_ADDRESS_BSC));
+        let balance = await this.contract_blxm_token_bsc.balanceOf(constants.POOL_ADDRESS_BSC);
+
+        return ethers.utils.formatEther(balance);
     }
     async getPoolBalanceUSDBSC() {
-        return await ethers.utils.formatEther(this.contract_usd_token_bsc.balanceOf(constants.POOL_ADDRESS_BSC));
+        let balance = await this.contract_usd_token_bsc.balanceOf(constants.POOL_ADDRESS_BSC);
+
+        return ethers.utils.formatEther(balance);
     }
     async getPoolBalanceBlxmETH() {
-        return await ethers.utils.formatEther(this.contract_blxm_token_eth.balanceOf(constants.POOL_ADDRESS_ETH));
+        let balance = await this.contract_blxm_token_eth.balanceOf(constants.POOL_ADDRESS_ETH);
+
+        return ethers.utils.formatEther(balance);
     }
     async getPoolBalanceUSDETH() {
-        return await ethers.utils.formatEther(this.contract_usd_token_eth.balanceOf(constants.POOL_ADDRESS_ETH));
+        let balance = await this.contract_usd_token_eth.balanceOf(constants.POOL_ADDRESS_ETH);
+
+        return ethers.utils.formatEther(balance);
     }
 
     async getArbitrageBalanceBlxmETH() {
-        return await ethers.utils.formatEther(this.contract_blxm_token_eth.balanceOf(constants.ARBITRAGE_WALLET_ADRESS));
+        let balance = await this.contract_blxm_token_eth.balanceOf(constants.ARBITRAGE_WALLET_ADRESS);
+
+        return ethers.utils.formatEther(balance);
     }
 
     async getArbitrageBalanceBlxmBSC() {
-        return await ethers.utils.formatEther(this.contract_blxm_token_bsc.balanceOf(constants.ARBITRAGE_WALLET_ADRESS));
+        let balance = await this.contract_blxm_token_bsc.balanceOf(constants.ARBITRAGE_WALLET_ADRESS);
+
+        return ethers.utils.formatEther(this.contract_blxm_token_bsc.balanceOf(balance));
     }
 
     async getArbitrageBalanceUSDETH() {
-        return await ethers.utils.formatEther(this.contract_usd_token_eth.balanceOf(constants.ARBITRAGE_WALLET_ADRESS));
+        let balance = await this.contract_usd_token_eth.balanceOf(constants.ARBITRAGE_WALLET_ADRESS);
+
+        return ethers.utils.formatEther(balance);
     }
 
     async getArbitrageBalanceUSDBSC() {
-        return await ethers.utils.formatEther(this.contract_usd_token_bsc.balanceOf(constants.ARBITRAGE_WALLET_ADRESS));
+        let balance = await this.contract_usd_token_bsc.balanceOf(constants.ARBITRAGE_WALLET_ADRESS);
+
+        return ethers.utils.formatEther(balance);
     }
 
 
