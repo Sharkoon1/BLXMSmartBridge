@@ -24,8 +24,8 @@ class ArbitrageService {
         this.wallet_BSC = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider_bsc);
         this.wallet_ETH = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider_eth);
 
-        this.contract_pool_bsc = new ethers.Contract(constants.POOL_BSC, pool_bsc_abi, this.wallet_BSC);
-        this.contract_pool_eth = new ethers.Contract(constants.POOL_ETH, pool_eth_abi, this.wallet_ETH);
+        this.contract_pool_bsc = new ethers.Contract(constants.POOL_ADDRESS_BSC, pool_bsc_abi, this.wallet_BSC);
+        this.contract_pool_eth = new ethers.Contract(constants.POOL_ADDRESS_ETH, pool_eth_abi, this.wallet_ETH);
 
 
         if (!this.contract_pool_bsc.deployed) {
