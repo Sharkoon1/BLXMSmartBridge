@@ -3,7 +3,7 @@
 *  takes Values from the monitoring service and processes it with the pq-formular
 */
 
-module.exports = function getAdjustmentValue (BLXM_CHEAP, USD_CHEAP, BLXM_EXPENSIVE, USD_EXPENSIVE) {
+exports.getAdjustmentValue = function (BLXM_CHEAP, USD_CHEAP, BLXM_EXPENSIVE, USD_EXPENSIVE) {
 
 	let p;
 	let q;
