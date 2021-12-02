@@ -28,26 +28,26 @@ class BridgeService {
  
 		this.bridge_wallet_contract_blxm_token_eth = new ethers.Contract(constants.BLXM_TOKEN_ADDRESS_ETH, this.erc20_abi, this.bridge_wallet_ETH);
 		this.bridge_wallet_contract_usd_token_eth = new ethers.Contract(constants.USD_TOKEN_ADRESS_ETH, this.erc20_abi, this.bridge_wallet_ETH); 
-	}
+	}	
 
 	async swapBLXMTokenEthToBsc(amount) {
-		await this.contract_blxm_token_eth.transfer(constants.BRIDGE_WALLET_ADDRESS, utility.toWei(amount));    
-		await this.bridge_wallet_contract_blxm_token_bsc.transfer(constants.ARBITRAGE_WALLT_ADDRESS, utility.toWei(amount));   
+		await this.contract_blxm_token_eth.transfer(constants.BRIDGE_WALLET_ADDRESS, utility.toWei(amount));    		
+		await this.bridge_wallet_contract_blxm_token_bsc.transfer(constants.ARBITRAGE_WALLET_ADDRESS, utility.toWei(amount));   
 	}
  
 	async swapBLXMTokenBscToEth(amount) {
-		await this.contract_blxm_token_bsc.transfer(constants.BRIDGE_WALLET_ADDRESS, utility.toWei(amount));    
-		await this.bridge_wallet_contract_blxm_token_eth.transfer(constants.ARBITRAGE_WALLT_ADDRESS, utility.toWei(amount));   
+		await this.contract_blxm_token_bsc.transfer(constants.BRIDGE_WALLET_ADDRESS, utility.toWei(amount));
+		await this.bridge_wallet_contract_blxm_token_eth.transfer(constants.ARBITRAGE_WALLET_ADDRESS, utility.toWei(amount))
 	}
  
 	async swapUSDTokenEthToBsc(amount) {
 		await this.contract_usd_token_eth.transfer(constants.BRIDGE_WALLET_ADDRESS, utility.toWei(amount));            
-		await this.bridge_wallet_contract_usd_token_bsc.transfer(constants.ARBITRAGE_WALLT_ADDRESS, utility.toWei(amount));    
+		await this.bridge_wallet_contract_usd_token_bsc.transfer(constants.ARBITRAGE_WALLET_ADDRESS, utility.toWei(amount));    
 	}
  
 	async swapUSDTokenBscToEth(amount) {
 		await this.contract_usd_token_bsc.transfer(constants.BRIDGE_WALLET_ADDRESS, utility.toWei(amount));            
-		await this.bridge_wallet_contract_usd_token_eth.transfer(constants.ARBITRAGE_WALLT_ADDRESS, utility.toWei(amount));     
+		await this.bridge_wallet_contract_usd_token_eth.transfer(constants.ARBITRAGE_WALLET_ADDRESS, utility.toWei(amount));     
 	}
 }
  

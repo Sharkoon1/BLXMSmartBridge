@@ -42,7 +42,6 @@ class ArbitrageService {
 		this.contract_blxm_token_eth = new ethers.Contract(constants.BLXM_TOKEN_ADDRESS_ETH, erc20_abi, this.wallet_ETH);
 		this.contract_usd_token_eth = new ethers.Contract(constants.USD_TOKEN_ADRESS_ETH, erc20_abi, this.wallet_ETH);
 		
-		this._registerSwapEvents();
 	}
 
 	_registerSwapEvents() {
@@ -57,7 +56,10 @@ class ArbitrageService {
 
 	async _startArbitrageCycleBSC() {
 		let pool_price_bsc = await this.getPoolPriceBSC();
-		let pool_price_eth = await this.getPoolPriceBSC();
+		let pool_price_eth = await this.getPoolPriceETH();
+
+		console.log('ETH network price: ' + pool_price_bsc);
+		console.log('BSC network price: '+ pool_price_eth);
 
 		if (pool_price_bsc > pool_price_eth) {
 			let arbitrage_balance_blxm_eth = await this.getArbitrageBalanceBlxmETH();
@@ -69,14 +71,29 @@ class ArbitrageService {
 
 			let adjustmentValue = AdjustmentValueService.getAdjustmentValue(balanceBlxmETH, balanceUsdcETH, balanceBlxmBSC, balanceUsdcBSC);
 
-			// is liqudity avaible ? 
+			console.log('Adjustment value: '+ adjustmentValue);
+
+			// is liqudity available ? 
 			if (arbitrage_balance_blxm_eth > 0) {
-				return await this._bridgeAndSwapBSC(adjustmentValue, arbitrage_balance_blxm_eth);
+
+				console.log('liquidity available, starting to bridge and swap.');
+
+				 await this._bridgeAndSwapBSC(adjustmentValue, arbitrage_balance_blxm_eth);
+
+				 if (this.isBscMoreExpensive()) { 
+					this._startArbitrageCycleBSC();
+				}
+
+				else {
+					return true;
+				}
 			}
 
 			// provide liqudity in bsc
 			// swap and bridge usd
 			else {
+				console.log('liquidity available, starting to bridge and swap.');
+
 				let arbitrage_balance_usd_bsc = await this.getArbitrageBalanceUSDBSC();
 				let arbitrage_balance_usd_eth = await this.getArbitrageBalanceUSDETH();
 
@@ -107,14 +124,45 @@ class ArbitrageService {
 
 				arbitrage_balance_blxm_eth = this.getArbitrageBalanceBlxmBSC();
 
-				return await this._bridgeAndSwapBSC(adjustmentValue, arbitrage_balance_blxm_eth);
+				await this._bridgeAndSwapBSC(adjustmentValue, arbitrage_balance_blxm_eth);
+
+				if (this.isBscMoreExpensive()) { 
+					this._startArbitrageCycleBSC();
+				}
+
+				else {
+					return true;
+				}
 			}
 		}
 	}
 
+	async isBscMoreExpensive() {
+		let newPoolPriceBsc = await this.getPoolPriceBSC();
+		let newPoolPriceEth = await this.getPoolPriceETH();
+
+		console.log('Price after cycle in eth: ' + newPoolPriceEth);
+		console.log('Price after cycle in bsc: ' + newPoolPriceBsc);
+
+		return newPoolPriceBsc > newPoolPriceEth;
+	}
+
+	async isEthMoreExpensive() {
+		let newPoolPriceBsc = await this.getPoolPriceBSC();
+		let newPoolPriceEth = await this.getPoolPriceETH();
+
+		console.log('Price after cycle in eth: ' + newPoolPriceEth);
+		console.log('Price after cycle in bsc: ' + newPoolPriceBsc);
+
+		return newPoolPriceBsc < newPoolPriceEth;
+	}
+
 	async _startArbitrageCycleETH() {
 		let pool_price_bsc = await this.getPoolPriceBSC();
-		let pool_price_eth = await this.getPoolPriceBSC();
+		let pool_price_eth = await this.getPoolPriceETH();
+
+		console.log('ETH network price: ' + pool_price_eth);
+		console.log('BSC network price: '+ pool_price_eth);
 
 		if (pool_price_bsc < pool_price_eth) {
 			let arbitrage_balance_blxm_bsc = await this.getArbitrageBalanceBlxmBSC();
@@ -126,14 +174,28 @@ class ArbitrageService {
 
 			let adjustmentValue = AdjustmentValueService.getAdjustmentValue(balanceBlxmBSC, balanceUsdcBSC, balanceBlxmETH, balanceUsdcETH);
 
+			console.log('Adjustment value: '+ adjustmentValue);
+
 			// is liqudity avaible ? 
 			if (arbitrage_balance_blxm_bsc > 0) {
-				return await this._bridgeAndSwapETH(adjustmentValue, arbitrage_balance_blxm_bsc);
+				console.log('liquidity available, starting to bridge and swap.');
+
+				await this._bridgeAndSwapETH(adjustmentValue, arbitrage_balance_blxm_bsc);
+
+				if (this.isEthMoreExpensive()) { 
+					this._startArbitrageCycleETH();
+				}
+
+				else {
+					return true;
+				}
 			}
 
 			// provide liqudity in bsc
 			// swap and bridge usd
 			else {
+				console.log('liquidity available, starting to bridge and swap.');
+
 				let arbitrage_balance_usd_bsc = await this.getArbitrageBalanceUSDBSC();
 				let arbitrage_balance_usd_eth = await this.getArbitrageBalanceUSDETH();
 
@@ -162,7 +224,15 @@ class ArbitrageService {
 
 				arbitrage_balance_blxm_bsc = await this.getArbitrageBalanceBlxmBSC();
 
-				return await this._bridgeAndSwapETH(adjustmentValue, arbitrage_balance_blxm_bsc);
+				await this._bridgeAndSwapETH(adjustmentValue, arbitrage_balance_blxm_bsc);
+
+				if (this.isEthMoreExpensive()) { 
+					this._startArbitrageCycleETH();
+				}
+
+				else {
+					return true;
+				}
 			}
 		}
 	}
@@ -174,7 +244,9 @@ class ArbitrageService {
 		// swap exact amount, if abitrage pool has enough tokens, swap minimal avaible otherwise
 		let swapAmount = Math.min(amount, abitrageBalance);
 
-		return await this._swapTokenToStables_ETH(swapAmount);
+		console.log('Amount to swap on liquidity pool: ' + swapAmount);
+
+		await this._swapTokenToStables_ETH(swapAmount);
 	}
 
 	async _bridgeAndSwapBSC(amount, abitrageBalance) {
@@ -184,7 +256,9 @@ class ArbitrageService {
 		// swap exact amount, if abitrage pool has enough tokens, swap minimal avaible otherwise
 		let swapAmount = Math.min(amount, abitrageBalance);
 
-		return await this._swapTokenToStables_BSC(swapAmount);
+		console.log('Amount to swap on liquidity pool: ' + swapAmount);
+
+		await this._swapTokenToStables_BSC(swapAmount);
 	}
 
 	calculateAbitrageProfit(swapAmount_blxm, startPrice_cheap_BLXM, startPrice_expensive_BLXM, usdcProfit, swapTo) {
@@ -228,25 +302,25 @@ class ArbitrageService {
 	}
 
 	async getArbitrageBalanceBlxmETH() {
-		let balance = await this.contract_blxm_token_eth.balanceOf(constants.ARBITRAGE_WALLET_ADRESS);
+		let balance = await this.contract_blxm_token_eth.balanceOf(constants.ARBITRAGE_WALLET_ADDRESS);
 
 		return ethers.utils.formatEther(balance);
 	}
 
 	async getArbitrageBalanceBlxmBSC() {
-		let balance = await this.contract_blxm_token_bsc.balanceOf(constants.ARBITRAGE_WALLET_ADRESS);
+		let balance = await this.contract_blxm_token_bsc.balanceOf(constants.ARBITRAGE_WALLET_ADDRESS);
 
-		return ethers.utils.formatEther(this.contract_blxm_token_bsc.balanceOf(balance));
+		return ethers.utils.formatEther(balance);
 	}
 
 	async getArbitrageBalanceUSDETH() {
-		let balance = await this.contract_usd_token_eth.balanceOf(constants.ARBITRAGE_WALLET_ADRESS);
+		let balance = await this.contract_usd_token_eth.balanceOf(constants.ARBITRAGE_WALLET_ADDRESS);
 
 		return ethers.utils.formatEther(balance);
 	}
 
 	async getArbitrageBalanceUSDBSC() {
-		let balance = await this.contract_usd_token_bsc.balanceOf(constants.ARBITRAGE_WALLET_ADRESS);
+		let balance = await this.contract_usd_token_bsc.balanceOf(constants.ARBITRAGE_WALLET_ADDRESS);
 
 		return ethers.utils.formatEther(balance);
 	}
@@ -273,12 +347,18 @@ class ArbitrageService {
 		let balanceWeiBlXM = await this.getPoolBalanceBlxmBSC();
 		let balanceWeiUSD = await this.getPoolBalanceUSDBSC();
 
+		console.log('BSC: Amount of tokens blxm: ' + balanceWeiBlXM);
+		console.log('BSC: Amount of tokens usd: ' + balanceWeiUSD);
+
 		return balanceWeiUSD / balanceWeiBlXM;
 	}
 
 	async getPoolPriceETH() {
 		let balanceWeiBlXM = await this.getPoolBalanceBlxmETH();
 		let balanceWeiUSD = await this.getPoolBalanceUSDETH();
+
+		console.log('ETH: Amount of tokens blxm: ' + balanceWeiBlXM);
+		console.log('ETH: Amount of tokens usd: ' + balanceWeiUSD);
 
 		return balanceWeiUSD / balanceWeiBlXM;
 	}

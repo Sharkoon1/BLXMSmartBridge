@@ -11,6 +11,8 @@ const ArbitrageService = require("./service/ArbitrageService");
 const BridgeService = require("./service/BridgeService");
 // DB connection
 
+var bridgeService = new BridgeService();
+var arbitrageService = new ArbitrageService(bridgeService);
 
 var app = express();
 
@@ -40,10 +42,6 @@ app.use((err, req, res) => {
 		return apiResponse.unauthorizedResponse(res, err.message);
 	}
 });
-
-var arbitrageService = new ArbitrageService();
-
-arbitrageService._startArbitrageCycleBSC();
 
 module.exports = app;
 
