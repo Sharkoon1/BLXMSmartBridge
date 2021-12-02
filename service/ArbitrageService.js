@@ -41,7 +41,7 @@ class ArbitrageService {
 
 		this.contract_blxm_token_eth = new ethers.Contract(constants.BLXM_TOKEN_ADDRESS_ETH, erc20_abi, this.wallet_ETH);
 		this.contract_usd_token_eth = new ethers.Contract(constants.USD_TOKEN_ADRESS_ETH, erc20_abi, this.wallet_ETH);
-
+		
 		this._registerSwapEvents();
 	}
 
@@ -228,25 +228,25 @@ class ArbitrageService {
     }
 
     async getArbitrageBalanceBlxmETH() {
-        let balance = await this.contract_blxm_token_eth.balanceOf(constants.ARBITRAGE_WALLET_ADRESS);
+        let balance = await this.contract_blxm_token_eth.balanceOf(constants.ARBITRAGE_WALLT_ADDRESS);
 
         return ethers.utils.formatEther(balance);
     }
 
     async getArbitrageBalanceBlxmBSC() {
-        let balance = await this.contract_blxm_token_bsc.balanceOf(constants.ARBITRAGE_WALLET_ADRESS);
+        let balance = await this.contract_blxm_token_bsc.balanceOf(constants.ARBITRAGE_WALLT_ADDRESS);
 
-        return ethers.utils.formatEther(this.contract_blxm_token_bsc.balanceOf(balance));
+        return ethers.utils.formatEther(balance);
     }
 
     async getArbitrageBalanceUSDETH() {
-        let balance = await this.contract_usd_token_eth.balanceOf(constants.ARBITRAGE_WALLET_ADRESS);
+        let balance = await this.contract_usd_token_eth.balanceOf(constants.ARBITRAGE_WALLT_ADDRESS);
 
         return ethers.utils.formatEther(balance);
     }
 
     async getArbitrageBalanceUSDBSC() {
-        let balance = await this.contract_usd_token_bsc.balanceOf(constants.ARBITRAGE_WALLET_ADRESS);
+        let balance = await this.contract_usd_token_bsc.balanceOf(constants.ARBITRAGE_WALLT_ADDRESS);
 
         return ethers.utils.formatEther(balance);
     }

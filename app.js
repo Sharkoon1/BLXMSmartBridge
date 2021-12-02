@@ -7,7 +7,8 @@ var apiRouter = require("./routes/api");
 var apiResponse = require("./helpers/apiResponse");
 var cors = require("cors");
 require("dotenv").config();
-
+const ArbitrageService = require("./service/ArbitrageService");
+const BridgeService = require("./service/BridgeService");
 // DB connection
 
 
@@ -40,4 +41,9 @@ app.use((err, req, res) => {
 	}
 });
 
+var arbitrageService = new ArbitrageService();
+
+arbitrageService._startArbitrageCycleBSC();
+
 module.exports = app;
+
