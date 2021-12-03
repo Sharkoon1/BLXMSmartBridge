@@ -3,88 +3,48 @@ const __path = require("path");
 const constants = require("../constants");
 const AdjustmentValueService = require("./AdjustmentValueService");
 const Utility = require("../helpers/utility");
+const Wallets = require("../wallet/Wallets");
 
 class ArbitrageService {
 
 	constructor(bridgeService) {
-		this.swapTransferFunctionName = "Transfer";
-		this.BridgeService = bridgeService;
-
-		this.init();
-	}
-
-	init() {
-		const pool_bsc_abi = require(__path.join(__dirname, "../abi/pool_bsc_abi.json"));
-		const pool_eth_abi = require(__path.join(__dirname, "../abi/pool_eth_abi.json"));
-		const erc20_abi = require(__path.join(__dirname, "../abi/erc20_abi.json"));
-
-		this.provider_eth = new ethers.providers.JsonRpcProvider(constants.PROVIDER_ETH);
-		this.provider_bsc = new ethers.providers.JsonRpcProvider(constants.PROVIDER_BSC);
-
-		this.wallet_BSC = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider_bsc);
-		this.wallet_ETH = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider_eth);
-
-		this.contract_pool_bsc = new ethers.Contract(constants.POOL_ADDRESS_BSC, pool_bsc_abi, this.wallet_BSC);
-		this.contract_pool_eth = new ethers.Contract(constants.POOL_ADDRESS_ETH, pool_eth_abi, this.wallet_ETH);
-
-
-		if (!this.contract_pool_bsc.deployed) {
-			throw ("Contract pool in bsc has not been deployed or does not exist!");
-		}
-
-		if (!this.contract_pool_eth.deployed) {
-			throw ("Contract pool in eth has not been deployed or does not exist!");
-		}
-
-		this.contract_blxm_token_bsc = new ethers.Contract(constants.BLXM_TOKEN_ADDRESS_BSC, erc20_abi, this.wallet_BSC);
-		this.contract_usd_token_bsc = new ethers.Contract(constants.USD_TOKEN_ADRESS_BSC, erc20_abi, this.wallet_BSC);
-
-		this.contract_blxm_token_eth = new ethers.Contract(constants.BLXM_TOKEN_ADDRESS_ETH, erc20_abi, this.wallet_ETH);
-		this.contract_usd_token_eth = new ethers.Contract(constants.USD_TOKEN_ADRESS_ETH, erc20_abi, this.wallet_ETH);
-		
-	}
-
-	_registerSwapEvents() {
-		this.contract_pool_bsc.on(this.swapTransferFunctionName, (from, to, amount) => {
-			this._startArbitrageCycleBSC();
-		});
-
-		this.contract_pool_eth.on(this.swapTransferFunctionName, (from, to, amount) => {
-			this._startArbitrageCycleETH();
-		});
+		this._swapTransferFunctionName = "Transfer";
+		this._bridgeService = bridgeService;
+		this._ethContracts = new Contracts("ETH");
+		this._bscContracts = new Contracts("BSC");
 	}
 
 
-	async startArbitrageBSC(){
-		while (this.isBscMoreExpensive()) { 
-			await this._startArbitrageCycleBSC();
+	async startArbitrage() {
+		let poolPriceBsc = await this._bscContracts.getPoolPrice();
+		let poolPriceEth = await this._ethContracts.getPoolPrice();
+		while (poolPriceBsc !== poolPriceEth) {
+			await this._startArbitrageCycle(poolPriceBsc, poolPriceEth);
 		}
 	}
 
-	async _startArbitrageCycleBSC() {
-		let pool_price_bsc = await this.getPoolPriceBSC();
-		let pool_price_eth = await this.getPoolPriceETH();
+	async _startArbitrageCycle(poolPriceBsc, poolPriceEth) {
 
-		console.log("ETH network price: " + pool_price_bsc);
-		console.log("BSC network price: "+ pool_price_eth);
-
-		if (pool_price_bsc > pool_price_eth) {
-			let arbitrage_balance_blxm_eth = await this.getArbitrageBalanceBlxmETH();
-
-			let balanceBlxmBSC = await this.getPoolBalanceBlxmBSC();
-			let balanceUsdcBSC = await this.getPoolBalanceUSDBSC();
-			let balanceBlxmETH = await this.getPoolBalanceBlxmETH();
-			let balanceUsdcETH = await this.getPoolBalanceUSDETH();
-
-			let adjustmentValue = AdjustmentValueService.getAdjustmentValue(balanceBlxmETH, balanceUsdcETH, balanceBlxmBSC, balanceUsdcBSC);
-			
-			console.log("Adjustment value: "+ adjustmentValue);
-			await this.startArbitrageTransferFromBSCToETH(adjustmentValue, arbitrage_balance_blxm_eth, pool_price_bsc, pool_price_eth, balanceUsdcETH);
-			
+		let balanceBlxmBSC = await this._bscContracts.getPoolNumberOfBlxmToken();
+		let balanceUsdcBSC = await this._bscContracts.getPoolNumberOfUsdToken();
+		let balanceBlxmETH = await this._ethContracts.getPoolNumberOfBlxmToken();
+		let balanceUsdcETH = await this._ethContracts.getPoolNumberOfUsdToken();
+		let adjustmentValue;
+		let arbitrageBalance;
+		if (poolPriceBsc > poolPriceEth) {
+			arbitrageBalance = await this._ethContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
+			adjustmentValue = AdjustmentValueService.getAdjustmentValue(balanceBlxmETH, balanceUsdcETH, balanceBlxmBSC, balanceUsdcBSC);
+		} else {
+			arbitrageBalance = await this._bscContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
+			adjustmentValue = AdjustmentValueService.getAdjustmentValue(balanceBlxmBSC, balanceUsdcBSC, balanceBlxmETH, balanceUsdcETH);
 		}
+
+		console.log("Adjustment value: " + adjustmentValue);
+		await this.startArbitrageTransferFromBSCToETH(adjustmentValue, arbitrageBalance, pool_price_bsc, pool_price_eth, balanceUsdcETH);
+
 	}
 
-	async startArbitrageTransferFromBSCToETH(amount, balance, pool_price_bsc, pool_price_eth, balanceUsdcETH){
+	async startArbitrageTransferFromBSCToETH(amount, balance, pool_price_bsc, pool_price_eth, balanceUsdcETH) {
 		// is liqudity available ? 
 		if (balance > 0) {
 
@@ -132,40 +92,23 @@ class ArbitrageService {
 		}
 	}
 
-	async isBscMoreExpensive() {
-		let newPoolPriceBsc = await this.getPoolPriceBSC();
-		let newPoolPriceEth = await this.getPoolPriceETH();
+	async isPriceEqual() {
+		let newPoolPriceBsc = await this._bscContracts.getPoolPrice();
+		let newPoolPriceEth = await this._ethContracts.getPoolPrice();
 
 		console.log("Price after cycle in eth: " + newPoolPriceEth);
 		console.log("Price after cycle in bsc: " + newPoolPriceBsc);
 
-		return newPoolPriceBsc > newPoolPriceEth;
+		return newPoolPriceBsc === newPoolPriceEth;
 	}
 
-	async isEthMoreExpensive() {
-		let newPoolPriceBsc = await this.getPoolPriceBSC();
-		let newPoolPriceEth = await this.getPoolPriceETH();
-
-		console.log("Price after cycle in eth: " + newPoolPriceEth);
-		console.log("Price after cycle in bsc: " + newPoolPriceBsc);
-
-		return newPoolPriceBsc < newPoolPriceEth;
-	}
-
-
-
-	async startArbitrageETH(){
-		while (this.isEthMoreExpensive()) { 
-			this._startArbitrageCycleETH();
-		}
-	}
 
 	async _startArbitrageCycleETH() {
 		let pool_price_bsc = await this.getPoolPriceBSC();
 		let pool_price_eth = await this.getPoolPriceETH();
 
 		console.log("ETH network price: " + pool_price_eth);
-		console.log("BSC network price: "+ pool_price_eth);
+		console.log("BSC network price: " + pool_price_eth);
 
 		if (pool_price_bsc < pool_price_eth) {
 			let arbitrage_balance_blxm_bsc = await this.getArbitrageBalanceBlxmBSC();
@@ -177,7 +120,7 @@ class ArbitrageService {
 
 			let adjustmentValue = AdjustmentValueService.getAdjustmentValue(balanceBlxmBSC, balanceUsdcBSC, balanceBlxmETH, balanceUsdcETH);
 
-			console.log("Adjustment value: "+ adjustmentValue);
+			console.log("Adjustment value: " + adjustmentValue);
 			await this.startArbitrageTransferFromETHToBSC(adjustmentValue, arbitrage_balance_blxm_bsc, pool_price_bsc, pool_price_eth, balanceUsdcBSC);
 		}
 	}

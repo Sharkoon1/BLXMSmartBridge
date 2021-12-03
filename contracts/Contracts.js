@@ -22,9 +22,17 @@ class Contracts  {
         }
     }
 
+    async getPoolNumberOfBlxmToken(){
+        return await this.blxmTokenContract.getTokenBalance(constants["POOL_ADDRESS_" + this._network]);
+    }
+
+    async getPoolNumberOfUsdToken(){
+        return await this.usdTokenContract.getTokenBalance(constants["POOL_ADDRESS_" + this._network]);
+    }
+
     async getPoolPrice() {
-        let numberOfBlxmToken = await this.blxmTokenContract.getTokenBalance(constants["POOL_ADDRESS_" + this._network]);
-		let numberOfUsdToken = await this.usdTokenContract.getTokenBalance(constants["POOL_ADDRESS_" + this._network]);
+        let numberOfBlxmToken = await getPoolNumberOfBlxmToken();
+		let numberOfUsdToken = await getPoolNumberOfUsdToken();
 
 		return numberOfUsdToken / numberOfBlxmToken;
     }
