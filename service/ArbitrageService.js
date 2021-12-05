@@ -1,13 +1,15 @@
 const constants = require("../constants");
+const { ethers } = require("ethers");
 const Utility = require("../helpers/utility");
 const AdjustmentValueService = require("./AdjustmentValueService");
 const Contracts  = require("../contracts/Contracts");
-
+const DataBaseService = require("./service/DataBaseService");
 class ArbitrageService {
 
 	constructor(bridgeService, walletContainer) {
 		this._swapTransferFunctionName = "Transfer";
 		this._bridgeService = bridgeService;
+		this._databaseService = new DataBaseService();
 		
 
 		this._ethContracts = new Contracts("ETH", walletContainer.ArbitrageWalletETH);
@@ -33,17 +35,25 @@ class ArbitrageService {
 
 		let adjustmentValue;
 		let arbitrageBlxmBalance;
+		let result;
+		let profit;
+
 		if (poolPriceBsc.gt(poolPriceEth)) {
 			arbitrageBlxmBalance = await this._ethContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 			adjustmentValue = AdjustmentValueService.getAdjustmentValue(balanceBlxmETH, balanceUsdcETH, balanceBlxmBSC, balanceUsdcBSC);
 
-			await this.startArbitrageTransferFromBSCToETH(adjustmentValue, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdcETH);
-		} else {
+			result = await this.startArbitrageTransferFromBSCToETH(adjustmentValue, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdcETH);
+		    profit = this._calculateAbitrageProfit(result.swapAmount, balanceBlxmETH, balanceBlxmBSC, result.profit, "ETH");
+		} 
+		else {
 			arbitrageBlxmBalance = await this._bscContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 			adjustmentValue = AdjustmentValueService.getAdjustmentValue(balanceBlxmBSC, balanceUsdcBSC, balanceBlxmETH, balanceUsdcETH);
 
-			await this.startArbitrageTransferFromETHToBSC(adjustmentValue, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdcETH);
+			result = await this.startArbitrageTransferFromETHToBSC(adjustmentValue, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdcETH);
+			profit = this._calculateAbitrageProfit(result.swapAmount, balanceBlxmBSC, balanceBlxmETH, result.profit, "BSC");
 		}
+
+		this._databaseService.AddData({Profit: profit});
 	}
 
 	async startArbitrageTransferFromBSCToETH(amount, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdc) {
@@ -88,7 +98,7 @@ class ArbitrageService {
 	async startArbitrageTransferFromETHToBSC(amount, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdc) {
 		// is liqudity avaible ? 
 		if (!arbitrageBlxmBalance.isZero()) {
-			await this._bridgeAndSwapETH(amount, arbitrageBlxmBalance);
+			return await this._bridgeAndSwapETH(amount, arbitrageBlxmBalance);
 		}
 
 		// provide liqudity in bsc
@@ -122,7 +132,7 @@ class ArbitrageService {
 
 			arbitrageBlxmBalance = await this._bscContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 
-			await this._bridgeAndSwapETH(amount, arbitrageBlxmBalance);
+			return await this._bridgeAndSwapETH(amount, arbitrageBlxmBalance);
 		}
 	}
 
@@ -133,7 +143,9 @@ class ArbitrageService {
 		// bridge blxm tokens
 		await this._bridgeService.bridgeBLXMTokenBscToEth(swapAmount);
 
-		await this._ethContracts.poolContract.swapTokenToStables(swapAmount);
+		let profit = await this._ethContracts.poolContract.swapTokenToStables(swapAmount);
+
+		return { profit: profit, swapAmount: swapAmount };
 	}
 
 	async _bridgeAndSwapBSC(amount, abitrageBalance) {
@@ -143,26 +155,36 @@ class ArbitrageService {
 		// bridge blxm tokens
 		await this._bridgeService.bridgeBLXMTokenEthToBsc(swapAmount);
 
-		await this._bscContracts.poolContract.swapTokenToStables(swapAmount);
+		let profit = this._bscContracts.poolContract.swapTokenToStables(swapAmount);
+
+		return { profit: profit, swapAmount: swapAmount };
 	}
 
-	calculateAbitrageProfit(swapAmount_blxm, startPrice_cheap_BLXM, startPrice_expensive_BLXM, usdcProfit, swapTo) {
-
-		let capital_loss = 0;
+	async _calculateAbitrageProfit(swapAmountBlxm, startPriceCheapBLXM, startPriceExpensiveBLXM, usdcProfit, network) {
+		let capitalLoss;
+		swapAmountBlxm = ethers.utils.formatEther(swapAmountBlxm);
+		startPriceCheapBLXM = ethers.utils.formatEther(startPriceCheapBLXM);
+		startPriceExpensiveBLXM = ethers.utils.formatEther(startPriceExpensiveBLXM);
+		usdcProfit = ethers.utils.formatEther(usdcProfit);
 
 		//Calculate how much the abitrage costs us 
-		let input_factor = swapAmount_blxm * startPrice_cheap_BLXM; //Cheap BLXM
+		let inputFactor = swapAmountBlxm * startPriceCheapBLXM; //Cheap BLXM
+
+		let poolPriceBsc = ethers.utils.formatEther(await this._bscContracts.getPoolPrice());
+		let poolPriceEth = ethers.utils.formatEther(await this._ethContracts.getPoolPrice());
+		let	arbitrageBlxmBalanceEth = ethers.utils.formatEther(await this._ethContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS));
+		let	arbitrageBlxmBalanceBsc = ethers.utils.formatEther(await this._bscContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS));
 
 		//Calculate the loss that happens because of changed price in our abitrage wallet 
-		if (swapTo === "BSC") {
-			capital_loss = (startPrice_expensive_BLXM - this.getPoolPriceBSC()) * this.getArbitrageBalanceBlxmBSC();
+		if (network === "BSC") {
+			capitalLoss = (startPriceExpensiveBLXM - poolPriceBsc) * arbitrageBlxmBalanceBsc;
 		} else {
-			capital_loss = (startPrice_expensive_BLXM - this.getPoolPriceETH()) * this.getArbitrageBalanceBlxmETH();
+			capitalLoss = (startPriceExpensiveBLXM - poolPriceEth) * arbitrageBlxmBalanceEth;
 		}
 
-		let absolute_abitrage_profit = usdcProfit - input_factor - capital_loss;
+		let absoluteAbitrageProfit = usdcProfit - inputFactor - capitalLoss;
 
-		return absolute_abitrage_profit;
+		return absoluteAbitrageProfit;
 	}
 }
 
