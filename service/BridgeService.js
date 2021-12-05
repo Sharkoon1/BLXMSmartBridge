@@ -28,10 +28,7 @@ class BridgeService {
 	}
  
 	async bridgeUSDTokenBscToEth(amount) {
-		this._bscContracts.usdTokenContract.Connect(this._walletContainer.ArbitrageWalletETH);
 		await this._bscContracts.usdTokenContract.transferTokens(constants.BRIDGE_WALLET_ADDRESS, amount);    	
-
-		this._ethContracts.usdTokenContract.Connect(this._walletContainer.BridgeWalletBSC);
 		await this._bridgeEthContracts.usdTokenContract.transferTokens(constants.ARBITRAGE_WALLET_ADDRESS, amount);       
 	}
 }

@@ -13,7 +13,7 @@ const BridgeService = require("./service/BridgeService");
 
 var bridgeService = new BridgeService(WalletContainer);
 var arbitrageService = new ArbitrageService(bridgeService, WalletContainer);
-arbitrageService.startArbitrage();
+
 var app = express();
 
 app.use(express.json());
