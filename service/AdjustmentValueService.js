@@ -1,9 +1,15 @@
+const { ethers } = require("ethers");
 
 /* transforms the formular of the "value adjustment algorithm" to an equation that can be resolved
 *  takes Values from the monitoring service and processes it with the pq-formular
 */
 
 exports.getAdjustmentValue = function (BLXM_CHEAP, USD_CHEAP, BLXM_EXPENSIVE, USD_EXPENSIVE) {
+	BLXM_CHEAP = ethers.utils.formatEther(BLXM_CHEAP);
+	USD_CHEAP = ethers.utils.formatEther(USD_CHEAP);
+	BLXM_EXPENSIVE = ethers.utils.formatEther(BLXM_EXPENSIVE);
+	USD_EXPENSIVE = ethers.utils.formatEther(USD_EXPENSIVE);
+
 
 	let p;
 	let q;
@@ -25,13 +31,13 @@ exports.getAdjustmentValue = function (BLXM_CHEAP, USD_CHEAP, BLXM_EXPENSIVE, US
 	// condition for real and different roots
 	if (discriminant > 0) {
 		root1 = (-b + Math.sqrt(discriminant)) / (2 * a);
-		return root1;
+		return ethers.utils.parseEther(String(root1));
 	}
 
 	// condition for real and equal roots
 	else if (discriminant == 0) {
 		root1 = -b / (2 * a);
-		return root1;
+		return ethers.utils.parseEther(String(root1));
 
 	}
 

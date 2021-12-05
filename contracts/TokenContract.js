@@ -1,21 +1,21 @@
-const BaseContract = require('./BaseContract');
+const BaseContract = require("./BaseContract");
 const __path = require("path");
 
 class TokenContract extends BaseContract {
-    constructor(contractAddress, signer) {
-        const erc20_abi = require(__path.join(__dirname, "../abi/erc20_abi.json"));
+	constructor(contractAddress, signer) {
+		const erc20_abi = require(__path.join(__dirname, "../abi/erc20_abi.json"));
 
-        super(contractAddress, erc20_abi, signer);
+		super(contractAddress, erc20_abi, signer);
 
-    }
+	}
 
-    async getTokenBalance(address) {
-        return this.WeiToEther(await this._contract.balanceOf(address));
-    }
+	async getTokenBalance(address) {
+		return await this._contract.balanceOf(address);
+	}
 
-    async transferTokens(address, amount) {
-        return await this._contract.transfer(address, this.DecimalToWei(amount));
-    }
+	async transferTokens(address, amount) {
+		return this._contract.transfer(address, amount);
+	}
 }
 
 module.exports = TokenContract;
