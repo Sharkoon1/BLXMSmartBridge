@@ -33,7 +33,7 @@ class SwapService {
 	async swap(OutputNetwork, amount, publicAddress){	
 		// Get the address of the expensive Network
 		const ExpensiveNetwork = await this.getExpensiveNetwork() ? constants.BLXM_TOKEN_ADDRESS_BSC : constants.BLXM_TOKEN_ADDRESS_ETH;
-		// Check whether the swap is targeting the expensiv network
+		// Check whether the swap is targeting the expensive network
 		const swapToExpensiveNetwork = ExpensiveNetwork === OutputNetwork ? true : false;
 		
 		if (swapToExpensiveNetwork){
