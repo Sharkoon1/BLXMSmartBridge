@@ -5,6 +5,7 @@ const Utility = require("../helpers/utility");
 const AdjustmentValueService = require("./AdjustmentValueService");
 const Contracts  = require("../contracts/Contracts");
 const DataBaseService = require("./DataBaseService");
+
 class ArbitrageService {
 
 	constructor(bridgeService, walletContainer) {
