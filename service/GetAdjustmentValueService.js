@@ -1,3 +1,4 @@
+const logger = require("./logger/logger")
 const { ethers } = require("ethers");
 
 /* transforms the formular of the "value adjustment algorithm" to an equation that can be resolved
@@ -31,13 +32,16 @@ exports.getAdjustmentValue = function (BLXM_CHEAP, USD_CHEAP, BLXM_EXPENSIVE, US
 	// condition for real and different roots
 	if (discriminant > 0) {
 		root1 = (-b + Math.sqrt(discriminant)) / (2 * a);
+
+        logger.info("The amount of BLXM to add to the expensive to archive price equilibrium is " + root1);
 		return ethers.utils.parseEther(String(root1));
 	}
 
 	// condition for real and equal roots
 	else if (discriminant == 0) {
 		root1 = -b / (2 * a);
-		
+
+        logger.info("The amount of BLXM to add to the expensive to archive price equilibrium is " + root1);
 		return ethers.utils.parseEther(String(root1));
 
 	}
@@ -45,6 +49,18 @@ exports.getAdjustmentValue = function (BLXM_CHEAP, USD_CHEAP, BLXM_EXPENSIVE, US
 	// if roots are not real
 	else {
 		// Something went wrong, return -1 as indicator!
+
+        logger.error("Something went wrong in the calculation of the adjustment value");
 		return -1;
 	}
 };
+
+
+
+
+
+
+
+
+
+    
