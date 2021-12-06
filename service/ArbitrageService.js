@@ -50,8 +50,8 @@ class ArbitrageService {
 			arbitrageBlxmBalance = await this._ethContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 			adjustmentValue = AdjustmentValueService.getAdjustmentValue(balanceBlxmETH, balanceUsdcETH, balanceBlxmBSC, balanceUsdcBSC);
 
-			logger.info("The BLXM token trades cheaper on the Binance Smart Chain network than Ethereum network" + '\n' + 
-						"Price difference: " + ethers.utils.formatEther((poolPriceEth-poolPriceBsc)) + " USD");
+			logger.info("The BLXM token trades cheaper on the Ethereum network than Binance Smart Chain network " + '\n' + 
+						"Price difference: " + ethers.utils.formatEther((poolPriceBsc-poolPriceEth)) + " USD");
 
 			result = await this.startArbitrageTransferFromBSCToETH(adjustmentValue, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdcETH);
 		    profit = this._calculateAbitrageProfit(result.swapAmount, balanceBlxmETH, balanceBlxmBSC, result.profit, "ETH");
@@ -60,8 +60,8 @@ class ArbitrageService {
 			arbitrageBlxmBalance = await this._bscContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 			adjustmentValue = AdjustmentValueService.getAdjustmentValue(balanceBlxmBSC, balanceUsdcBSC, balanceBlxmETH, balanceUsdcETH);
 
-			logger.info("The BLXM token trades cheaper on the Ethereum network than Binance Smart Chain network" + '\n' + 
-						"Price difference: " + ethers.utils.formatEther((poolPriceBsc-poolPriceEth)) + " USD");
+			logger.info("The BLXM token trades cheaper on the Binance Smart Chain network than Ethereum network" + '\n' + 
+						"Price difference: " + ethers.utils.formatEther((poolPriceEth-poolPriceBsc)) + " USD");
 
 			result = await this.startArbitrageTransferFromETHToBSC(adjustmentValue, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdcETH);
 			profit = this._calculateAbitrageProfit(result.swapAmount, balanceBlxmBSC, balanceBlxmETH, result.profit, "BSC");
@@ -74,9 +74,8 @@ class ArbitrageService {
 		
 		// is liqudity available ? 
 		if (!arbitrageBlxmBalance.isZero()) {
-			
-			logger.warn("No liqudity of BLXM in the Binance Smart Chain network available" + '\n' +
-						"Going to bridge and swap to still perform arbitrage trade ...");
+			logger.info("Liqudity of BLXM in the Binance Smart Chain network available" + '\n' +
+						"Going to perform the swap directly with available BLXM balance of " + ethers.utils.formatEther(amount) + " BLXM");
 
 			return await this._bridgeAndSwapBSC(amount, arbitrageBlxmBalance);
 		}
@@ -90,7 +89,7 @@ class ArbitrageService {
 
 			// provide liquidity from cheap network via usd
 			if (!arbitrageUsdcBalanceEth.isZero()) {
-				logger.info("Going to swap USDC from Binance Smart Chain network to BLXM in the Binance Smart Chain network to perform arbitrage trade");
+				logger.info("Going to swap USDC from Ethereum network to BLXM in Ethereum network to perform arbitrage trade");
 				// cheap network    
 				let usdcAmount = poolPriceEth.mul(amount);
 				usdcSwapAmount = Utility.BigNumberMin(usdcAmount, balanceUsdc);
@@ -98,14 +97,15 @@ class ArbitrageService {
 
 			// provide liquidity from expensive network via usd
 			else if (!arbitrageUsdcBalanceBsc.isZero()) {
-				logger.warn("No liqudity of USDC in the Binance Smart Chain network to swap to BLXM in the Binance Smart Chain network found");
-				logger.info("Going to bridge USDC in the Ethereum network to the Binance Smart Chain network to have liquidity to perform arbitrage trade");
+				logger.warn("Liqudity of USDC in the Binance Smart Chain network to swap to BLXM in the Binance Smart Chain network available");
+				
 				// expensive network     
 				let usdcAmount = poolPriceBsc.mul(amount);
 				usdcSwapAmount = Utility.BigNumberMin(usdcAmount, balanceUsdc);
 
 				// bridge usdc from bsc to eth
 				await this._bridgeService.bridgeUSDTokenBSC(usdcSwapAmount);
+				logger.info("Going to bridge USDC from the Ethereum network to the Binance Smart Chain network to have liquidity in Binance Smart Chain to perform arbitrage trade");
 			}
 			// swap from usd to blxm
 			await this._ethContracts.poolContract.swapStablesToToken(usdcSwapAmount);
@@ -121,9 +121,8 @@ class ArbitrageService {
 	async startArbitrageTransferFromETHToBSC(amount, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdc) {
 		// is liqudity avaible ? 
 		if (!arbitrageBlxmBalance.isZero()) {
-
-			logger.warn("No liqudity of BLXM in the Ethereum network available" + '\n' +
-						"Going to bridge and swap to still perform arbitrage trade ...");
+			logger.info("Liqudity of BLXM in the Ethereum for swap available" +
+						"Going to perform the swap directly with available BLXM balance of " + ethers.utils.formatEther(amount) + " BLXM");
 
 			return await this._bridgeAndSwapETH(amount, arbitrageBlxmBalance);
 		}
@@ -146,8 +145,8 @@ class ArbitrageService {
 
 			// provide liquidity from expensive network via usd
 			else if (!arbitrageUsdcBalanceEth.isZero()) {
-				logger.warn("No liqudity of USDC in the Ethereum network to swap to BLXM in the Ethereum network found");
-				logger.info("Going to bridge USDC in the Binance Smart Chain network to the Ethereum network to have liquidity to perform arbitrage trade");
+				logger.warn("Liqudity of USDC in the Binance Smart Chain network to swap to BLXM in the Binance Smart Chain network available");
+				
 				// expensive network                         
 				let usdcAmount = poolPriceEth.mul(amount);
 
@@ -170,8 +169,8 @@ class ArbitrageService {
 
 	async _bridgeAndSwapETH(amount, abitrageBalance) {
 		// swap exact amount, if abitrage pool has enough tokens, swap minimal avaible otherwise
-		logger.info("Swapping " + ethers.utils.formatEther(amount) + " USDC to BLXM to perform arbitrage trade");
 		let swapAmount = Utility.BigNumberMin(amount, abitrageBalance);
+		logger.info("Swapping " + ethers.utils.formatEther(swapAmount) + " USDC to BLXM to perform arbitrage trade");
 
 		// bridge blxm tokens
 		logger.info("Bridging " + ethers.utils.formatEther(swapAmount) + " BLXM from Ethereum network to Binance Smart Chain network");
@@ -184,8 +183,8 @@ class ArbitrageService {
 
 	async _bridgeAndSwapBSC(amount, abitrageBalance) {
 		// swap exact amount, if abitrage pool has enough tokens, swap minimal avaible otherwise
-		logger.info("Swapping " + ethers.utils.formatEther(amount) + " USDC to BLXM to perform arbitrage trade");
 		let swapAmount = Utility.BigNumberMin(amount, abitrageBalance);
+		logger.info("Swapping " + ethers.utils.formatEther(swapAmount) + " USDC to BLXM to perform arbitrage trade");
 
 		// bridge blxm tokens
 		logger.info("Bridging " + ethers.utils.formatEther(swapAmount) + " BLXM from Binance Smart Chain network to Ethereum network");
@@ -220,7 +219,7 @@ class ArbitrageService {
 
 		let absoluteAbitrageProfit = usdcProfit - inputFactor - capitalLoss;
 
-		logger.verbose("The abitrage trade made in sum " + ethers.utils.formatEther(swapAmount) + " USD absolute profit"); 
+		logger.verbose("The abitrage trade made in sum " + ethers.utils.formatEther(absoluteAbitrageProfit) + " USD absolute profit"); 
 		logger.info(" =    " + "USD profit:   " + ethers.utils.formatEther(usdcProfit) + " USD" + '\n' + 
 					" -    " + "Input factor: " + ethers.utils.formatEther(inputFactor) + " USD" + '\n' +
 					" -    " + "Capital loss: " + ethers.utils.formatEther(capitalLoss) + " USD" + '\n' );
