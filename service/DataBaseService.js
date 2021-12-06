@@ -20,50 +20,50 @@ class DataBaseService {
 		this.db = mongoose.connection;
 	}
 
-	QueryData(query) {
-		Profit.find(query)
-			.then(profits => {
-				console.log("success");
-				return profits;
-			})
-			.catch(err => {
-				console.log(err.message);
-			});
-	}
+	QueryData(query, model) {
+        model.find(query)
+            .then(profits => {
+                console.log("success");
+                return profits;
+            })
+            .catch(err => {
+                console.log(err.message);
+            });
+    }
 
-	QueryById(id) {
-		Profit.findById(id)
-			.then(profits => {
-				console.log("success");
-				return profits;
-			})
-			// eslint-disable-next-line no-unused-vars
-			.catch(err => {
-				console.log("Entry " + id + " not found.");
-			});
-	}
+    QueryById(id, model) {
+        model.findById(id)
+            .then(profits => {
+                console.log("success");
+                return profits;
+            })
+            // eslint-disable-next-line no-unused-vars
+            .catch(err => {
+                console.log("Entry " + id + " not found.");
+            });
+    }
 
-	AddData(query) {
-		Profit.create(query)
-			.then(profits => {
-				console.log("success");
-				return profits;
-			})
-			.catch(err => {
-				console.log(err.message);
-			});
-	}
+    AddData(query, model) {
+        model.create(query)
+            .then(profits => {
+                console.log("success");
+                return profits;
+            })
+            .catch(err => {
+                console.log(err.message);
+            });
+    }
 
-	UpdateById(id, query) {
-		Profit.findByIdAndUpdate(id, query, { new: true })
-			.then(profits => {
-				console.log("success");
-				return profits;
-			})
-			.catch(err => {
-				console.log(err.message);
-			});
-	}
+    UpdateById(id, query, model) {
+        model.findByIdAndUpdate(id, query, { new: true })
+            .then(profits => {
+                console.log("success");
+                return profits;
+            })
+            .catch(err => {
+                console.log(err.message);
+            });
+    }
 }
 
 
