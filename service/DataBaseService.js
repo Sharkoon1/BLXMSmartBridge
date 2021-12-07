@@ -22,61 +22,21 @@ class DataBaseService {
 	}
 
 	QueryData(query, model) {
-		model.find(query)
-			.then(profits => {
-				console.log("success");
-				return profits;
-			})
-			.catch(err => {
-				console.log(err.message);
-			});
+		return model.find(query);
 	}
 
 	QueryById(id, model) {
-		model.findById(id)
-			.then(profits => {
-				console.log("success");
-				return profits;
-			})
-			// eslint-disable-next-line no-unused-vars
-			.catch(err => {
-				console.log("Entry " + id + " not found.");
-			});
+		return model.findById(id);
 	}
 
 	AddData(query, model) {
-		model.create(query)
-			.then(profits => {
-				console.log("success");
-				return profits;
-			})
-			.catch(err => {
-				console.log(err.message);
-			});
+		model.create(query);
 	}
 
 	UpdateById(id, query, model) {
-		model.findByIdAndUpdate(id, query, { new: true })
-			.then(profits => {
-				console.log("success");
-				return profits;
-			})
-			.catch(err => {
-				console.log(err.message);
-			});
+		model.findByIdAndUpdate(id, query, { new: true });
 	}
 }
 
-/* TEST CODE */
-//////////////////////////////////////////////////////
 
-
-module.exports = DataBaseService;
-
-/*
-DataBaseService.AddData({
-	Profit: 1,
-	isBSC: true,
-	isArbitrageSwap: true
-},Profit)
-*/
+module.exports = new DataBaseService();
