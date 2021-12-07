@@ -28,7 +28,7 @@ class ArbitrageService {
 			let poolPriceBsc = await this._bscContracts.getPoolPrice();
 			let poolPriceEth = await this._ethContracts.getPoolPrice();
 	
-			while (poolPriceBsc > poolPriceEth) {
+			while (poolPriceBsc !== poolPriceEth) {
 				
 				logger.info("Abitrage opportunity found " + "\n" +
 							"Current price BLXM Ethereum network " + poolPriceEth + " USD" + "\n" +
