@@ -1,5 +1,6 @@
 const Profit = require("./../models/Profit");
 const mongoose = require("mongoose");
+require("dotenv").config();
 
 class DataBaseService {
 
@@ -20,8 +21,8 @@ class DataBaseService {
 		this.db = mongoose.connection;
 	}
 
-	QueryData(query) {
-		Profit.find(query)
+	QueryData(query, model) {
+		model.find(query)
 			.then(profits => {
 				console.log("success");
 				return profits;
@@ -31,8 +32,8 @@ class DataBaseService {
 			});
 	}
 
-	QueryById(id) {
-		Profit.findById(id)
+	QueryById(id, model) {
+		model.findById(id)
 			.then(profits => {
 				console.log("success");
 				return profits;
@@ -43,8 +44,8 @@ class DataBaseService {
 			});
 	}
 
-	AddData(query) {
-		Profit.create(query)
+	AddData(query, model) {
+		model.create(query)
 			.then(profits => {
 				console.log("success");
 				return profits;
@@ -54,8 +55,8 @@ class DataBaseService {
 			});
 	}
 
-	UpdateById(id, query) {
-		Profit.findByIdAndUpdate(id, query, { new: true })
+	UpdateById(id, query, model) {
+		model.findByIdAndUpdate(id, query, { new: true })
 			.then(profits => {
 				console.log("success");
 				return profits;
@@ -66,5 +67,16 @@ class DataBaseService {
 	}
 }
 
+/* TEST CODE */
+//////////////////////////////////////////////////////
+
 
 module.exports = DataBaseService;
+
+/*
+DataBaseService.AddData({
+	Profit: 1,
+	isBSC: true,
+	isArbitrageSwap: true
+},Profit)
+*/
