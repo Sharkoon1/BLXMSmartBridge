@@ -76,11 +76,4 @@ class SwapService {
 	}
 }
 
-/* TEST CODE */
-//////////////////////////////////////////////////////
-
-
 module.exports = SwapService;
-
-const swapInstance = new SwapService();
-swapInstance.swap("ETH", 1, "0xc591113a44fCF67aA205B074011fdeb862a9C755");
