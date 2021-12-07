@@ -8,7 +8,6 @@ class CronJobs {
 	constructor() {
 		let bridgeService = new BridgeService(WalletContainer);
 		this._arbitrageService = new ArbitrageService(bridgeService, WalletContainer);
-		this._jobIsRunning = false;
 	}
 
 	registerArbitrageJob() {
