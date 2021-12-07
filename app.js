@@ -6,14 +6,8 @@ var apiRouter = require("./routes/api");
 var apiResponse = require("./helpers/apiResponse");
 var cors = require("cors");
 require("dotenv").config();
-const WalletContainer = require("./wallet/WalletContainer");
-const ArbitrageService = require("./service/ArbitrageService");
-const BridgeService = require("./service/BridgeService");
-// DB connection
 
-var bridgeService = new BridgeService(WalletContainer);
-var arbitrageService = new ArbitrageService(bridgeService, WalletContainer);
-
+var cronJobs = require("./jobs/CronJobs");
 var app = express();
 
 app.use(express.json());
@@ -38,6 +32,9 @@ app.use((err, req, res) => {
 		return apiResponse.unauthorizedResponse(res, err.message);
 	}
 });
+
+// register arbitrage cron job 
+cronJobs.registerArbitrageJob();
 
 module.exports = app;
 
