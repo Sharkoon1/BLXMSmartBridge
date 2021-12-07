@@ -21,7 +21,7 @@ class BaseContract {
 		return ethers.utils.formatEther(bigNumber);
 	}
 
-	DecimalToWei (amount) {
+	DecimalToWei(amount) {
 		return ethers.utils.parseEther(String(amount));
 	}
 }

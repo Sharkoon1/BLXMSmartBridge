@@ -1,63 +1,79 @@
 const ArbitrageService = require("./ArbitrageService");
+const logger = require("../logger/logger")
 const BridgeService = require("./BridgeService");
+const Contracts = require("../contracts/Contracts");
 const constants = require("../constants");
-const utility = require("../helpers/utility");
+const walletContainer = require("../wallet/WalletContainer");
+const { ethers } = require("ethers");
 require("dotenv").config();
 
 
 class SwapService {
- 
+
 	constructor() {
-		this.BridgeServiceInstance = new BridgeService();
-		this.ArbitrageServiceInstance = new ArbitrageService(this.BridgeServiceInstance);
+		this._ethContracts = new Contracts("ETH", walletContainer.ArbitrageWalletETH);
+		this._bscContracts = new Contracts("BSC", walletContainer.ArbitrageWalletBSC);
+		this.BridgeServiceInstance = new BridgeService(walletContainer);
+		this.ArbitrageServiceInstance = new ArbitrageService(this.BridgeServiceInstance, walletContainer);
 	}
 
 	async getExpensiveNetwork() {
 		// return 1 if BSC is the expensive network, otherwise ETH is more expensive 
-		const PoolBalanceBSC = await this.ArbitrageServiceInstance.getPoolPriceBSC();
-		const PoolBalanceETH = await this.ArbitrageServiceInstance.getPoolPriceETH();
-		return PoolBalanceBSC > PoolBalanceETH ? 1 : 0;
+		const PoolBalanceBSC = await this._bscContracts.getPoolPrice();
+		const PoolBalanceETH = await this._ethContracts.getPoolPrice();
+		return PoolBalanceBSC.gt(PoolBalanceETH) ? 1 : 0;
 	}
 
-	async swapViaBridge(Network,amount, publicAddress){
-		if (Network === constants.BLXM_TOKEN_ADDRESS_BSC){
-			await this.BridgeServiceInstance.swapBLXMTokenEthToBsc(amount);   
-			await this.BridgeServiceInstance.wallet_BSC.transfer(publicAddress, utility.toWei(amount)); 
+	async swapViaBridge(Network, amount, publicAddress) {
+		if (Network === "BSC") {
+			await this.BridgeServiceInstance.bridgeBLXMTokenEthToBsc(amount);
+			await this._bscContracts.blxmTokenContract.transferTokens(publicAddress, amount);
 		} else {
-			await this.BridgeServiceInstance.swapBLXMTokenBscToEth(amount);   
-			await this.BridgeServiceInstance.wallet_ETH.transfer(publicAddress, utility.toWei(amount)); 
+			await this.BridgeServiceInstance.bridgeBLXMTokenBscToEth(amount);
+			await this._ethContracts.blxmTokenContract.transferTokens(publicAddress, amount);
 		}
 	}
- 
 
-	async swap(OutputNetwork, amount, publicAddress){	
+	/**
+	 * 
+	 * @param {string} outputNetwork - Either "BSC" or "ETH" 
+	 * @param {number} amount - Amount of tokens to swap
+	 * @param {string} publicAddress - Hexadecimal address of recipient on other network
+	 */
+	async swap(outputNetwork, amount, publicAddress) {
+		// Convert passed number to BigNumber
+		amount = ethers.utils.parseEther(String(amount));
 		// Get the address of the expensive Network
-		const ExpensiveNetwork = await this.getExpensiveNetwork() ? constants.BLXM_TOKEN_ADDRESS_BSC : constants.BLXM_TOKEN_ADDRESS_ETH;
-		// Check whether the swap is targeting the expensive network
-		const swapToExpensiveNetwork = ExpensiveNetwork === OutputNetwork ? true : false;
-		
-		if (swapToExpensiveNetwork){
+		const ExpensiveNetwork = await this.getExpensiveNetwork() ? "BSC" : "ETH";
+		// Check whether the swap is targeting the expensive network TODO wrong comparison
+		const swapToExpensiveNetwork = ExpensiveNetwork === outputNetwork ? true : false;
+
+		if (swapToExpensiveNetwork) {
 			// A swap is happening towards the expensive network, thus the bridge will be utilized
-			await this.swapViaBridge(OutputNetwork,amount, publicAddress);
+			await this.swapViaBridge(outputNetwork, amount, publicAddress);
 		} else {
-			let pool_price_bsc = await this.getPoolPriceBSC();
-			let pool_price_eth = await this.getPoolPriceETH();
-			let balanceUsdcBSC = await this.getPoolBalanceUSDBSC();
-			let balanceUsdcETH = await this.getPoolBalanceUSDETH();
+			let poolPriceBsc = await this._bscContracts.getPoolPrice();
+			let poolPriceEth = await this._ethContracts.getPoolPrice();
+
+			let balanceUsdcBSC = await this._bscContracts.getPoolNumberOfUsdToken();
+			let balanceUsdcETH = await this._ethContracts.getPoolNumberOfUsdToken();
 
 			// A swap is happening towards the cheap network 
-			if (OutputNetwork === constants.BLXM_TOKEN_ADDRESS_BSC){
-				const arbitrage_balance_blxm_bsc = await this.getArbitrageBalanceBlxmBSC();
-				await this.ArbitrageServiceInstance.startArbitrageTransferFromETHToBSC(amount, arbitrage_balance_blxm_bsc, pool_price_bsc, pool_price_eth, balanceUsdcBSC);
-				await this.BridgeServiceInstance.wallet_BSC.transfer(publicAddress, utility.toWei(amount)); 
-			} else
-			{
-				const arbitrage_balance_blxm_eth = await this.getArbitrageBalanceBlxmETH();
-				await this.ArbitrageServiceInstance.startArbitrageTransferFromBSCToETH(amount, arbitrage_balance_blxm_eth, pool_price_bsc, pool_price_eth, balanceUsdcETH);
-				await this.BridgeServiceInstance.wallet_ETH.transfer(publicAddress, utility.toWei(amount)); 
+			if (outputNetwork === "BSC") {
+				const arbitrageBalanceBlxmBsc = await this._bscContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
+				await this.ArbitrageServiceInstance.startArbitrageTransferFromETHToBSC(amount, arbitrageBalanceBlxmBsc, poolPriceBsc, poolPriceEth, balanceUsdcBSC);
+				const exchangeRate = poolPriceEth.div(poolPriceBsc);
+				let profit = exchangeRate.mul(amount).sub(amount);
+				await this._bscContracts.blxmTokenContract.transferTokens(publicAddress, amount.add(profit).div(2));
+			} else {
+				const arbitrageBalanceBlxmEth = await this._ethContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
+				await this.ArbitrageServiceInstance.startArbitrageTransferFromBSCToETH(amount, arbitrageBalanceBlxmEth, poolPriceBsc, poolPriceEth, balanceUsdcETH);
+				const exchangeRate = poolPriceBsc.div(poolPriceEth);
+				let profit = exchangeRate.mul(amount).sub(amount);
+				await this._ethContracts.blxmTokenContract.transferTokens(publicAddress, amount.add(profit).div(2));
 			}
 		}
 	}
 }
- 
+
 module.exports = SwapService;

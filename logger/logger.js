@@ -4,33 +4,7 @@ module.exports = createLogger({
     transports: [
 
 
-        new transports.Console({
-            level: 'error',
-        }),
-
-        new transports.Console({
-            level: 'warn',
-        }),
-
-        new transports.Console({
-            level: 'info',
-        }),
-
-        new transports.Console({
-            level: 'http',
-        }),
-
-        new transports.Console({
-            level: 'verbose',
-        }),
-
-        new transports.Console({
-            level: 'debug',
-        }),
-
-        new transports.Console({
-            level: 'silly',
-        })
+        new transports.Console()
 
     ],
 
@@ -42,5 +16,3 @@ module.exports = createLogger({
     ),
 
 });
-
-
