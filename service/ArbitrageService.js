@@ -1,6 +1,6 @@
-const logger = require("./logger/logger")
+const logger = require("../logger/logger");
 const constants = require("../constants");
-const { ethers, logger } = require("ethers");
+const { ethers } = require("ethers");
 const Utility = require("../helpers/utility");
 const AdjustmentValueService = require("./AdjustmentValueService");
 const Contracts  = require("../contracts/Contracts");
@@ -11,28 +11,34 @@ class ArbitrageService {
 	constructor(bridgeService, walletContainer) {
 		this._swapTransferFunctionName = "Transfer";
 		this._bridgeService = bridgeService;
-	//	this._databaseService = new DataBaseService();
+		//	this._databaseService = new DataBaseService();
 		
 
 		this._ethContracts = new Contracts("ETH", walletContainer.ArbitrageWalletETH);
 		this._bscContracts = new Contracts("BSC", walletContainer.ArbitrageWalletBSC);
+
+		this._isRunning = true;
 	}
 
 	async startArbitrage() {
-		logger.info("Start AbitrageService ...")
-		let poolPriceBsc = await this._bscContracts.getPoolPrice();
-		let poolPriceEth = await this._ethContracts.getPoolPrice();
-
-		while (!poolPriceBsc.eq(poolPriceEth)) {
-			
-			logger.info("Abitrage opportunity found " + '\n' +
-						"Current price BLXM Ethereum network " + ethers.utils.formatEther(poolPriceEth) + " USD" + '\n' +
-						"Current price BLXM Binance Smart Chain network" + ethers.utils.formatEther(poolPriceBsc) + " USD");
-
-			await this._startArbitrageCycle(poolPriceBsc, poolPriceEth);
-			poolPriceBsc = await this._bscContracts.getPoolPrice();
-			poolPriceEth = await this._ethContracts.getPoolPrice();
+		if(!this._isRunning) {
+			logger.info("Start AbitrageService ...");
+			let poolPriceBsc = await this._bscContracts.getPoolPrice();
+			let poolPriceEth = await this._ethContracts.getPoolPrice();
+	
+			while (!poolPriceBsc.eq(poolPriceEth)) {
+				
+				logger.info("Abitrage opportunity found " + "\n" +
+							"Current price BLXM Ethereum network " + ethers.utils.formatEther(poolPriceEth) + " USD" + "\n" +
+							"Current price BLXM Binance Smart Chain network" + ethers.utils.formatEther(poolPriceBsc) + " USD");
+	
+				await this._startArbitrageCycle(poolPriceBsc, poolPriceEth);
+				poolPriceBsc = await this._bscContracts.getPoolPrice();
+				poolPriceEth = await this._ethContracts.getPoolPrice();
+			}
 		}
+
+		this._isRunning = false;
 	}
 
 	async _startArbitrageCycle(poolPriceBsc, poolPriceEth) {
@@ -51,7 +57,7 @@ class ArbitrageService {
 			arbitrageBlxmBalance = await this._ethContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 			adjustmentValue = AdjustmentValueService.getAdjustmentValue(balanceBlxmETH, balanceUsdcETH, balanceBlxmBSC, balanceUsdcBSC);
 
-			logger.info("The BLXM token trades cheaper on the Ethereum network than Binance Smart Chain network " + '\n' + 
+			logger.info("The BLXM token trades cheaper on the Ethereum network than Binance Smart Chain network " + "\n" + 
 						"Price difference: " + ethers.utils.formatEther((poolPriceBsc-poolPriceEth)) + " USD");
 
 			result = await this.startArbitrageTransferFromBSCToETH(adjustmentValue, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdcETH);
@@ -61,7 +67,7 @@ class ArbitrageService {
 			arbitrageBlxmBalance = await this._bscContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 			adjustmentValue = AdjustmentValueService.getAdjustmentValue(balanceBlxmBSC, balanceUsdcBSC, balanceBlxmETH, balanceUsdcETH);
 
-			logger.info("The BLXM token trades cheaper on the Binance Smart Chain network than Ethereum network" + '\n' + 
+			logger.info("The BLXM token trades cheaper on the Binance Smart Chain network than Ethereum network" + "\n" + 
 						"Price difference: " + ethers.utils.formatEther((poolPriceEth-poolPriceBsc)) + " USD");
 
 			result = await this.startArbitrageTransferFromETHToBSC(adjustmentValue, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdcETH);
@@ -75,7 +81,7 @@ class ArbitrageService {
 		
 		// is liqudity available ? 
 		if (!arbitrageBlxmBalance.isZero()) {
-			logger.info("Liqudity of BLXM in the Binance Smart Chain network available" + '\n' +
+			logger.info("Liqudity of BLXM in the Binance Smart Chain network available" + "\n" +
 						"Going to perform the swap directly with available BLXM balance of " + ethers.utils.formatEther(amount) + " BLXM");
 
 			return await this._bridgeAndSwapBSC(amount, arbitrageBlxmBalance);
@@ -221,9 +227,9 @@ class ArbitrageService {
 		let absoluteAbitrageProfit = usdcProfit - inputFactor - capitalLoss;
 
 		logger.verbose("The abitrage trade made in sum " + ethers.utils.formatEther(absoluteAbitrageProfit) + " USD absolute profit"); 
-		logger.info(" =    " + "USD profit:   " + ethers.utils.formatEther(usdcProfit) + " USD" + '\n' + 
-					" -    " + "Input factor: " + ethers.utils.formatEther(inputFactor) + " USD" + '\n' +
-					" -    " + "Capital loss: " + ethers.utils.formatEther(capitalLoss) + " USD" + '\n' );
+		logger.info(" =    " + "USD profit:   " + ethers.utils.formatEther(usdcProfit) + " USD" + "\n" + 
+					" -    " + "Input factor: " + ethers.utils.formatEther(inputFactor) + " USD" + "\n" +
+					" -    " + "Capital loss: " + ethers.utils.formatEther(capitalLoss) + " USD" + "\n" );
 
 		return absoluteAbitrageProfit;
 	}

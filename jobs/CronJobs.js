@@ -1,28 +1,24 @@
-const CronJob = require("cron").CronJob;
+var cron = require("node-cron");
+const logger = require("../logger/logger");
 const WalletContainer = require("../wallet/WalletContainer");
 const ArbitrageService = require("../service/ArbitrageService");
 const BridgeService = require("../service/BridgeService");
 
 class CronJobs {
-	constructor(jobConfig) {
+	constructor() {
 		let bridgeService = new BridgeService(WalletContainer);
 		this._arbitrageService = new ArbitrageService(bridgeService, WalletContainer);
-		this._jobConfig = jobConfig;
 		this._jobIsRunning = false;
 	}
 
 	registerArbitrageJob() {
-		let job = new CronJob("*/10 * * * * *", function() {
-			if(!this._jobIsRunning) {
-				this._jobIsRunning = true;
-				//this._arbitrageService.startArbitrage();   
-			}
-		}, function() { 
-			this._jobIsRunning = false;
-		}, true, "Europe/Berlin");
-
-		job.start();
+		logger.info("Register Abitrage Job ...");
+		let task = cron.schedule("*/10 * * * * *", () => {
+			logger.info("Starting Abitrage Job ...");
+			this._arbitrageService.startArbitrage();
+		});
+		task.start();
 	}
 }
 
-module.exports = CronJobs;
+module.exports = new CronJobs();

@@ -7,7 +7,7 @@ var apiResponse = require("./helpers/apiResponse");
 var cors = require("cors");
 require("dotenv").config();
 
-const CronJobs = require("./jobs/CronJobs");
+var cronJobs = require("./jobs/CronJobs");
 var app = express();
 
 app.use(express.json());
@@ -33,10 +33,8 @@ app.use((err, req, res) => {
 	}
 });
 
-// start arbitrage cron job 
-var cronJobs = new CronJobs();
+// register arbitrage cron job 
 cronJobs.registerArbitrageJob();
-
 
 module.exports = app;
 
