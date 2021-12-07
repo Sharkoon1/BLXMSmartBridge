@@ -165,7 +165,7 @@ class ArbitrageService {
 
 			// swap usd from bsc to blxm
 			await this._bscContracts.poolContract.swapStablesToToken(usdSwapAmount);
-			logger.info("Swap " + ethers.utils.formatEther(usdcSwapAmount) + " USDC to BLXM in the Binance Smart Chain Network to perform arbitrage trade");
+			logger.info("Swap " + ethers.utils.formatEther(usdSwapAmount) + " USDC to BLXM in the Binance Smart Chain Network to perform arbitrage trade");
 
 			arbitrageBlxmBalance = await this._bscContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 
