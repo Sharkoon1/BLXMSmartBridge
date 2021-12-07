@@ -26,11 +26,11 @@ class ArbitrageService {
 			let poolPriceBsc = await this._bscContracts.getPoolPrice();
 			let poolPriceEth = await this._ethContracts.getPoolPrice();
 	
-			while (!poolPriceBsc.eq(poolPriceEth)) {
+			while (poolPriceBsc > poolPriceEth) {
 				
 				logger.info("Abitrage opportunity found " + "\n" +
-							"Current price BLXM Ethereum network " + ethers.utils.formatEther(poolPriceEth) + " USD" + "\n" +
-							"Current price BLXM Binance Smart Chain network" + ethers.utils.formatEther(poolPriceBsc) + " USD");
+							"Current price BLXM Ethereum network " + poolPriceEth + " USD" + "\n" +
+							"Current price BLXM Binance Smart Chain network" + poolPriceBsc + " USD");
 	
 				await this._startArbitrageCycle(poolPriceBsc, poolPriceEth);
 				poolPriceBsc = await this._bscContracts.getPoolPrice();
@@ -53,12 +53,12 @@ class ArbitrageService {
 		let result;
 		let profit;
 
-		if (poolPriceBsc.gt(poolPriceEth)) {
+		if (poolPriceBsc > poolPriceEth) {
 			arbitrageBlxmBalance = await this._ethContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 			adjustmentValue = AdjustmentValueService.getAdjustmentValue(balanceBlxmETH, balanceUsdcETH, balanceBlxmBSC, balanceUsdcBSC);
 
 			logger.info("The BLXM token trades cheaper on the Ethereum network than Binance Smart Chain network " +
-				"Price difference: " + ethers.utils.formatEther((poolPriceBsc - poolPriceEth)) + " USD");
+				"Price difference: " + poolPriceBsc - poolPriceEth + " USD");
 
 			result = await this.startArbitrageTransferFromBSCToETH(adjustmentValue, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdcETH);
 			profit = this._calculateAbitrageProfit(result.swapAmount, balanceBlxmETH, balanceBlxmBSC, result.profit, "ETH");
@@ -68,7 +68,7 @@ class ArbitrageService {
 			adjustmentValue = AdjustmentValueService.getAdjustmentValue(balanceBlxmBSC, balanceUsdcBSC, balanceBlxmETH, balanceUsdcETH);
 
 			logger.info("The BLXM token trades cheaper on the Binance Smart Chain network than Ethereum network" +
-				"Price difference: " + ethers.utils.formatEther((poolPriceEth - poolPriceBsc)) + " USD");
+				"Price difference: " + poolPriceEth - poolPriceBsc + " USD");
 
 			result = await this.startArbitrageTransferFromETHToBSC(adjustmentValue, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdcETH);
 			profit = this._calculateAbitrageProfit(result.swapAmount, balanceBlxmBSC, balanceBlxmETH, result.profit, "BSC");
@@ -212,8 +212,8 @@ class ArbitrageService {
 		//Calculate how much the abitrage costs us 
 		let inputFactor = swapAmountBlxm * startPriceCheapBLXM; //Cheap BLXM
 
-		let poolPriceBsc = ethers.utils.formatEther(await this._bscContracts.getPoolPrice());
-		let poolPriceEth = ethers.utils.formatEther(await this._ethContracts.getPoolPrice());
+		let poolPriceBsc = await this._bscContracts.getPoolPrice();
+		let poolPriceEth = await this._ethContracts.getPoolPrice();
 		let arbitrageBlxmBalanceEth = ethers.utils.formatEther(await this._ethContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS));
 		let arbitrageBlxmBalanceBsc = ethers.utils.formatEther(await this._bscContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS));
 

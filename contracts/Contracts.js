@@ -37,7 +37,7 @@ class Contracts  {
 		numberOfUsdToken = ethers.utils.formatEther(numberOfUsdToken);
 		numberOfBlxmToken = ethers.utils.formatEther(numberOfBlxmToken);
 
-		return ethers.utils.parseEther(String(numberOfUsdToken / numberOfBlxmToken));
+		return numberOfUsdToken / numberOfBlxmToken;
 	}
 }
 
