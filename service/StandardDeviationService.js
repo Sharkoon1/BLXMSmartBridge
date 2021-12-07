@@ -1,13 +1,13 @@
 const mongoose = require("mongoose");
 const DataBaseService = require("./DataBaseService");
 
-function averageStandardDeviation(){
+exports.averageStandardDeviation = function(){
     var averageStandardDeviation = ((standardDeviationETH() +  standardDeviationBSC()) / 2);
     return averageStandardDeviation;
 };
 
 
-function standardDeviationETH() {
+exports.standardDeviationETH = function () {
 
     var priceHistoryETH = [];
     //get data from db
@@ -20,7 +20,7 @@ function standardDeviationETH() {
 };
 
 
-function standardDeviationBSC() {
+exports.standardDeviationBSC = function() {
 
     var priceHistoryBSC = [];
     //get data from db
