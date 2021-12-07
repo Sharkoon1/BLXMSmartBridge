@@ -17,11 +17,13 @@ class ArbitrageService {
 		this._ethContracts = new Contracts("ETH", walletContainer.ArbitrageWalletETH);
 		this._bscContracts = new Contracts("BSC", walletContainer.ArbitrageWalletBSC);
 
-		this._isRunning = true;
+		this._isRunning = false;
 	}
 
 	async startArbitrage() {
 		if(!this._isRunning) {
+			this._isRunning = true;
+			
 			logger.info("Start AbitrageService ...");
 			let poolPriceBsc = await this._bscContracts.getPoolPrice();
 			let poolPriceEth = await this._ethContracts.getPoolPrice();
