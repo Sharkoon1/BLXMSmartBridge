@@ -23,7 +23,7 @@ class ArbitrageService {
 	async startArbitrage() {
 		if(!this._isRunning) {
 			this._isRunning = true;
-			
+
 			logger.info("Start AbitrageService ...");
 			let poolPriceBsc = await this._bscContracts.getPoolPrice();
 			let poolPriceEth = await this._ethContracts.getPoolPrice();
@@ -38,9 +38,9 @@ class ArbitrageService {
 				poolPriceBsc = await this._bscContracts.getPoolPrice();
 				poolPriceEth = await this._ethContracts.getPoolPrice();
 			}
-		}
 
-		this._isRunning = false;
+			this._isRunning = false;
+		}
 	}
 
 	async _startArbitrageCycle(poolPriceBsc, poolPriceEth) {
