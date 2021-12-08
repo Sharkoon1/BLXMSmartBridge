@@ -21,7 +21,7 @@ class SwapService {
 		// return 1 if BSC is the expensive network, otherwise ETH is more expensive 
 		const PoolBalanceBSC = await this._bscContracts.getPoolPrice();
 		const PoolBalanceETH = await this._ethContracts.getPoolPrice();
-		return PoolBalanceBSC.gt(PoolBalanceETH) ? 1 : 0;
+		return PoolBalanceBSC > PoolBalanceETH ? 1 : 0;
 	}
 
 	async swapViaBridge(Network, amount, publicAddress) {
@@ -62,14 +62,14 @@ class SwapService {
 			if (outputNetwork === "BSC") {
 				const arbitrageBalanceBlxmBsc = await this._bscContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 				await this.ArbitrageServiceInstance.startArbitrageTransferFromETHToBSC(amount, arbitrageBalanceBlxmBsc, poolPriceBsc, poolPriceEth, balanceUsdcBSC);
-				const exchangeRate = poolPriceEth.div(poolPriceBsc);
-				let profit = exchangeRate.mul(amount).sub(amount);
+				const exchangeRate = poolPriceEth/poolPriceBsc;
+				let profit = amount.mul(ethers.utils.parseEther(exchangeRate.toString())).div(ethers.utils.parseEther((10**18).toString())).sub(amount);
 				await this._bscContracts.blxmTokenContract.transferTokens(publicAddress, amount.add(profit).div(2));
 			} else {
 				const arbitrageBalanceBlxmEth = await this._ethContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 				await this.ArbitrageServiceInstance.startArbitrageTransferFromBSCToETH(amount, arbitrageBalanceBlxmEth, poolPriceBsc, poolPriceEth, balanceUsdcETH);
-				const exchangeRate = poolPriceBsc.div(poolPriceEth);
-				let profit = exchangeRate.mul(amount).sub(amount);
+				const exchangeRate = poolPriceBsc/poolPriceEth;
+				let profit = amount.mul(ethers.utils.parseEther(exchangeRate.toString())).div(ethers.utils.parseEther((10**18).toString())).sub(amount);
 				await this._ethContracts.blxmTokenContract.transferTokens(publicAddress, amount.add(profit).div(2));
 			}
 		}
