@@ -1,13 +1,8 @@
 const mongoose = require("mongoose");
 const DataBaseService = require("./DataBaseService");
 const PoolPrice = require("../models/PoolPrice");
-var ObjectID = require('mongodb').ObjectID;
 
 class StandardDeviationService {
-
-	constructor() {
-		this.db = new DataBaseService();
-	}
 
 	averageStandardDeviation() {
 		var averageStandardDeviation = ((standardDeviationETH() + standardDeviationBSC()) / 2);
@@ -19,39 +14,34 @@ class StandardDeviationService {
 		var timestamp = new Date(Date.now() - seconds * 60 * 1000);
 		var hexSeconds = Math.floor(timestamp / 1000).toString(16);
 		// Create an ObjectId with that hex timestamp
-		return ObjectID(hexSeconds + "0000000000000000");
+		return mongoose.Types.ObjectId(hexSeconds + "0000000000000000");
 	}
 
 
 
-	standardDeviationETH(from, to) {
+	async standardDeviation(from, to, network) {
 
-		var priceHistoryETH = [];
+		var priceHistory = [];
 		//get data from db
 		let EarlierConstructedObjectId = this.getSeconds(from);
 		console.log(EarlierConstructedObjectId);
 		let LaterConstructedObjectId = this.getSeconds(to);
+		console.log(LaterConstructedObjectId);
 		let query = {
 			"_id": { $gt: EarlierConstructedObjectId, $lt: LaterConstructedObjectId },
-			"Network": "ETH"
+			"Network": network
 		}
-		var priceHistoryETH = this.db.QueryData(query, PoolPrice);
-		console.log(priceHistoryETH);
-		//var standardDeviationETH = CalculateStandardDeviation(priceHistoryETH);
-		//return standardDeviationETH;
-	};
+		try {
+			let priceQuery = await DataBaseService.QueryData(query, PoolPrice);
+			priceQuery.forEach(element => {
+				priceHistory.push(element.PoolPrice)
+			})
 
-
-	standardDeviationBSC() {
-
-		var priceHistoryBSC = [];
-		//get data from db
-		var priceHistoryBSC = DataBaseService.QueryData(
-			"db.posts.find({ created_on: { $gte: new Date(2012, 7, 14), $lt: new Date(2012, 7, 15)}})", PoolPrice
-		);
-
-		var standardDeviationBSC = CalculateStandardDeviation(priceHistoryBSC);
-		return standardDeviationBSC;
+			return this.CalculateStandardDeviation(priceHistory);
+		} catch (err) {
+			console.log(err);
+			throw err;
+		}
 	};
 
 
@@ -78,7 +68,7 @@ module.exports = StandardDeviationService;
 
 /* TEST CODE */
 //////////////////////////////////////////////////////
-
+/*
 let sd = new StandardDeviationService();
 
 function sleep(ms) {
@@ -92,13 +82,14 @@ let End = 10;
 let pauseSeconds = 1000;
 
 setInterval(() => {
-	sd.db.AddData({
+	DataBaseService.AddData({
 		PoolPrice: 1,
 		Network: "ETH",
 	}, PoolPrice);
 	intervals++;
-	if (intervals===End){
+	if (intervals === End) {
 		clearInterval(this);
-		sd.standardDeviationETH(10, 0);
+		console.log(sd.standardDeviationETH(10, 0));
 	}
 }, pauseSeconds);
+*/
