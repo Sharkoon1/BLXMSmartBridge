@@ -96,10 +96,9 @@ class ArbitrageService {
 	}
 
 	async startArbitrageTransferFromEthToBsc(amount, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdc) {
-
 		// is liqudity available ? 
 		if (!arbitrageBlxmBalance.isZero()) {
-			logger.info("Liqudity of BLXM in BSC available.");
+			logger.info("Liqudity of BLXM in ETH available.");
 
 			return await this._bridgeAndSwapToBsc(amount, arbitrageBlxmBalance);
 		}
@@ -143,7 +142,7 @@ class ArbitrageService {
 	async startArbitrageTransferFromBscToEth(amount, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdc) {
 		// is liqudity avaible ? 
 		if (!arbitrageBlxmBalance.isZero()) {
-			logger.info("Liqudity of BLXM in ETH for swap available");
+			logger.info("Liqudity of BLXM in BSC for swap available");
 
 			return await this._bridgeAndSwapToEth(amount, arbitrageBlxmBalance);
 		}
@@ -151,12 +150,15 @@ class ArbitrageService {
 		// provide liqudity in bsc
 		// swap and bridge usd
 		else {
+			logger.warning("Not enough blxm liqudity in bsc, need to swap usdc");
+
 			let arbitrageUsdcBalanceBsc = await this._bscContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 			let arbitrageUsdcBalanceEth = await this._ethContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 			let usdSwapAmount = 0;
 
 			// provide liquidity from cheap network via usd
 			if (!arbitrageUsdcBalanceBsc.isZero()) {
+
 				// cheap network    
 				let usdcAmount = Utility.bigNumberMul(poolPriceBsc, amount);
 
