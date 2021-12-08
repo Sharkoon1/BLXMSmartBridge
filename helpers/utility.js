@@ -5,7 +5,7 @@ exports.toWei = function (amount) {
 };
 
 
-exports.BigNumberMin = function (bigNumberOne, bigNumberTwo) {
+exports.bigNumberMin = function (bigNumberOne, bigNumberTwo) {
 	let min;
 
 	if(bigNumberOne.lt(bigNumberTwo))
@@ -20,4 +20,10 @@ exports.BigNumberMin = function (bigNumberOne, bigNumberTwo) {
 	return min;
 };
 
+
+exports.bigNumberMul = function (bigNumberOne, bigNumberTwo) {
+	let weiUnit = ethers.BigNumber.from((10**18).toString());
+
+	return (bigNumberOne.mul(bigNumberTwo)).div(weiUnit);
+};
 

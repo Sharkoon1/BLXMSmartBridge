@@ -13,7 +13,6 @@ class CronJobs {
 	registerArbitrageJob() {
 		logger.info("Register Abitrage Job ...");
 		let task = cron.schedule("*/10 * * * * *", () => {
-			logger.info("Starting Abitrage Job ...");
 			this._arbitrageService.startArbitrage();
 		});
 		task.start();
