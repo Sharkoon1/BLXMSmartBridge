@@ -34,10 +34,9 @@ class Contracts  {
 		let numberOfBlxmToken = await this.getPoolNumberOfBlxmToken();
 		let numberOfUsdToken = await this.getPoolNumberOfUsdToken();
 
-		numberOfUsdToken = ethers.utils.formatEther(numberOfUsdToken);
-		numberOfBlxmToken = ethers.utils.formatEther(numberOfBlxmToken);
+		var result = (numberOfUsdToken.mul(ethers.BigNumber.from((10**18).toString()))).div(numberOfBlxmToken);
 
-		return numberOfUsdToken / numberOfBlxmToken;
+		return result;
 	}
 }
 
