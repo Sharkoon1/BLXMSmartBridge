@@ -4,7 +4,7 @@ const { ethers } = require("ethers");
 const Utility = require("../helpers/utility");
 const AdjustmentValueService = require("./AdjustmentValueService");
 const Contracts = require("../contracts/Contracts");
-//const DataBaseService = require("./DataBaseService");
+const DataBaseService = require("./DataBaseService");
 
 class ArbitrageService {
 
@@ -71,7 +71,7 @@ class ArbitrageService {
 			// TODO: use response from startArbitrageTransferFromEthToBsc (result), workaround because value is null
 			let postUsdBalanceBsc = await this._ethContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 
-			let profit = ethers.utils.formatEther(postUsdBalanceBsc) - ethers.utils.formatEther(preUsdBalanceBsc);
+		    let profit = ethers.utils.formatEther(postUsdBalanceBsc) - ethers.utils.formatEther(preUsdBalanceBsc);
 			
 			absoluteProfit = this._calculateAbitrageProfit(result.swapAmount, balanceBlxmETH, balanceBlxmBSC, profit, "ETH");
 		}
@@ -92,7 +92,7 @@ class ArbitrageService {
 			absoluteProfit = this._calculateAbitrageProfit(result.swapAmount, balanceBlxmBSC, balanceBlxmETH, profit, "BSC");
 		}
 
-		//this._databaseService.AddData({Profit: profit});
+		this._databaseService.AddData({Profit: absoluteProfit});
 	}
 
 	async startArbitrageTransferFromEthToBsc(amount, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdc) {
