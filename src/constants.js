@@ -1,5 +1,5 @@
 module.exports = Object.freeze({
-	PROVIDER_BSC: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+	PROVIDER_BSC: "https://data-seed-prebsc-2-s3.binance.org:8545/" ,
 	PROVIDER_ETH: "https://rinkeby.infura.io/v3/cc9d34df18bf4e29aa284200acaf8911",
 	POOL_ADDRESS_BSC: "0xDc36D3700e90C512a3909B5a857aC488505E2f1d",
 	POOL_ADDRESS_ETH: "0xD9F9988880BA7d8ADFB746daaE70AaAd340F8d67",

@@ -100,6 +100,7 @@ class ArbitrageService {
 		// is liqudity available ? 
 		if (!arbitrageBlxmBalance.isZero()) {
 			logger.info("Liqudity of BLXM in ETH available.");
+			logger.info("Liqudity of BLXM  in ETH: " + ethers.utils.formatEther(arbitrageBlxmBalance));
 
 			return await this._bridgeAndSwapToBsc(amount, arbitrageBlxmBalance);
 		}
@@ -107,6 +108,8 @@ class ArbitrageService {
 		// provide liqudity in bsc
 		// swap and bridge usd
 		else {
+			logger.warn("Not enough blxm liqudity in eth, need to swap usdc");
+
 			let arbitrageUsdcBalanceBsc = await this._bscContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 			let arbitrageUsdcBalanceEth = await this._ethContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 			let usdcSwapAmount = 0;
@@ -123,7 +126,7 @@ class ArbitrageService {
 				usdcSwapAmount = Utility.bigNumberMin(amountUsd, balanceUsdc);
 
 				// bridge usdc from bsc to eth
-				await this._bridgeService.bridgeUSDTokenBSC(usdcSwapAmount);
+				await this._bridgeService.bridgeBLXMTokenBscToEth(usdcSwapAmount);
 			}
 
 			// swap from usd to blxm
@@ -142,6 +145,7 @@ class ArbitrageService {
 		// is liqudity avaible ? 
 		if (!arbitrageBlxmBalance.isZero()) {
 			logger.info("Liqudity of BLXM in BSC for swap available");
+			logger.info("Liqudity of BLXM  in BSC: " + ethers.utils.formatEther(arbitrageBlxmBalance));
 
 			return await this._bridgeAndSwapToEth(amount, arbitrageBlxmBalance);
 		}
@@ -149,7 +153,7 @@ class ArbitrageService {
 		// provide liqudity in bsc
 		// swap and bridge usd
 		else {
-			logger.warning("Not enough blxm liqudity in bsc, need to swap usdc");
+			logger.warn("Not enough blxm liqudity in bsc, need to swap usdc");
 
 			let arbitrageUsdcBalanceBsc = await this._bscContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 			let arbitrageUsdcBalanceEth = await this._ethContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
@@ -168,7 +172,7 @@ class ArbitrageService {
 				usdSwapAmount = Utility.bigNumberMin(amountUsd, balanceUsdc);
 
 				// bridge usdc from eth to bsc
-				await this._bridgeService.bridgeUSDTokenETH(usdSwapAmount);
+				await this._bridgeService.bridgeUSDTokenEthToBsc(usdSwapAmount);
 			}
 
 			// swap usd from bsc to blxm
