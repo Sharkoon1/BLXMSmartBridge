@@ -226,14 +226,14 @@ class ArbitrageService {
 
 		let poolPriceBsc = await this._bscContracts.getPoolPrice();
 		let poolPriceEth = await this._ethContracts.getPoolPrice();
-		let arbitrageBlxmBalanceEth = ethers.utils.formatEther(await this._ethContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS));
-		let arbitrageBlxmBalanceBsc = ethers.utils.formatEther(await this._bscContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS));
+		let arbitrageBlxmBalanceEth = await this._ethContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
+		let arbitrageBlxmBalanceBsc = await this._bscContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 
 		//Calculate the loss that happens because of changed price in our abitrage wallet 
 		if (network === "BSC") {
-			capitalLoss = (startPriceExpensiveBLXM - poolPriceBsc) * arbitrageBlxmBalanceBsc;
+			capitalLoss = (startPriceExpensiveBLXM - ethers.utils.formatEther(poolPriceBsc)) * ethers.utils.formatEther(arbitrageBlxmBalanceBsc);
 		} else {
-			capitalLoss = (startPriceExpensiveBLXM - poolPriceEth) * arbitrageBlxmBalanceEth;
+			capitalLoss = (startPriceExpensiveBLXM - ethers.utils.formatEther(poolPriceEth)) * ethers.utils.formatEther(arbitrageBlxmBalanceEth);
 		}
 
 		let absoluteAbitrageProfit = profit - inputFactor - capitalLoss;
