@@ -1,11 +1,10 @@
 const ArbitrageService = require("./ArbitrageService");
-const logger = require("../logger/logger")
+const logger = require("../logger/logger");
 const BridgeService = require("./BridgeService");
 const Contracts = require("../contracts/Contracts");
 const constants = require("../constants");
 const walletContainer = require("../wallet/WalletContainer");
 const { ethers } = require("ethers");
-require("dotenv").config();
 
 
 class SwapService {

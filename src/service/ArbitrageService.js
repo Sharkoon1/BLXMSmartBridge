@@ -4,14 +4,14 @@ const { ethers } = require("ethers");
 const Utility = require("../helpers/utility");
 const AdjustmentValueService = require("./AdjustmentValueService");
 const Contracts = require("../contracts/Contracts");
-const DataBaseService = require("./DataBaseService");
+//const DataBaseService = require("./DataBaseService");
 
 class ArbitrageService {
 
 	constructor(bridgeService, walletContainer) {
 		this._swapTransferFunctionName = "Transfer";
 		this._bridgeService = bridgeService;
-		this._databaseService = DataBaseService;
+		//this._databaseService = DataBaseService;
 		
 
 		this._ethContracts = new Contracts("ETH", walletContainer.ArbitrageWalletETH);
@@ -44,7 +44,6 @@ class ArbitrageService {
 	}
 
 	async _startArbitrageCycle(poolPriceBsc, poolPriceEth) {
-
 		let balanceBlxmBSC = await this._bscContracts.getPoolNumberOfBlxmToken();
 		let balanceUsdcBSC = await this._bscContracts.getPoolNumberOfUsdToken();
 		let balanceBlxmETH = await this._ethContracts.getPoolNumberOfBlxmToken();
@@ -55,6 +54,7 @@ class ArbitrageService {
 		let preUsdBalanceEth = await this._bscContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 
 		let adjustmentValue;
+		let adjustmentValueUsd;
 		let arbitrageBlxmBalance;
 		let result;
 		let absoluteProfit;
@@ -63,39 +63,40 @@ class ArbitrageService {
 		if (poolPriceBsc.gt(poolPriceEth)) {
 			arbitrageBlxmBalance = await this._ethContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 			adjustmentValue = AdjustmentValueService.getAdjustmentValue(balanceBlxmETH, balanceUsdcETH, balanceBlxmBSC, balanceUsdcBSC);
+			adjustmentValueUsd = AdjustmentValueService.getAdjustmentValueUsd(balanceBlxmETH, balanceUsdcETH, balanceBlxmBSC, balanceUsdcBSC);
 
 			logger.info("The BLXM is cheaper in  ETH. Price difference between the networks: " + poolPriceDifference);
 
-			result = await this.startArbitrageTransferFromEthToBsc(adjustmentValue, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdcETH);
+			result = await this.startArbitrageTransferFromEthToBsc(adjustmentValue, adjustmentValueUsd, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdcETH);
 
 			// TODO: use response from startArbitrageTransferFromEthToBsc (result), workaround because value is null
 			let postUsdBalanceBsc = await this._ethContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 
 		    let profit = ethers.utils.formatEther(postUsdBalanceBsc) - ethers.utils.formatEther(preUsdBalanceBsc);
 			
-			absoluteProfit = this._calculateAbitrageProfit(result.swapAmount, balanceBlxmETH, balanceBlxmBSC, profit, "ETH");
+			absoluteProfit = await this._calculateAbitrageProfit(result.swapAmount, balanceBlxmETH, balanceBlxmBSC, profit, "ETH");
 		}
 		else {
 			arbitrageBlxmBalance = await this._bscContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 			adjustmentValue = AdjustmentValueService.getAdjustmentValue(balanceBlxmBSC, balanceUsdcBSC, balanceBlxmETH, balanceUsdcETH);
-
+			adjustmentValueUsd = AdjustmentValueService.getAdjustmentValueUsd(balanceBlxmBSC, balanceUsdcBSC, balanceBlxmETH, balanceUsdcETH);
 
 			logger.info("The BLXM is cheaper in BSC. Price difference between the networks: " + poolPriceDifference);
 
-			result = await this.startArbitrageTransferFromBscToEth(adjustmentValue, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdcETH);
+			result = await this.startArbitrageTransferFromBscToEth(adjustmentValue, adjustmentValueUsd, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdcETH);
 
 			// TODO: use response from startArbitrageTransferFromEthToBsc (result), workaround because value is null
 			let postUsdBalanceEth = await this._ethContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 
 			let profit = ethers.utils.formatEther(postUsdBalanceEth) - ethers.utils.formatEther(preUsdBalanceEth);
 					
-			absoluteProfit = this._calculateAbitrageProfit(result.swapAmount, balanceBlxmBSC, balanceBlxmETH, profit, "BSC");
+			absoluteProfit = await this._calculateAbitrageProfit(result.swapAmount, balanceBlxmBSC, balanceBlxmETH, profit, "BSC");
 		}
 
-		this._databaseService.AddData({Profit: absoluteProfit});
+		//this._databaseService.AddData({Profit: absoluteProfit});
 	}
 
-	async startArbitrageTransferFromEthToBsc(amount, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdc) {
+	async startArbitrageTransferFromEthToBsc(amount, amountUsd, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdc) {
 		// is liqudity available ? 
 		if (!arbitrageBlxmBalance.isZero()) {
 			logger.info("Liqudity of BLXM in ETH available.");
@@ -113,15 +114,13 @@ class ArbitrageService {
 			// provide liquidity from cheap network via usd
 			if (!arbitrageUsdcBalanceEth.isZero()) {
 				// cheap network    
-				let usdcAmount = Utility.bigNumberMul(poolPriceEth, amount); 
-				usdcSwapAmount = Utility.bigNumberMin(usdcAmount, balanceUsdc);
+				usdcSwapAmount = Utility.bigNumberMin(amountUsd, balanceUsdc);
 			}
 
 			// provide liquidity from expensive network via usd
 			else if (!arbitrageUsdcBalanceBsc.isZero()) {
 				// expensive network     
-				let usdcAmount = Utility.bigNumberMul(poolPriceBsc, amount); 
-				usdcSwapAmount = Utility.bigNumberMin(usdcAmount, balanceUsdc);
+				usdcSwapAmount = Utility.bigNumberMin(amountUsd, balanceUsdc);
 
 				// bridge usdc from bsc to eth
 				await this._bridgeService.bridgeUSDTokenBSC(usdcSwapAmount);
@@ -135,11 +134,11 @@ class ArbitrageService {
 
 			arbitrageBlxmBalance = await this._ethContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 
-			return await this._bridgeAndSwapToBsc(amount, arbitrageBlxmBalance);
+			return await this._bridgeAndSwapToBsc(arbitrageBlxmBalance, arbitrageBlxmBalance);
 		}
 	}
 
-	async startArbitrageTransferFromBscToEth(amount, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdc) {
+	async startArbitrageTransferFromBscToEth(amount, amountUsd, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdc) {
 		// is liqudity avaible ? 
 		if (!arbitrageBlxmBalance.isZero()) {
 			logger.info("Liqudity of BLXM in BSC for swap available");
@@ -157,20 +156,16 @@ class ArbitrageService {
 			let usdSwapAmount = 0;
 
 			// provide liquidity from cheap network via usd
-			if (!arbitrageUsdcBalanceBsc.isZero()) {
-
+			if (!arbitrageUsdcBalanceBsc.isZero()) {		
 				// cheap network    
-				let usdcAmount = Utility.bigNumberMul(poolPriceBsc, amount);
-
-				usdSwapAmount = Utility.bigNumberMin(usdcAmount, balanceUsdc);
+				usdSwapAmount = Utility.bigNumberMin(amountUsd, balanceUsdc);
 			}
 
 			// provide liquidity from expensive network via usd
 			else if (!arbitrageUsdcBalanceEth.isZero()) {
+				
 				// expensive network                         
-				let usdcAmount = Utility.bigNumberMul(poolPriceEth, amount);
-
-				usdSwapAmount = Utility.bigNumberMin(usdcAmount, balanceUsdc);
+				usdSwapAmount = Utility.bigNumberMin(amountUsd, balanceUsdc);
 
 				// bridge usdc from eth to bsc
 				await this._bridgeService.bridgeUSDTokenETH(usdSwapAmount);
@@ -183,7 +178,7 @@ class ArbitrageService {
 
 			arbitrageBlxmBalance = await this._bscContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 
-			return await this._bridgeAndSwapToEth(amount, arbitrageBlxmBalance);
+			return await this._bridgeAndSwapToEth(arbitrageBlxmBalance, arbitrageBlxmBalance);
 		}
 	}
 
