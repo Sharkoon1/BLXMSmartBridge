@@ -8,7 +8,7 @@ Installing and Importing
 ### Install npm dependencies after installing (Git or manual download)
 
 ```bash
-cd server
+cd src
 npm install
 ```
 
