@@ -64,7 +64,7 @@ class ArbitrageService {
 			arbitrageBlxmBalance = await this._ethContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 			adjustmentValue = AdjustmentValueService.getAdjustmentValue(balanceBlxmETH, balanceUsdcETH, balanceBlxmBSC, balanceUsdcBSC);
 
-			logger.info("The BLXM is cheaper in  BSC. Price difference between the networks: " + poolPriceDifference);
+			logger.info("The BLXM is cheaper in  ETH. Price difference between the networks: " + poolPriceDifference);
 
 			result = await this.startArbitrageTransferFromEthToBsc(adjustmentValue, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdcETH);
 
@@ -80,7 +80,7 @@ class ArbitrageService {
 			adjustmentValue = AdjustmentValueService.getAdjustmentValue(balanceBlxmBSC, balanceUsdcBSC, balanceBlxmETH, balanceUsdcETH);
 
 
-			logger.info("The BLXM is cheaper in ETH. Price difference between the networks: " + poolPriceDifference);
+			logger.info("The BLXM is cheaper in BSC. Price difference between the networks: " + poolPriceDifference);
 
 			result = await this.startArbitrageTransferFromBscToEth(adjustmentValue, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdcETH);
 
