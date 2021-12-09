@@ -14,7 +14,9 @@ class TokenContract extends BaseContract {
 	}
 
 	async transferTokens(address, amount) {
-		return this._contract.transfer(address, amount);
+		let tx = await this._contract.transfer(address, amount);
+		
+		return await tx.wait(); 
 	}
 }
 

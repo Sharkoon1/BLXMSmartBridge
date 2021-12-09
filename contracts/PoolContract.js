@@ -9,11 +9,17 @@ class PoolContract extends BaseContract {
 	}
 
 	async swapTokenToStables(amount) {
-		return await this._contract.tokenToStables(amount);
+		let tx = await this._contract.stablesToToken(amount);
+		await tx.wait();
+
+		return tx;
 	}
 
 	async swapStablesToToken(amount) {
-		return await this._contract.stablesToToken(amount);
+		let tx = await this._contract.stablesToToken(amount);
+		await tx.wait();
+
+		return tx; 
 	}
 }
 
