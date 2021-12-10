@@ -4,20 +4,19 @@ const logger = require("../logger/logger");
 /* transforms the formular of the "value adjustment algorithm" to an equation that can be resolved
 *  takes Values from the monitoring service and processes it with the pq-formular
 */
-
-exports.getAdjustmentValue = function (BLXM_CHEAP, USD_CHEAP, BLXM_EXPENSIVE, USD_EXPENSIVE) {
-	BLXM_CHEAP = ethers.utils.formatEther(BLXM_CHEAP);
-	USD_CHEAP = ethers.utils.formatEther(USD_CHEAP);
-	BLXM_EXPENSIVE = ethers.utils.formatEther(BLXM_EXPENSIVE);
-	USD_EXPENSIVE = ethers.utils.formatEther(USD_EXPENSIVE);
+exports.getAdjustmentValue = function (blxmCHEAP, usdCHEAP, blxmEXPENSIVE, usdEXPENSIVE) {
+	blxmCHEAP = ethers.utils.formatEther(blxmCHEAP);
+	usdCHEAP = ethers.utils.formatEther(usdCHEAP);
+	blxmEXPENSIVE = ethers.utils.formatEther(blxmEXPENSIVE);
+	usdEXPENSIVE = ethers.utils.formatEther(usdEXPENSIVE);
 
 
 	let p;
 	let q;
 
-	p = BLXM_EXPENSIVE * 2;
-	q = Math.pow(BLXM_EXPENSIVE, 2);
-	q = q - (BLXM_EXPENSIVE * USD_EXPENSIVE) / (USD_CHEAP / BLXM_CHEAP);
+	p = blxmEXPENSIVE * 2;
+	q = Math.pow(blxmEXPENSIVE, 2);
+	q = q - (blxmEXPENSIVE * usdEXPENSIVE) / (usdCHEAP / blxmCHEAP);
 
 	let root1;
 
