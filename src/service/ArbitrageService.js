@@ -10,7 +10,6 @@ const Profit = require("../models/Profit");
 class ArbitrageService {
 
 	constructor(bridgeService, walletContainer) {
-		this._swapTransferFunctionName = "Transfer";
 		this._bridgeService = bridgeService;
 		this._databaseService = DataBaseService;
 		
@@ -125,7 +124,7 @@ class ArbitrageService {
 			let arbitrageUsdcBalanceBsc = await this._bscContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 			let arbitrageUsdcBalanceEth = await this._ethContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 
-			logger.info("Adjustment value: " + adjustmentValueUSDC);
+			logger.info("Adjustment value: " + ethers.utils.formatEther(adjustmentValueUSDC));
 
 			if(totalPoolUsdcEth.isZero()) {
 				logger.warn("Not enough usdc liquidity in BSC Pool. Need to stop the cycle.");
@@ -154,9 +153,9 @@ class ArbitrageService {
 			}
 
 			// swap from usd to blxm
-			await this._ethContracts.poolContract.swapStablesToToken(usdSwapAmount);
+			await this._ethContracts.poolContract.swapStablesToToken(totalAdjustmentValue);
 
-			logger.info("ETH network: Swapped :[" + ethers.utils.formatEther(usdSwapAmount) + "] USDC to BLXM to aquire liquidity.");
+			logger.info("ETH network: Swapped :[" + ethers.utils.formatEther(totalAdjustmentValue) + "] USDC to BLXM to aquire liquidity.");
 
 			totalAdjustmentValue = await this._ethContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 
@@ -184,7 +183,7 @@ class ArbitrageService {
 			let arbitrageUsdcBalanceBsc = await this._bscContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 			let arbitrageUsdcBalanceEth = await this._ethContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 
-			logger.info("Adjustment value: " + adjustmentValueUSDC);
+			logger.info("Adjustment value: " + ethers.utils.formatEther(adjustmentValueUSDC));
 
 			if(totalPoolUsdcBsc.isZero()) {
 				logger.warn("Not enough usdc liquidity in BSC Pool. Need to stop the cycle.");
