@@ -32,8 +32,6 @@ exports.getAdjustmentValue = function (blxmCHEAP, usdCHEAP, blxmEXPENSIVE, usdEX
 	if (discriminant > 0) {
 		root1 = (-b + Math.sqrt(discriminant)) / (2 * a);
 
-		logger.info("Adjustment value BLXM: " + root1);
-
 		return ethers.utils.parseEther(String(root1));
 	}
 
@@ -66,8 +64,6 @@ exports.getAdjustmentValueUsd = function (blxmCHEAP, usdCHEAP, blxmEXPENSIVE, us
 		Math.pow(blxmEXPENSIVE, 2) * constantCheap * constantExpensive) + 
 		Math.pow(blxmCHEAP, 2) * (-usdCHEAP) - 2 * blxmCHEAP * blxmEXPENSIVE * usdCHEAP + blxmCHEAP * constantCheap - Math.pow(blxmEXPENSIVE, 2) * 
 		usdCHEAP + blxmEXPENSIVE * constantCheap) / (Math.pow(blxmCHEAP,2) + 2 *blxmCHEAP * blxmEXPENSIVE + Math.pow(blxmEXPENSIVE, 2));
-
-	logger.info("Adjustment value USD: " + adjustmentValue);
 	
 	return ethers.utils.parseEther(String(adjustmentValue)); 
 };
