@@ -1,6 +1,5 @@
 const Profit = require("./../models/Profit");
 const mongoose = require("mongoose");
-require("dotenv").config();
 
 class DataBaseService {
 
