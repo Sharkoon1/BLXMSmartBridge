@@ -18,11 +18,13 @@ class ArbitrageService {
 		this._bscContracts = new Contracts("BSC", walletContainer.ArbitrageWalletBSC);
 
 		this._isRunning = false;
+		this._stopCycle = false;
 	}
 
 	async startArbitrage() {
 		if(!this._isRunning) {
 			this._isRunning = true;
+			this._stopCycle = false;
 
 			logger.info("Start AbitrageService ...");
 			let poolPriceBsc = await this._bscContracts.getPoolPrice();
@@ -35,6 +37,10 @@ class ArbitrageService {
 							"Current price BLXM Binance Smart Chain network " + ethers.utils.formatEther(poolPriceBsc) + " USD");
 	
 				await this._startArbitrageCycle(poolPriceBsc, poolPriceEth);
+				if(this._stopCycle) {
+					return false;
+				}
+
 				poolPriceBsc = await this._bscContracts.getPoolPrice();
 				poolPriceEth = await this._ethContracts.getPoolPrice();
 			}
@@ -69,8 +75,12 @@ class ArbitrageService {
 
 			result = await this.startArbitrageTransferFromEthToBsc(adjustmentValue, adjustmentValueUsd, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdcETH);
 
+			if(!result) {
+				return false;
+			}
+
 			// TODO: use response from startArbitrageTransferFromEthToBsc (result), workaround because value is null
-			let postUsdBalanceBsc = await this._ethContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
+			let postUsdBalanceBsc = await this._bscContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 
 		    let profit = ethers.utils.formatEther(postUsdBalanceBsc) - ethers.utils.formatEther(preUsdBalanceBsc);
 			
@@ -100,7 +110,7 @@ class ArbitrageService {
 		// is liqudity available ? 
 		if (!arbitrageBlxmBalance.isZero()) {
 			logger.info("Liqudity of BLXM in ETH available.");
-			logger.info("Liqudity of BLXM  in ETH: " + ethers.utils.formatEther(arbitrageBlxmBalance));
+			logger.info("Liqudity of BLXM  in ETH :[" + ethers.utils.formatEther(arbitrageBlxmBalance) + "]");
 
 			return await this._bridgeAndSwapToBsc(amount, arbitrageBlxmBalance);
 		}
@@ -129,11 +139,16 @@ class ArbitrageService {
 				await this._bridgeService.bridgeBLXMTokenBscToEth(usdcSwapAmount);
 			}
 
+			else {
+				logger.warn("Stopping the cycle not enough liquidty blxm or usdc avaible.");
+				this._stopCycle = true;
+			}
+
 			// swap from usd to blxm
 			await this._ethContracts.poolContract.swapStablesToToken(usdcSwapAmount);
 
 
-			logger.info("Swapped " + ethers.utils.formatEther(usdcSwapAmount) + " USDC to BLXM in ETH to aquire liquidity.");
+			logger.info("Swapped :[" + ethers.utils.formatEther(usdcSwapAmount) + "] USDC to BLXM in ETH to aquire liquidity.");
 
 			arbitrageBlxmBalance = await this._ethContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 
@@ -145,7 +160,7 @@ class ArbitrageService {
 		// is liqudity avaible ? 
 		if (!arbitrageBlxmBalance.isZero()) {
 			logger.info("Liqudity of BLXM in BSC for swap available");
-			logger.info("Liqudity of BLXM  in BSC: " + ethers.utils.formatEther(arbitrageBlxmBalance));
+			logger.info("Liqudity of BLXM  in BSC :[" + ethers.utils.formatEther(arbitrageBlxmBalance) + "]");
 
 			return await this._bridgeAndSwapToEth(amount, arbitrageBlxmBalance);
 		}
@@ -175,10 +190,15 @@ class ArbitrageService {
 				await this._bridgeService.bridgeUSDTokenEthToBsc(usdSwapAmount);
 			}
 
+			else {
+				logger.warn("Stopping the cycle not enough liquidty blxm or usdc avaible.");
+				this._stopCycle = true;
+			}
+
 			// swap usd from bsc to blxm
 			await this._bscContracts.poolContract.swapStablesToToken(usdSwapAmount);
 
-			logger.info("Swapped " + ethers.utils.formatEther(usdSwapAmount) + " USDC to BLXM in BSC to aquire liquidity.");
+			logger.info("Swapped :[" + ethers.utils.formatEther(usdSwapAmount) + "] USDC to BLXM in BSC to aquire liquidity.");
 
 			arbitrageBlxmBalance = await this._bscContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 
@@ -191,10 +211,10 @@ class ArbitrageService {
 		let swapAmount = Utility.bigNumberMin(amount, abitrageBalance);
 
 		// bridge blxm tokens
-		logger.info("Bridging " + ethers.utils.formatEther(swapAmount) + " BLXM from ETH to BSC.");
+		logger.info("Bridging :[" + ethers.utils.formatEther(swapAmount) + "] BLXM from BSC to ETH.");
 		await this._bridgeService.bridgeBLXMTokenBscToEth(swapAmount);
 
-		logger.info("Swapping " + ethers.utils.formatEther(swapAmount) + " BLXM to USDC in ETH.");
+		logger.info("Swapping :[" + ethers.utils.formatEther(swapAmount) + "] BLXM to USDC in ETH.");
 		let profit = await this._ethContracts.poolContract.swapTokenToStables(swapAmount);
 
 		return { profit: profit, swapAmount: swapAmount };
@@ -205,10 +225,10 @@ class ArbitrageService {
 		let swapAmount = Utility.bigNumberMin(amount, abitrageBalance);
 
 		// bridge blxm tokens
-		logger.info("Bridging " + ethers.utils.formatEther(swapAmount) + " BLXM from BSC to ETH.");
+		logger.info("Bridging : [" + ethers.utils.formatEther(swapAmount) + "] BLXM from ETH to BSC.");
 		await this._bridgeService.bridgeBLXMTokenEthToBsc(swapAmount);
 
-		logger.info("Swapping " + ethers.utils.formatEther(swapAmount) + " BLXM to USDC in ETH.");
+		logger.info("Swapping : [" + ethers.utils.formatEther(swapAmount) + "] BLXM to USDC in BSC.");
 		let profit = this._bscContracts.poolContract.swapTokenToStables(swapAmount);
 
 		return { profit: profit, swapAmount: swapAmount };
