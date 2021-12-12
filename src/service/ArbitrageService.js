@@ -71,13 +71,9 @@ class ArbitrageService {
 			adjustmentValue = AdjustmentValueService.getAdjustmentValue(balanceBlxmETH, balanceUsdcETH, balanceBlxmBSC, balanceUsdcBSC);
 			adjustmentValueUsd = AdjustmentValueService.getAdjustmentValueUsd(balanceBlxmETH, balanceUsdcETH, balanceBlxmBSC, balanceUsdcBSC);
 
-			logger.info("The BLXM is cheaper in  ETH. Price difference between the networks: " + poolPriceDifference);
+			logger.info("The BLXM is cheaper in  ETH. Price difference between the networks:" + Math.abs(poolPriceDifference) +  " USD");
 
 			result = await this.startArbitrageTransferFromEthToBsc(adjustmentValue, adjustmentValueUsd, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdcETH);
-
-			if(!result) {
-				return false;
-			}
 
 			// TODO: use response from startArbitrageTransferFromEthToBsc (result), workaround because value is null
 			let postUsdBalanceBsc = await this._bscContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
@@ -91,7 +87,7 @@ class ArbitrageService {
 			adjustmentValue = AdjustmentValueService.getAdjustmentValue(balanceBlxmBSC, balanceUsdcBSC, balanceBlxmETH, balanceUsdcETH);
 			adjustmentValueUsd = AdjustmentValueService.getAdjustmentValueUsd(balanceBlxmBSC, balanceUsdcBSC, balanceBlxmETH, balanceUsdcETH);
 
-			logger.info("The BLXM is cheaper in BSC. Price difference between the networks: " + poolPriceDifference);
+			logger.info("The BLXM is cheaper in BSC. Price difference between the networks :" + Math.abs(poolPriceDifference) +  " USD");
 
 			result = await this.startArbitrageTransferFromBscToEth(adjustmentValue, adjustmentValueUsd, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdcETH);
 
