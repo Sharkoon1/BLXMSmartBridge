@@ -4,14 +4,15 @@ const { ethers } = require("ethers");
 const Utility = require("../helpers/utility");
 const AdjustmentValueService = require("./AdjustmentValueService");
 const Contracts = require("../contracts/Contracts");
-//const DataBaseService = require("./DataBaseService");
+const DataBaseService = require("./DataBaseService");
+const Profit = require("../models/Profit");
 
 class ArbitrageService {
 
 	constructor(bridgeService, walletContainer) {
 		this._swapTransferFunctionName = "Transfer";
 		this._bridgeService = bridgeService;
-		//this._databaseService = DataBaseService;
+		this._databaseService = DataBaseService;
 		
 
 		this._ethContracts = new Contracts("ETH", walletContainer.ArbitrageWalletETH);
@@ -29,7 +30,7 @@ class ArbitrageService {
 			logger.info("Start AbitrageService ...");
 			let poolPriceBsc = await this._bscContracts.getPoolPrice();
 			let poolPriceEth = await this._ethContracts.getPoolPrice();
-	
+
 			while (!poolPriceBsc.eq(poolPriceEth)) {
 				
 				logger.info("Abitrage opportunity found " + "\n" +
@@ -73,14 +74,15 @@ class ArbitrageService {
 
 			logger.info("ETH < BSC: The BLXM token trades cheaper on the ETH network than on the BSC network. Price difference between the networks:" + Math.abs(poolPriceDifference) +  " USD");
 
-			result = await this.startArbitrageTransferFromEthToBsc(adjustmentValue, adjustmentValueUsd, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdcETH);
+			result = await this.startArbitrageTransferFromEthToBsc(adjustmentValue, adjustmentValueUsd, arbitrageBlxmBalance, balanceUsdcETH);
 
 			// TODO: use response from startArbitrageTransferFromEthToBsc (result), workaround because value is null
 			let postUsdBalanceBsc = await this._bscContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 
 		    let profit = ethers.utils.formatEther(postUsdBalanceBsc) - ethers.utils.formatEther(preUsdBalanceBsc);
 			
-			absoluteProfit = await this._calculateAbitrageProfit(result.swapAmount, balanceBlxmETH, balanceBlxmBSC, profit, "ETH");
+			absoluteProfit = await this._calculateAbitrageProfit(result.swapAmount, balanceBlxmETH, balanceBlxmBSC, profit, "BSC");
+			await this._databaseService.AddData({"profit": absoluteProfit, "network": "BSC", "isArbitrageSwap": true}, Profit);
 		}
 		else {
 			arbitrageBlxmBalance = await this._bscContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
@@ -89,17 +91,17 @@ class ArbitrageService {
 
 			logger.info("BSC < ETH: The BLXM token trades cheaper on the BSC network than on the ETH network. Price difference between the networks :" + Math.abs(poolPriceDifference) +  " USD");
 
-			result = await this.startArbitrageTransferFromBscToEth(adjustmentValue, adjustmentValueUsd, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdcETH);
+			result = await this.startArbitrageTransferFromBscToEth(adjustmentValue, adjustmentValueUsd, arbitrageBlxmBalance, balanceUsdcETH);
 
 			// TODO: use response from startArbitrageTransferFromEthToBsc (result), workaround because value is null
 			let postUsdBalanceEth = await this._ethContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 
 			let profit = ethers.utils.formatEther(postUsdBalanceEth) - ethers.utils.formatEther(preUsdBalanceEth);
 					
-			absoluteProfit = await this._calculateAbitrageProfit(result.swapAmount, balanceBlxmBSC, balanceBlxmETH, profit, "BSC");
+			absoluteProfit = await this._calculateAbitrageProfit(result.swapAmount, balanceBlxmBSC, balanceBlxmETH, profit, "ETH");
+			await this._databaseService.AddData({"profit": absoluteProfit, "network": "ETH", "isArbitrageSwap": true}, Profit);
 		}
 
-	  //	this._databaseService.AddData({Profit: absoluteProfit});
 	}
 
 	async startArbitrageTransferFromEthToBsc(adjustmentValue, adjustmentValueUSDC, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdc) {
