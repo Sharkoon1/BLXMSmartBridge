@@ -1,4 +1,3 @@
-const Profit = require("./../models/Profit");
 const mongoose = require("mongoose");
 
 class DataBaseService {
@@ -29,11 +28,11 @@ class DataBaseService {
 	}
 
 	AddData(query, model) {
-		model.create(query);
+		return model.create(query);
 	}
 
 	UpdateById(id, query, model) {
-		model.findByIdAndUpdate(id, query, { new: true });
+		return model.findByIdAndUpdate(id, query, { new: true });
 	}
 }
 
