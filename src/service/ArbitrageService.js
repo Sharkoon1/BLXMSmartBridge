@@ -104,7 +104,7 @@ class ArbitrageService {
 
 	}
 
-	async startArbitrageTransferFromEthToBsc(adjustmentValue, adjustmentValueUSDC, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdc) {
+	async startArbitrageTransferFromEthToBsc(adjustmentValue, adjustmentValueUSDC, arbitrageBlxmBalance, balanceUsdc) {
 		// is liqudity available ? 
 		if (!arbitrageBlxmBalance.isZero()) {
 			logger.info("ETH network: BLXM Liqudity available");
@@ -159,7 +159,7 @@ class ArbitrageService {
 		}
 	}
 
-	async startArbitrageTransferFromBscToEth(adjustmentValue, adjustmentValueUSDC, arbitrageBlxmBalance, poolPriceBsc, poolPriceEth, balanceUsdc) {
+	async startArbitrageTransferFromBscToEth(adjustmentValue, adjustmentValueUSDC, arbitrageBlxmBalance, balanceUsdc) {
 		// is liqudity avaible ? 
 		if (!arbitrageBlxmBalance.isZero()) {
 			logger.info("BSC network: Liqudity of BLXM for swap available");
