@@ -118,7 +118,7 @@ class ArbitrageService {
 		// provide liqudity in bsc
 		// swap and bridge usd
 		else {
-			logger.warn("ETH network: Not enough BLXM liqudity available. Need to swap USDC from BSC");
+			logger.warn("ETH network: Not enough BLXM liquidity available. Need to swap USDC from arbitrage Pool");
 
 			let arbitrageUsdcBalanceBsc = await this._bscContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 			let arbitrageUsdcBalanceEth = await this._ethContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
@@ -130,6 +130,7 @@ class ArbitrageService {
 			// provide liquidity from cheap network via usd
 			if (!arbitrageUsdcBalanceEth.isZero()) {
 				// cheap network    
+				logger.info("ETH network: USDC liquidity is available");
 				usdcSwapAmount = Utility.bigNumberMin(adjustmentValueUSDC, balanceUsdc);
 			}
 
