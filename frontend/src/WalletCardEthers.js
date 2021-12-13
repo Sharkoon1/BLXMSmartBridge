@@ -91,9 +91,11 @@ const WalletCardEthers = () => {
 			<div className="networkDisplay">
 				<h3 style={Textstyle}>Network: {userNetwork}</h3>
 			</div>
-			<div className="swapInformation">
-				<h3 style={Textstyle}>You will be swapping from the {userNetwork} to the {userNetwork === "Ethereum Blockchain" ? "Binance Smart Chain": "Ethereum Blockchain"}</h3>
-			</div>
+			{userNetwork ?
+				<div className="swapInformation">
+					<h3 style={Textstyle}>You will be swapping from the {userNetwork} to the {userNetwork === "Ethereum Blockchain" ? "Binance Smart Chain" : "Ethereum Blockchain"}</h3>
+				</div> : null
+			}
 			{errorMessage}
 		</div>
 	);
