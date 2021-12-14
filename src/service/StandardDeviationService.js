@@ -1,12 +1,20 @@
 const mongoose = require("mongoose");
-const DataBaseService = require("./DataBaseService");
 const PoolPrice = require("../models/PoolPrice");
 
 class StandardDeviationService {
 
+	constructor(dataBaseService) {
+		this._databaseService = dataBaseService;
+	}
+
 	averageStandardDeviation() {
 		var averageStandardDeviation = ((this.standardDeviationETH() + this.standardDeviationBSC()) / 2);
 		return averageStandardDeviation;
+	}
+
+	// for testing
+	getStandardDeviation() {
+		return 1;
 	}
 
 
@@ -32,7 +40,7 @@ class StandardDeviationService {
 			"Network": network
 		};
 		try {
-			let priceQuery = await DataBaseService.QueryData(query, PoolPrice);
+			let priceQuery = await this._databaseService.QueryData(query, PoolPrice);
 			priceQuery.forEach(element => {
 				priceHistory.push(element.PoolPrice);
 			});

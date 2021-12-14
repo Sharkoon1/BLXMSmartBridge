@@ -1,5 +1,4 @@
 const { ethers } = require("ethers");
-const logger = require("../logger/logger");
 
 /* transforms the formular of the "value adjustment algorithm" to an equation that can be resolved
 *  takes Values from the monitoring service and processes it with the pq-formular
