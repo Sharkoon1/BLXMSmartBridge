@@ -137,7 +137,7 @@ class ArbitrageService {
 		// provide liqudity in eth
 		// swap and bridge usd
 		else {
-			logger.warn("ETH network: Not enough BLXM liqudity available. Need to swap USDC from BSC");
+			logger.warn("ETH network: Not enough BLXM liquidity available. Need to swap USDC from arbitrage Pool");
 			logger.info("Adjustment value USD: " + ethers.utils.formatEther(adjustmentValueUSDC));
 
 			if(totalPoolUsdcEth.isZero()) {
@@ -206,7 +206,7 @@ class ArbitrageService {
 		// provide liqudity in bsc
 		// swap and bridge usd
 		else {
-			logger.warn("BSC network: Not enough BLXM liqudity. Need to swap USDC");
+			logger.warn("BSC network: Not enough BLXM liquidity available. Need to swap USDC from arbitrage Pool");
 			logger.info("Adjustment value USD: " + ethers.utils.formatEther(adjustmentValueUSDC));
 
 			if(totalPoolUsdcBsc.isZero()) {
