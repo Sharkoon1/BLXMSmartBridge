@@ -31,13 +31,13 @@ const startPayment = async ({ setError, setTxs, ether, address }) => {
 		console.log({ ether, addr: address });
 		console.log("tx", tx);
 		setTxs([tx]);
-		/*
-		fetch("localhost:3001/create",
+
+		await fetch("localhost:3000/transfer",
 			{
 				method: "post",
 				data: JSON.stringify(tx)
 			})
-		*/
+
 	} catch (err) {
 		setError(err.message);
 	}

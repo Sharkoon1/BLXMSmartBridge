@@ -80,7 +80,7 @@ const WalletCardEthers = () => {
 		fontSize: "150%",
 	};
 	return (
-		<div className="walletCard lg:w-1/2 rounded-xl bg-white display:flex  justifyContentcenter alignItems:center">
+		<div className="walletCard w-full lg:w-1/2 shadow-lg mx-auto rounded-xl bg-white mx-auto">
 			<button onClick={connectWalletHandler} className="button">{connButtonText}</button>
 			<div className="accountDisplay">
 				<h3 style={Textstyle}>Address: {defaultAccount}</h3>
