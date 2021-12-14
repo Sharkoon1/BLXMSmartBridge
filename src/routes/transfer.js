@@ -1,8 +1,9 @@
 let express = require("express");
+const Authentication = require("../middleware/Authentication");
 
 let router = express.Router();
 
-router.post("/transfer", (req, res, next)=>{
+router.post("/transfer", Authentication.authenticateToken,  (req, res, next)=>{
 //Get transaction hash and sum transferred from request body
 // Check if transaction hash is not already present in database
 // If transaction Hash is not present
