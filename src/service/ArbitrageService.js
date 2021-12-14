@@ -121,7 +121,7 @@ class ArbitrageService {
 			let totalAdjustmentValue = Utility.bigNumberMin(totalArbitrageBlxmEth, adjustmentValue);
 
 			logger.info("ETH network: BLXM Liqudity available");
-			logger.info("Liqudity of BLXM  in ETH :[" + ethers.utils.formatEther(totalArbitrageBlxmEth) + "]");
+			logger.info("Liqudity of BLXM  in ETH: [" + ethers.utils.formatEther(totalArbitrageBlxmEth) + "]");
 
 			logger.info("Adjustment value BLXM: " + ethers.utils.formatEther(adjustmentValue));
 
@@ -167,7 +167,7 @@ class ArbitrageService {
 				totalAdjustmentValue = Utility.bigNumberMin(adjustmentValueUSDC, totalArbitrageUsdcBsc);
 				
 				// bridge usdc from bsc to eth
-				await this._bridgeService.bridgeBLXMTokenBscToEth(totalAdjustmentValue);
+				await this._bridgeService.bridgeUSDTokenBscToEth(totalAdjustmentValue);
 			}
 
 			if(minimumSwapAmountValue.minimumSwapAmountUSD > ethers.utils.formatEther(totalAdjustmentValue)) {
@@ -179,7 +179,7 @@ class ArbitrageService {
 			// swap from usd to blxm
 			await this._ethContracts.poolContract.swapStablesToToken(totalAdjustmentValue);
 
-			logger.info("ETH network: Swapped :[" + ethers.utils.formatEther(totalAdjustmentValue) + "] USDC to BLXM to aquire liquidity.");
+			logger.info("ETH network: Swapped: [" + ethers.utils.formatEther(totalAdjustmentValue) + "] USDC to BLXM to aquire liquidity.");
 
 			totalAdjustmentValue = await this._ethContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 
@@ -193,7 +193,7 @@ class ArbitrageService {
 			let totalAdjustmentValue = Utility.bigNumberMin(totalArbitrageBlxmBsc, adjustmentValue);
 
 			logger.info("BSC network: Liqudity of BLXM for swap available");
-			logger.info("BSC network: Liqudity amount of BLXM :[" + ethers.utils.formatEther(totalArbitrageBlxmBsc) + "]");
+			logger.info("BSC network: Liqudity amount of BLXM: [" + ethers.utils.formatEther(totalArbitrageBlxmBsc) + "]");
 			logger.info("Adjustment value BLXM: " + adjustmentValue);
 
 			if(minimumSwapAmountValue.minimumSwapAmountBLXM > ethers.utils.formatEther(totalAdjustmentValue)) {
@@ -255,7 +255,7 @@ class ArbitrageService {
 			// swap from usd to blxm
 			await this._bscContracts.poolContract.swapStablesToToken(totalAdjustmentValue);
 
-			logger.info("BSC network: Swapped :[" + ethers.utils.formatEther(totalAdjustmentValue) + "] USDC to BLXM to aquire liquidity.");
+			logger.info("BSC network: Swapped: [" + ethers.utils.formatEther(totalAdjustmentValue) + "] USDC to BLXM to aquire liquidity.");
 
 			totalAdjustmentValue = await this._bscContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 
