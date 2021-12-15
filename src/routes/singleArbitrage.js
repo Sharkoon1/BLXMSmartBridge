@@ -18,8 +18,8 @@ router.post("/", (req, res, next) => {
 	(async () => {
 		poolPriceBsc = await _bscContracts.getPoolPrice();
 		poolPriceEth = await _ethContracts.getPoolPrice();
+		ArbitrageServiceInstance._startArbitrageCycle(poolPriceBsc, poolPriceEth);
 	})();
-	ArbitrageServiceInstance._startArbitrageCycle(poolPriceBsc, poolPriceEth);
 });
 
 module.exports = router;

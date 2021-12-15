@@ -7,7 +7,7 @@ const Contracts = require("../contracts/Contracts");
 const DataBaseService = require("./DataBaseService");
 const Profit = require("../models/Profit");
 const EvaluationService = require("./EvaluationService");
-
+ 
 class ArbitrageService {
 
 	constructor(bridgeService, walletContainer) {
@@ -75,7 +75,16 @@ class ArbitrageService {
 		let adjustmentValue;
 		let adjustmentValueUsd;
 		let result;
-		let poolPriceDifference = ethers.utils.formatEther(poolPriceEth) - ethers.utils.formatEther(poolPriceBsc);
+		let poolPriceDifference;
+		try{
+			poolPriceDifference = ethers.utils.formatEther(poolPriceEth) - ethers.utils.formatEther(poolPriceBsc);
+		} catch (error){
+			console.log(error);
+			console.log(poolPriceEth);
+			console.log(poolPriceBsc);
+			process.exit(1);
+		}
+
 		let minimumSwapAmountValue = await this._evaluationService.minimumSwapAmount(poolPriceBsc, poolPriceEth, totalArbitrageBlxmEth, totalArbitrageBlxmBsc, totalArbitrageUsdcEth, totalArbitrageUsdcBsc);
 
 		if (poolPriceBsc.gt(poolPriceEth)) {
