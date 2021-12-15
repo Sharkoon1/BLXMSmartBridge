@@ -4,6 +4,9 @@ import ReactDOM from "react-dom";
 import App from "./App";
 import App1 from "./App1";
 import Buttons from "./Buttons";
+
+//const rootElement = document.getElementById("Admin");
+
 const rootElement = document.getElementById("root");
 ReactDOM.render(
 	<StrictMode>
@@ -26,3 +29,4 @@ ReactDOM.render(
 	</StrictMode>,
 	rootElement2
 );
+
