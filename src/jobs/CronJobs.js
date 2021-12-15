@@ -14,9 +14,11 @@ class CronJobs {
 	registerArbitrageJob() {
 		logger.info("Register Abitrage Job ...");
 		let task = cron.schedule("*/10 * * * * *", () => {
+			/*
 			if(process.env.JOBS_ENABLED === constants.JOB_ENABLED_STATE) {
 				this._arbitrageService.startArbitrage();
 			}
+			*/
 		});
 		task.start();
 	}
