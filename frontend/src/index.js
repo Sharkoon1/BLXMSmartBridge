@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 
 import App from "./App";
 import App1 from "./App1";
+import Buttons from "./Buttons";
 const rootElement = document.getElementById("root");
 ReactDOM.render(
 	<StrictMode>
@@ -16,4 +17,12 @@ ReactDOM.render(
 		<App />
 	</StrictMode>,
 	rootElement1
+);
+
+const rootElement2 = document.getElementById("buttons");
+ReactDOM.render(
+	<StrictMode>
+		<Buttons />
+	</StrictMode>,
+	rootElement2
 );

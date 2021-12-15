@@ -23,7 +23,7 @@ class ArbitrageService {
 	}
 
 	async startArbitrage() {
-		if(!this._isRunning) {
+		if (!this._isRunning) {
 			this._isRunning = true;
 			this._stopCycle = false;
 
@@ -32,13 +32,13 @@ class ArbitrageService {
 			let poolPriceEth = await this._ethContracts.getPoolPrice();
 
 			while (!poolPriceBsc.eq(poolPriceEth)) {
-				
-				logger.info("Price difference  found ");			
+
+				logger.info("Price difference  found ");
 				logger.info("ETH network: Current price BLXM " + ethers.utils.formatEther(poolPriceEth) + " USD");
 				logger.info("BSC network: Current price BLXM " + ethers.utils.formatEther(poolPriceBsc) + " USD");
-	
+
 				await this._startArbitrageCycle(poolPriceBsc, poolPriceEth);
-				if(this._stopCycle) {
+				if (this._stopCycle) {
 					return false;
 				}
 
@@ -48,6 +48,13 @@ class ArbitrageService {
 
 			this._isRunning = false;
 		}
+	}
+
+
+	async startSingleArbitrageCycle() {
+		let poolPriceBsc = await this._bscContracts.getPoolPrice();
+		let poolPriceEth = await this._ethContracts.getPoolPrice();
+		await this._startArbitrageCycle(poolPriceBsc, poolPriceEth);
 	}
 
 	async _startArbitrageCycle(poolPriceBsc, poolPriceEth) {
@@ -75,33 +82,33 @@ class ArbitrageService {
 			adjustmentValue = AdjustmentValueService.getAdjustmentValue(totalPoolBlxmETH, totalPoolUsdcETH, totalPoolBlxmBSC, totalPoolUsdcBSC);
 			adjustmentValueUsd = AdjustmentValueService.getAdjustmentValueUsd(totalPoolBlxmETH, totalPoolUsdcETH, totalPoolBlxmBSC, totalPoolUsdcBSC);
 
-			logger.info("ETH < BSC: The BLXM token trades cheaper on the ETH network than on the BSC network. Price difference between the networks: " + Math.abs(poolPriceDifference) +  " USD");
+			logger.info("ETH < BSC: The BLXM token trades cheaper on the ETH network than on the BSC network. Price difference between the networks: " + Math.abs(poolPriceDifference) + " USD");
 
-			result = await this.startArbitrageTransferFromEthToBsc(adjustmentValue, adjustmentValueUsd, totalArbitrageBlxmEth, totalArbitrageUsdcEth ,totalArbitrageUsdcBsc, totalPoolUsdcBSC, minimumSwapAmountValue);
+			result = await this.startArbitrageTransferFromEthToBsc(adjustmentValue, adjustmentValueUsd, totalArbitrageBlxmEth, totalArbitrageUsdcEth, totalArbitrageUsdcBsc, totalPoolUsdcBSC, minimumSwapAmountValue);
 
 			// cancel cycle
-			if(result === -1) {
+			if (result === -1) {
 				return;
 			}
 
 			// TODO: use response from startArbitrageTransferFromEthToBsc (result), workaround because value is null
 			let postUsdBalanceBsc = await this._bscContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 
-		    let profit = ethers.utils.formatEther(postUsdBalanceBsc) - ethers.utils.formatEther(preUsdBalanceBsc);
+			let profit = ethers.utils.formatEther(postUsdBalanceBsc) - ethers.utils.formatEther(preUsdBalanceBsc);
 			let absoluteProfit = await this._calculateAbitrageProfit(result.swapAmount, poolPriceEth, profit);
 
-			await this._databaseService.AddData({"profit": absoluteProfit, "network": "BSC", "isArbitrageSwap": true}, Profit);
+			await this._databaseService.AddData({ "profit": absoluteProfit, "network": "BSC", "isArbitrageSwap": true }, Profit);
 		}
 		else {
 			adjustmentValue = AdjustmentValueService.getAdjustmentValue(totalPoolBlxmBSC, totalPoolBlxmBSC, totalPoolBlxmETH, totalPoolUsdcETH);
 			adjustmentValueUsd = AdjustmentValueService.getAdjustmentValueUsd(totalPoolBlxmBSC, totalPoolBlxmBSC, totalPoolBlxmETH, totalPoolUsdcETH);
 
-			logger.info("BSC < ETH: The BLXM token trades cheaper on the BSC network than on the ETH network. Price difference between the networks: " + Math.abs(poolPriceDifference) +  " USD");
+			logger.info("BSC < ETH: The BLXM token trades cheaper on the BSC network than on the ETH network. Price difference between the networks: " + Math.abs(poolPriceDifference) + " USD");
 
-			result = await this.startArbitrageTransferFromBscToEth(adjustmentValue, adjustmentValueUsd, totalArbitrageBlxmBsc, totalArbitrageUsdcEth ,totalArbitrageUsdcBsc, totalPoolUsdcETH, minimumSwapAmountValue);
+			result = await this.startArbitrageTransferFromBscToEth(adjustmentValue, adjustmentValueUsd, totalArbitrageBlxmBsc, totalArbitrageUsdcEth, totalArbitrageUsdcBsc, totalPoolUsdcETH, minimumSwapAmountValue);
 
 			// cancel cycle
-			if(result === -1) {
+			if (result === -1) {
 				return;
 			}
 
@@ -111,11 +118,11 @@ class ArbitrageService {
 			let profit = ethers.utils.formatEther(postUsdBalanceEth) - ethers.utils.formatEther(preUsdBalanceEth);
 			let absoluteProfit = await this._calculateAbitrageProfit(result.swapAmount, poolPriceBsc, profit);
 
-			await this._databaseService.AddData({"profit": absoluteProfit, "network": "ETH", "isArbitrageSwap": true}, Profit);
+			await this._databaseService.AddData({ "profit": absoluteProfit, "network": "ETH", "isArbitrageSwap": true }, Profit);
 		}
 	}
 
-	async startArbitrageTransferFromEthToBsc(adjustmentValue, adjustmentValueUSDC, totalArbitrageBlxmEth, totalArbitrageUsdcEth, totalArbitrageUsdcBsc,  totalPoolUsdcEth, minimumSwapAmountValue) {
+	async startArbitrageTransferFromEthToBsc(adjustmentValue, adjustmentValueUSDC, totalArbitrageBlxmEth, totalArbitrageUsdcEth, totalArbitrageUsdcBsc, totalPoolUsdcEth, minimumSwapAmountValue) {
 		// is liqudity available ? 
 		if (!totalArbitrageBlxmEth.isZero()) {
 			let totalAdjustmentValue = Utility.bigNumberMin(totalArbitrageBlxmEth, adjustmentValue);
@@ -125,10 +132,10 @@ class ArbitrageService {
 
 			logger.info("Adjustment value BLXM: " + ethers.utils.formatEther(adjustmentValue));
 
-			if(minimumSwapAmountValue.minimumSwapAmountBLXM > ethers.utils.formatEther(totalAdjustmentValue)) {
+			if (minimumSwapAmountValue.minimumSwapAmountBLXM > ethers.utils.formatEther(totalAdjustmentValue)) {
 				logger.warn("Minimum swap BLXM amount is less than the adjustment value. Canceling current cycle.");
 
-				return  -1;
+				return -1;
 			}
 
 			return await this._bridgeAndSwapToBsc(totalAdjustmentValue);
@@ -140,24 +147,24 @@ class ArbitrageService {
 			logger.warn("ETH network: Not enough BLXM liquidity available. Need to swap USDC from arbitrage Pool");
 			logger.info("Adjustment value USD: " + ethers.utils.formatEther(adjustmentValueUSDC));
 
-			if(totalPoolUsdcEth.isZero()) {
+			if (totalPoolUsdcEth.isZero()) {
 				logger.warn("Not enough usdc liquidity in BSC Pool. Need to stop the cycle.");
 				this._stopCycle = true;
 
-				return  -1;
+				return -1;
 			}
 
 			// find minimum of the adjustmentValue and pool usd balance
 			let totalAdjustmentValue = Utility.bigNumberMin(adjustmentValueUSDC, totalPoolUsdcEth);
 
-			if(totalArbitrageUsdcEth.isZero() && totalArbitrageUsdcBsc.isZero()) {
+			if (totalArbitrageUsdcEth.isZero() && totalArbitrageUsdcBsc.isZero()) {
 				logger.warn("Stopping the cycle not enough liquidty BLXM or USDC avaible.");
 				this._stopCycle = true;
 
-				return  -1;
+				return -1;
 			}
-	
-			if(!totalArbitrageUsdcEth.isZero()) {
+
+			if (!totalArbitrageUsdcEth.isZero()) {
 				totalAdjustmentValue = Utility.bigNumberMin(adjustmentValueUSDC, totalArbitrageUsdcEth);
 			}
 
@@ -165,15 +172,15 @@ class ArbitrageService {
 			else if (!totalArbitrageUsdcBsc.isZero()) {
 				// take minimum Usd in BSC, if arbitrage total of usd is not equals to adjustmentValueUSDC
 				totalAdjustmentValue = Utility.bigNumberMin(adjustmentValueUSDC, totalArbitrageUsdcBsc);
-				
+
 				// bridge usdc from bsc to eth
 				await this._bridgeService.bridgeUSDTokenBscToEth(totalAdjustmentValue);
 			}
 
-			if(minimumSwapAmountValue.minimumSwapAmountUSD > ethers.utils.formatEther(totalAdjustmentValue)) {
+			if (minimumSwapAmountValue.minimumSwapAmountUSD > ethers.utils.formatEther(totalAdjustmentValue)) {
 				logger.warn("Minimum swap USD amount is less than the adjustment value. Canceling current cycle.");
 
-				return  -1;
+				return -1;
 			}
 
 			// swap from usd to blxm
@@ -196,8 +203,8 @@ class ArbitrageService {
 			logger.info("BSC network: Liqudity amount of BLXM: [" + ethers.utils.formatEther(totalArbitrageBlxmBsc) + "]");
 			logger.info("Adjustment value BLXM: " + adjustmentValue);
 
-			if(minimumSwapAmountValue.minimumSwapAmountBLXM > ethers.utils.formatEther(totalAdjustmentValue)) {
-				return  -1;
+			if (minimumSwapAmountValue.minimumSwapAmountBLXM > ethers.utils.formatEther(totalAdjustmentValue)) {
+				return -1;
 			}
 
 			return await this._bridgeAndSwapToEth(totalAdjustmentValue);
@@ -209,7 +216,7 @@ class ArbitrageService {
 			logger.warn("BSC network: Not enough BLXM liquidity available. Need to swap USDC from arbitrage Pool");
 			logger.info("Adjustment value USD: " + ethers.utils.formatEther(adjustmentValueUSDC));
 
-			if(totalPoolUsdcBsc.isZero()) {
+			if (totalPoolUsdcBsc.isZero()) {
 				logger.warn("Not enough usdc liquidity in BSC Pool. Need to stop the cycle.");
 				this._stopCycle = true;
 
@@ -219,14 +226,14 @@ class ArbitrageService {
 			// find minimum of the adjustmentValue and pool usd balance
 			let totalAdjustmentValue = Utility.bigNumberMin(adjustmentValueUSDC, totalPoolUsdcBsc);
 
-			if(totalArbitrageUsdcEth.isZero() && totalArbitrageUsdcBsc.isZero()) {
+			if (totalArbitrageUsdcEth.isZero() && totalArbitrageUsdcBsc.isZero()) {
 				logger.warn("Stopping the cycle not enough liquidty BLXM or USDC avaible.");
 				this._stopCycle = true;
 
 				return -1;
 			}
 
-			if(!totalArbitrageUsdcBsc.isZero()) {
+			if (!totalArbitrageUsdcBsc.isZero()) {
 				totalAdjustmentValue = Utility.bigNumberMin(adjustmentValueUSDC, totalArbitrageUsdcBsc);
 			}
 
@@ -235,7 +242,7 @@ class ArbitrageService {
 				// take minimum Usd in ETH, if arbitrage total of usd is not equals to adjustmentValueUSDC
 				totalAdjustmentValue = Utility.bigNumberMin(adjustmentValueUSDC, totalArbitrageUsdcEth);
 
-				if(totalAdjustmentValue.gt(totalArbitrageUsdcEth)) {
+				if (totalAdjustmentValue.gt(totalArbitrageUsdcEth)) {
 					this._stopCycle = true;
 
 					return -1;
@@ -245,11 +252,11 @@ class ArbitrageService {
 				await this._bridgeService.bridgeUSDTokenEthToBsc(totalAdjustmentValue);
 			}
 
-			
-			if(minimumSwapAmountValue.minimumSwapAmountUSD > ethers.utils.formatEther(totalAdjustmentValue)) {
+
+			if (minimumSwapAmountValue.minimumSwapAmountUSD > ethers.utils.formatEther(totalAdjustmentValue)) {
 				logger.warn("Minimum swap USD amount is less than the adjustment value. Canceling current cycle.");
 
-				return  -1;
+				return -1;
 			}
 
 			// swap from usd to blxm

@@ -13,7 +13,7 @@ var app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
+//app.use(express.static(path.join(__dirname, "public")));
 
 //To allow cross-origin requests
 app.use(cors());
@@ -34,7 +34,7 @@ app.use((err, req, res) => {
 });
 
 // register arbitrage cron job 
-cronJobs.registerArbitrageJob();
+//cronJobs.registerArbitrageJob();
 
 module.exports = app;
 

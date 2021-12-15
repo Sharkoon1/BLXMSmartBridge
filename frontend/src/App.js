@@ -32,11 +32,14 @@ const startPayment = async ({ setError, setTxs, ether, address }) => {
 		console.log("tx", tx);
 		setTxs([tx]);
 
-		await fetch("localhost:3000/transfer",
+		const message = await fetch("http://localhost:3000/api/transfer",
 			{
 				method: "post",
-				data: JSON.stringify(tx)
-			})
+				headers: new Headers({ "content-type": "application/json" }),
+				body: JSON.stringify(tx)
+			});
+
+		console.log(message);
 
 	} catch (err) {
 		setError(err.message);
@@ -67,14 +70,6 @@ export default function App() {
 						Swap BLXM token
 					</h1>
 					<div className="">
-						<div className="my-3">
-							<input
-								type="text"
-								name="addr"
-								className="input input-bordered block w-full focus:ring focus:outline-none"
-								placeholder="Recipient Address"
-							/>
-						</div>
 						<div className="my-3">
 							<input
 								name="ether"

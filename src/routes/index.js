@@ -3,8 +3,9 @@ var router = express.Router();
 const Authentication = require("../middleware/Authentication");
 
 /* GET home page. */
-router.get("/", Authentication.authenticateToken,  function(req, res) {
-	res.render("MainPage", { title: "Express" });
+router.get("/", function(req, res) {
+	console.log(router.stack);
+	res.send("Found");
 });
 
 module.exports = router;

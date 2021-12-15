@@ -1,5 +1,6 @@
 const { ethers } = require("ethers");
 const constants = require("../constants");
+require("dotenv").config();
 
 class WalletContainer {
 	constructor() {

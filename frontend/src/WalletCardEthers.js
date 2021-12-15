@@ -69,7 +69,6 @@ const WalletCardEthers = () => {
 		window.location.reload();
 	};
 
-
 	// listen for account changes
 	window.ethereum.on("accountsChanged", accountChangedHandler);
 
