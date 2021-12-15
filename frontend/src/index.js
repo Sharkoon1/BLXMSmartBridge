@@ -4,6 +4,7 @@ import ReactDOM from "react-dom";
 import App from "./App";
 import App1 from "./App1";
 import Buttons from "./Buttons";
+import socketIOClient from "socket.io-client";
 
 //const rootElement = document.getElementById("Admin");
 
@@ -30,3 +31,12 @@ ReactDOM.render(
 	rootElement2
 );
 
+let ioClient = socketIOClient.connect("http://localhost:3002");
+
+ioClient.on("connection",(socket) => {
+	console.log('connected!');
+});
+
+ioClient.on("log", function(msg){
+	console.log(msg);
+});
