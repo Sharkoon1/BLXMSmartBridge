@@ -213,6 +213,8 @@ class ArbitrageService {
 			logger.info("Adjustment value BLXM: " + ethers.utils.formatEther(adjustmentValue));
 
 			if (minimumSwapAmountValue.minimumSwapAmountBLXM > ethers.utils.formatEther(totalAdjustmentValue)) {
+				logger.warn("Minimum swap BLXM amount is less than the adjustment value. Canceling current cycle.");
+
 				return -1;
 			}
 
