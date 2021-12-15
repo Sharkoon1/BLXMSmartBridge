@@ -210,9 +210,11 @@ class ArbitrageService {
 
 			logger.info("BSC network: Liqudity of BLXM for swap available");
 			logger.info("BSC network: Liqudity amount of BLXM: [" + ethers.utils.formatEther(totalArbitrageBlxmBsc) + "]");
-			logger.info("Adjustment value BLXM: " + adjustmentValue);
+			logger.info("Adjustment value BLXM: " + ethers.utils.formatEther(adjustmentValue));
 
 			if (minimumSwapAmountValue.minimumSwapAmountBLXM > ethers.utils.formatEther(totalAdjustmentValue)) {
+				logger.warn("Minimum swap BLXM amount is less than the adjustment value. Canceling current cycle.");
+
 				return -1;
 			}
 
