@@ -4,19 +4,19 @@ let router = express.Router();
 
 
 router.get("/", (req, res, next) => {
-	res.send(cronJobs._arbitrageService._isRunning);
-	console.log("Page load ",cronJobs._arbitrageService._isRunning);
+	res.send(cronJobs.taskRunning);
+	console.log("Page load ",cronJobs.taskRunning);
 });
 
 router.post("/", (req, res, next) => {
-	console.log("Before ",cronJobs._arbitrageService._isRunning);
-	if (!cronJobs._arbitrageService._isRunning){
+	console.log("Before ",cronJobs.taskRunning);
+	if (!cronJobs.taskRunning){
 		cronJobs.startTask();
 	} else {
 		cronJobs.stopTask();
 	}
-	console.log("After ",cronJobs._arbitrageService._isRunning);
-	res.send(cronJobs._arbitrageService._isRunning);
+	console.log("After ",cronJobs.taskRunning);
+	res.send(cronJobs.taskRunning);
 });
 
 module.exports = router;

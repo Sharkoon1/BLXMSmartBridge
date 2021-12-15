@@ -9,6 +9,7 @@ class CronJobs {
 		let bridgeService = new BridgeService(WalletContainer);
 		this._arbitrageService = new ArbitrageService(bridgeService, WalletContainer);
 		this._task;
+		this.taskRunning = false;
 	}
 
 	registerArbitrageJob() {
@@ -20,12 +21,13 @@ class CronJobs {
 
 	startTask() {
 		this._task.start();
-		this._arbitrageService._isRunning = true;
+		this.taskRunning = true;
 	}
 
 	stopTask() {
 		this._task.stop();
-		this._arbitrageService._isRunning = false;
+		this.taskRunning = false;
+		this._arbitrageService._stopCycle = true;
 	}
 }
 
