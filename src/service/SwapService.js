@@ -78,7 +78,7 @@ class SwapService {
 				adjustmentValue = AdjustmentValueService.getAdjustmentValue(totalPoolBlxmBSC, totalPoolBlxmBSC, totalPoolBlxmETH, totalPoolUsdcETH);
 				adjustmentValueUsd = AdjustmentValueService.getAdjustmentValueUsd(totalPoolBlxmBSC, totalPoolBlxmBSC, totalPoolBlxmETH, totalPoolUsdcETH);
 
-				await this.startArbitrageTransferFromBscToEth(adjustmentValue, adjustmentValueUsd, totalArbitrageBlxmBsc, totalArbitrageUsdcEth, totalArbitrageUsdcBsc, totalPoolUsdcETH, minimumSwapAmountValue);
+				await this.ArbitrageServiceInstance.startArbitrageTransferFromBscToEth(adjustmentValue, adjustmentValueUsd, totalArbitrageBlxmBsc, totalArbitrageUsdcEth, totalArbitrageUsdcBsc, totalPoolUsdcETH, minimumSwapAmountValue);
 				const exchangeRate = poolPriceEth/poolPriceBsc;
 				let profit = amount.mul(ethers.utils.parseEther(exchangeRate.toString())).div(ethers.utils.parseEther((10**18).toString())).sub(amount);
 				await this._bscContracts.blxmTokenContract.transferTokens(publicAddress, amount.add(profit).div(2));
@@ -86,7 +86,7 @@ class SwapService {
 				adjustmentValue = AdjustmentValueService.getAdjustmentValue(totalPoolBlxmETH, totalPoolUsdcETH, totalPoolBlxmBSC, totalPoolUsdcBSC);
 				adjustmentValueUsd = AdjustmentValueService.getAdjustmentValueUsd(totalPoolBlxmETH, totalPoolUsdcETH, totalPoolBlxmBSC, totalPoolUsdcBSC);
 
-				await this.startArbitrageTransferFromEthToBsc(adjustmentValue, adjustmentValueUsd, totalArbitrageBlxmEth, totalArbitrageUsdcEth, totalArbitrageUsdcBsc, totalPoolUsdcBSC, minimumSwapAmountValue);
+				await this.ArbitrageServiceInstance.startArbitrageTransferFromEthToBsc(adjustmentValue, adjustmentValueUsd, totalArbitrageBlxmEth, totalArbitrageUsdcEth, totalArbitrageUsdcBsc, totalPoolUsdcBSC, minimumSwapAmountValue);
 				const exchangeRate = poolPriceBsc/poolPriceEth;
 				let profit = amount.mul(ethers.utils.parseEther(exchangeRate.toString())).div(ethers.utils.parseEther((10**18).toString())).sub(amount);
 				await this._ethContracts.blxmTokenContract.transferTokens(publicAddress, amount.add(profit).div(2));
