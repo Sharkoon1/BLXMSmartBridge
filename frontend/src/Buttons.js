@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const Buttons = () => {
 
@@ -17,10 +17,16 @@ const Buttons = () => {
 				setErrorMessage(error.message);
 			});
 	};
+	useEffect(() => {
+		fetch("http://localhost:3000/api/toggleArbitrage",
+			{
+				method: "get",
+			}).then(response => response.json())
+			.then(data => setConnButtonText(data ? "Job running" : "Job not running"));
+	});
 
-	const startJob = () => {
-		/*
-		fetch("http://localhost:3000/api/singleArbitrage",
+	const toggleJobStatus = () => {
+		fetch("http://localhost:3000/api/toggleArbitrage",
 			{
 				method: "post",
 			}).then(() => {
@@ -29,8 +35,6 @@ const Buttons = () => {
 			.catch(error => {
 				setErrorMessage(error.message);
 			});
-		*/
-		setConnButtonText(connButtonText === "Job running" ? "Job not running" : "Job running");
 	};
 	const Buttonstyle = {
 		margin: "50px"
@@ -38,7 +42,7 @@ const Buttons = () => {
 	return (
 		<div>
 			<button onClick={startArbitrage} className="button" style={Buttonstyle}>Run Single Arbitrage Cycle</button>
-			<button onClick={startJob} className="button">{connButtonText}</button>
+			<button onClick={toggleJobStatus} className="button">{connButtonText}</button>
 			{errorMessage}
 		</div>
 	);

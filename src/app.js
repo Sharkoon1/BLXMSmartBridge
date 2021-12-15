@@ -35,6 +35,7 @@ app.use((err, req, res) => {
 
 // register arbitrage cron job 
 cronJobs.registerArbitrageJob();
+cronJobs.stopTask();
 
 module.exports = app;
 

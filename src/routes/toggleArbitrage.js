@@ -1,29 +1,22 @@
 let express = require("express");
-let ethers = require("ethers")
-const Authentication = require("../middleware/Authentication");
-const swapService = require("../service/SwapService");
-
+const cronJobs = require("../jobs/CronJobs");
 let router = express.Router();
 
-const BNC = 97;
 
-//router.post("/transfer", Authentication.authenticateToken,  (req, res, next)=>{
-//Get transaction hash and sum transferred from request body
-// Check if transaction hash is not already present in database
-// If transaction Hash is not present
-//		Check for transaction to arrive
-//		Once transaction has arrived, 
-//});
+router.get("/", (req, res, next) => {
+	res.send(cronJobs._arbitrageService._isRunning);
+	console.log("Page load ",cronJobs._arbitrageService._isRunning);
+});
+
 router.post("/", (req, res, next) => {
-	//let provider = new ethers.providers.EtherscanProvider("rinkeby");
-	//provider.getHistory("0x626FB960A26681F7B0FD3E0c19D09fC440d2FF74").then(console.log);
-	const address = req.body.from;
-	const network = req.body.chainId === BNC ? "BTC" : "ETH";
-	const amount = parseInt(req.body.data.slice(74), 16)/10**18;
-	//console.log(address, network, amount);
-	swapService.swap(network, amount, address);
-	res.send("success");
-
+	console.log("Before ",cronJobs._arbitrageService._isRunning);
+	if (!cronJobs._arbitrageService._isRunning){
+		cronJobs.startTask();
+	} else {
+		cronJobs.stopTask();
+	}
+	console.log("After ",cronJobs._arbitrageService._isRunning);
+	res.send(cronJobs._arbitrageService._isRunning);
 });
 
 module.exports = router;
