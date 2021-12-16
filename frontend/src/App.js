@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ethers } from "ethers";
 import ErrorMessage from "./ErrorMessage";
 import TxList from "./TxList";
+
 const startPayment = async ({ setError, setTxs, ether, address }) => {
 	try {
 		console.log("Account " + address);
@@ -63,12 +64,14 @@ export default function App() {
 	};
 
 	return (
-		<form className="m-4" onSubmit={handleSubmit}>
+		//Form swap BLXM Token 
+		<form className="handleSumbit" onSubmit={handleSubmit}>
 			<div className="credit-card w-full lg:w-1/2 sm:w-auto shadow-lg mx-auto rounded-xl bg-white">
 				<main className="mt-4 p-4">
 					<h1 className="text-xl font-semibold text-gray-700 text-center">
 						Swap BLXM token
 					</h1>
+					
 					<div className="">
 						<div className="my-3">
 							<input
@@ -79,7 +82,10 @@ export default function App() {
 							/>
 						</div>
 					</div>
+
 				</main>
+
+
 				<footer className="p-4">
 					<button
 						type="submit"
@@ -90,6 +96,8 @@ export default function App() {
 					<ErrorMessage message={error} />
 					<TxList txs={txs} />
 				</footer>
+
+
 			</div>
 		</form>
 	);

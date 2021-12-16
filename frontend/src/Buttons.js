@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import "./Buttons.css";
+
+
 
 const Buttons = () => {
 	const runningMessage = "Job running";
@@ -40,9 +43,10 @@ const Buttons = () => {
 		margin: "50px"
 	};
 	return (
-		<div>
-			<button onClick={startArbitrage} className="button" style={Buttonstyle}>Run Single Arbitrage Cycle</button>
-			<button onClick={toggleJobStatus} className="button">{connButtonText}</button>
+		<div className="adminPanel">
+			
+			<button onClick={startArbitrage} className="button" id="runSingle" >Run Single Arbitrage Cycle</button>
+			<button onClick={toggleJobStatus} className="button" id="toggleStatus">{connButtonText}</button>
 			{errorMessage}
 		</div>
 	);

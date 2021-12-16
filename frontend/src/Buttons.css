@@ -1,0 +1,21 @@
+.adminPanel{
+    
+    text-align: center;
+    text-align: center;
+    margin-left: 0;
+    margin-right: 0;
+    
+  
+}
+
+#runSingle, #toggleStatus { 
+    width: 50%; 
+    display: inline;
+    margin: 5px;}
+
+@media only screen and (max-width: 1023px) {
+    #runSingle, #toggleStatus {
+        margin-top: 10; 
+        width: 100%; 
+        margin-left: 0;}
+  }

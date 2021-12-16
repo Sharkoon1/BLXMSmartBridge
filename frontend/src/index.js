@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom";
 
+import "./App.css";
 import App from "./App";
 import App1 from "./App1";
 import Buttons from "./Buttons";
