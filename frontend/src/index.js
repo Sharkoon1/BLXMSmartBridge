@@ -34,7 +34,8 @@ ReactDOM.render(
 let ioClient = socketIOClient.connect("http://localhost:3002");
 
 ioClient.on("connection",(socket) => {
-	console.log('connected!');
+	console.log(socket);
+	console.log("connected!");
 });
 
 ioClient.on("log", function(msg){

@@ -23,7 +23,6 @@ class ArbitrageService {
 	}
 
 	async startArbitrage() {
-		if (!this._isRunning) {
 			this._isRunning = true;
 			this._stopCycle = false;
 
@@ -47,7 +46,6 @@ class ArbitrageService {
 			}
 
 			this._isRunning = false;
-		}
 	}
 
 

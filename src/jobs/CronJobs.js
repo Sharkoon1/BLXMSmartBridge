@@ -20,6 +20,7 @@ class CronJobs {
 	}
 
 	startTask() {
+		this._arbitrageService._stopCycle = false;
 		this._task.start();
 		this.taskRunning = true;
 	}

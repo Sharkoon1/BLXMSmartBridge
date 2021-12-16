@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 
 const Buttons = () => {
-
+	const runningMessage = "Job running";
+	const notRunningMessage = "Job not running";
 	const [errorMessage, setErrorMessage] = useState(null);
-	const [connButtonText, setConnButtonText] = useState("Job not running");
+	const [connButtonText, setConnButtonText] = useState("");
 
 	const startArbitrage = () => {
 
@@ -11,7 +12,6 @@ const Buttons = () => {
 			{
 				method: "post",
 			}).then(() => {
-			setConnButtonText("Wallet Connected");
 		})
 			.catch(error => {
 				setErrorMessage(error.message);
@@ -22,16 +22,16 @@ const Buttons = () => {
 			{
 				method: "get",
 			}).then(response => response.json())
-			.then(data => setConnButtonText(data ? "Job running" : "Job not running"));
+			.then(data => setConnButtonText(data ? runningMessage : notRunningMessage));
 	});
 
 	const toggleJobStatus = () => {
 		fetch("http://localhost:3000/api/toggleArbitrage",
 			{
 				method: "post",
-			}).then(() => {
-			setConnButtonText(connButtonText === "Job Running" ? "Job not running" : "Job running");
-		})
+			}).then(response => response.json())
+			.then(data => setConnButtonText(data ? runningMessage : notRunningMessage)
+			)
 			.catch(error => {
 				setErrorMessage(error.message);
 			});
