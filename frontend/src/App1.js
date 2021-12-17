@@ -1,4 +1,4 @@
-import "./App1.css";
+import "./style/App1.css";
 import WalletCardEthers from "./WalletCardEthers";
 
 function App1() {

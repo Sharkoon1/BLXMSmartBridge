@@ -1,15 +1,15 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom";
 
-import "./index.css"
-import "./App.css";
+import "./style/index.css"
+import "./style/App.css";
 import App from "./App";
 import App1 from "./App1";
 import Buttons from "./Buttons";
 import socketIOClient from "socket.io-client";
 import Navbar from "./Navbar";
 import {Log} from "./components/log";
-
+import { NavLink } from "react-router-dom";
 
 //const rootElement = document.getElementById("Admin");
 const navbar = document.getElementById("navbar");
@@ -40,6 +40,14 @@ ReactDOM.render(
 		<Buttons />
 	</StrictMode>,
 	rootElement2
+);
+
+const rootElement3 = document.getElementById("log");
+ReactDOM.render(
+	<StrictMode>
+		<Log />
+	</StrictMode>,
+	rootElement3
 );
 
 let ioClient = socketIOClient.connect("http://localhost:3002");

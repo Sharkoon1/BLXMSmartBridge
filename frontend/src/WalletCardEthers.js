@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ethers } from "ethers";
-import "./WalletCard.css";
+import "./style/WalletCard.css";
 
 const WalletCardEthers = () => {
 
