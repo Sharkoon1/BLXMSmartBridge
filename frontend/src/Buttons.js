@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "./style/Buttons.css";
-import { NavLink } from "react-router-dom";
-
-
 
 const Buttons = () => {
 	const runningMessage = "Job running";
