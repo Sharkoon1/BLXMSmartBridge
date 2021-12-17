@@ -10,7 +10,7 @@ export default function App() {
      
     return (
         <div class="topnav">
-        <a href="#home" class="active"> <img class="image" src="../bloxmove.png"></img></a>
+        <a href="" class="active"> <img class="image" src="../bloxmove.png"></img></a>
             <div id="myLinks" style={{ display: show ? "block" : "none" }}>
                 <a href="#admin">Admin</a>
             </div>
