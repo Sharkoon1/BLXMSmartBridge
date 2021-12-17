@@ -1,14 +1,24 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom";
 
+import "./index.css"
+import "./App.css";
 import App from "./App";
 import App1 from "./App1";
 import Buttons from "./Buttons";
+import socketIOClient from "socket.io-client";
+import Navbar from "./Navbar";
 import {Log} from "./components/log";
 
 
 //const rootElement = document.getElementById("Admin");
-
+const navbar = document.getElementById("navbar");
+ReactDOM.render(
+	<StrictMode>
+		<Navbar />
+	</StrictMode>,
+	navbar
+);
 const rootElement = document.getElementById("root");
 ReactDOM.render(
 	<StrictMode>
@@ -32,11 +42,13 @@ ReactDOM.render(
 	rootElement2
 );
 
-const rootElement3 = document.getElementById("log");
-ReactDOM.render(
-	<StrictMode>
-		<Log />
-	</StrictMode>,
-	rootElement3
-);
+let ioClient = socketIOClient.connect("http://localhost:3002");
 
+ioClient.on("connection",(socket) => {
+	console.log(socket);
+	console.log("connected!");
+});
+
+ioClient.on("log", function(msg){
+	console.log(msg);
+});

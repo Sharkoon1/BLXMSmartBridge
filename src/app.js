@@ -1,5 +1,6 @@
 var express = require("express");
 var path = require("path");
+var EventEmitter = require("events").EventEmitter;
 var cookieParser = require("cookie-parser");
 var indexRouter = require("./routes/index");
 var apiRouter = require("./routes/api");
@@ -33,8 +34,46 @@ app.use((err, req, res) => {
 	}
 });
 
+app.use(function (req, res, next) {
+
+	res.setHeader("Access-Control-Allow-Origin", "*");
+	res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
+	res.setHeader("Access-Control-Allow-Headers", "X-Requested-With,content-type");
+	res.setHeader("Access-Control-Allow-Credentials", true);
+
+	next();
+});
+
+const server = require("http").createServer();
+
+const io = require("socket.io")(server,{
+	cors: {
+		origin: "*",
+		methods: ["GET", "POST"]
+	}
+});
+
+
+io.on("connection", client => {
+	console.log("Connected!");
+	client.on("event", data => { /* … */ });
+	client.on("disconnect", () => { /* … */ });
+});
+
+
+var logEvent = new EventEmitter();
+
+exports.logEvent = logEvent;
+
+logEvent.on("logMessage", function(msg) {
+	io.sockets.emit("log", msg);
+});
+
+server.listen(3002);
+
 // register arbitrage cron job 
 cronJobs.registerArbitrageJob();
+cronJobs.stopTask();
 
 module.exports = app;
 

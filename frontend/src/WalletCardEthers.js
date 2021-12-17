@@ -76,10 +76,9 @@ const WalletCardEthers = () => {
 
 	const Textstyle = {
 		color: "black",
-		fontSize: "150%",
 	};
 	return (
-		<div className="walletCard w-full lg:w-1/2 shadow-lg mx-auto rounded-xl bg-white mx-auto">
+		<div  className="walletCard w-full lg:w-1/2 shadow-lg mx-auto rounded-xl bg-white mx-auto">
 			<button onClick={connectWalletHandler} className="button">{connButtonText}</button>
 			<div className="accountDisplay">
 				<h3 style={Textstyle}>Address: {defaultAccount}</h3>

@@ -1,9 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import "./Buttons.css";
+
+
 
 const Buttons = () => {
-
+	const runningMessage = "Job running";
+	const notRunningMessage = "Job not running";
 	const [errorMessage, setErrorMessage] = useState(null);
-	const [connButtonText, setConnButtonText] = useState("Job not running");
+	const [connButtonText, setConnButtonText] = useState("");
 
 	const startArbitrage = () => {
 
@@ -11,34 +15,38 @@ const Buttons = () => {
 			{
 				method: "post",
 			}).then(() => {
-			setConnButtonText("Wallet Connected");
 		})
 			.catch(error => {
 				setErrorMessage(error.message);
 			});
 	};
+	useEffect(() => {
+		fetch("http://localhost:3000/api/toggleArbitrage",
+			{
+				method: "get",
+			}).then(response => response.json())
+			.then(data => setConnButtonText(data ? runningMessage : notRunningMessage));
+	});
 
-	const startJob = () => {
-		/*
-		fetch("http://localhost:3000/api/singleArbitrage",
+	const toggleJobStatus = () => {
+		fetch("http://localhost:3000/api/toggleArbitrage",
 			{
 				method: "post",
-			}).then(() => {
-			setConnButtonText(connButtonText === "Job Running" ? "Job not running" : "Job running");
-		})
+			}).then(response => response.json())
+			.then(data => setConnButtonText(data ? runningMessage : notRunningMessage)
+			)
 			.catch(error => {
 				setErrorMessage(error.message);
 			});
-		*/
-		setConnButtonText(connButtonText === "Job running" ? "Job not running" : "Job running");
 	};
 	const Buttonstyle = {
 		margin: "50px"
 	};
 	return (
-		<div>
-			<button onClick={startArbitrage} className="button" style={Buttonstyle}>Run Single Arbitrage Cycle</button>
-			<button onClick={startJob} className="button">{connButtonText}</button>
+		<div className="adminPanel">
+			
+			<button onClick={startArbitrage} className="button" id="runSingle" >Run Single Arbitrage Cycle</button>
+			<button onClick={toggleJobStatus} className="button" id="toggleStatus">{connButtonText}</button>
 			{errorMessage}
 		</div>
 	);
