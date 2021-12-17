@@ -7,10 +7,17 @@ import App from "./App";
 import App1 from "./App1";
 import Buttons from "./Buttons";
 import socketIOClient from "socket.io-client";
+import Navbar from "./Navbar";
 
 
 //const rootElement = document.getElementById("Admin");
-
+const navbar = document.getElementById("navbar");
+ReactDOM.render(
+	<StrictMode>
+		<Navbar />
+	</StrictMode>,
+	navbar
+);
 const rootElement = document.getElementById("root");
 ReactDOM.render(
 	<StrictMode>
