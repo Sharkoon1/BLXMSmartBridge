@@ -1,11 +1,13 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom";
 
+import "./index.css"
 import "./App.css";
 import App from "./App";
 import App1 from "./App1";
 import Buttons from "./Buttons";
 import socketIOClient from "socket.io-client";
+
 
 //const rootElement = document.getElementById("Admin");
 

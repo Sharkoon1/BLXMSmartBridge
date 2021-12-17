@@ -3,7 +3,8 @@
 /** APP1 CSS  **/
 /** Only conatins top connect wallet button   **/
 .App {
-  margin-top: 5%;
+
+ padding-top: 15%;
   margin-left: 0;
   margin-right: 0;
   text-align: center;
