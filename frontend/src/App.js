@@ -2,6 +2,8 @@ import { useState } from "react";
 import { ethers } from "ethers";
 import ErrorMessage from "./ErrorMessage";
 import TxList from "./TxList";
+
+
 const startPayment = async ({ setError, setTxs, ether, address }) => {
 	try {
 		console.log("Account " + address);
@@ -61,6 +63,7 @@ export default function App() {
 			address: data.get("addr")
 		});
 	};
+
 
 	return (
 		<form className="m-4" onSubmit={handleSubmit}>
