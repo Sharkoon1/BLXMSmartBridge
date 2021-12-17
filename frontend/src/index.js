@@ -8,8 +8,13 @@ import App1 from "./App1";
 import Buttons from "./Buttons";
 import socketIOClient from "socket.io-client";
 import Navbar from "./Navbar";
+<<<<<<< Updated upstream
 import {Log} from "./components/log";
 import { NavLink } from "react-router-dom";
+=======
+import Logs from "./Logs";
+
+>>>>>>> Stashed changes
 
 //const rootElement = document.getElementById("Admin");
 const navbar = document.getElementById("navbar");
@@ -23,6 +28,7 @@ const rootElement = document.getElementById("root");
 ReactDOM.render(
 	<StrictMode>
 		<App1 />
+		<Logs />
 	</StrictMode>,
 	rootElement
 );
@@ -42,6 +48,7 @@ ReactDOM.render(
 	rootElement2
 );
 
+<<<<<<< Updated upstream
 const rootElement3 = document.getElementById("log");
 ReactDOM.render(
 	<StrictMode>
@@ -60,3 +67,5 @@ ioClient.on("connection",(socket) => {
 ioClient.on("log", function(msg){
 	console.log(msg);
 });
+=======
+>>>>>>> Stashed changes
