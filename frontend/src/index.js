@@ -8,16 +8,8 @@ import App1 from "./App1";
 import Buttons from "./Buttons";
 import socketIOClient from "socket.io-client";
 import Navbar from "./Navbar";
-<<<<<<< Updated upstream
 import {Log} from "./components/log";
-<<<<<<< HEAD
-=======
-import { NavLink } from "react-router-dom";
-=======
 import Logs from "./Logs";
-
->>>>>>> Stashed changes
->>>>>>> cc3f86d1f2791880c24f51be2f125623f394b333
 
 //const rootElement = document.getElementById("Admin");
 const navbar = document.getElementById("navbar");
@@ -51,24 +43,3 @@ ReactDOM.render(
 	rootElement2
 );
 
-<<<<<<< Updated upstream
-const rootElement3 = document.getElementById("log");
-ReactDOM.render(
-	<StrictMode>
-		<Log />
-	</StrictMode>,
-	rootElement3
-);
-
-let ioClient = socketIOClient.connect("http://localhost:3002");
-
-ioClient.on("connection",(socket) => {
-	console.log(socket);
-	console.log("connected!");
-});
-
-ioClient.on("log", function(msg){
-	console.log(msg);
-});
-=======
->>>>>>> Stashed changes
