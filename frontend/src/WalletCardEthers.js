@@ -81,17 +81,17 @@ const WalletCardEthers = () => {
 		<div  className="walletCard w-full lg:w-1/2 shadow-lg mx-auto rounded-xl bg-white mx-auto">
 			<button onClick={connectWalletHandler} className="button">{connButtonText}</button>
 			<div className="accountDisplay">
-				<h3 style={Textstyle}>Address: {defaultAccount}</h3>
+				<h4 style={Textstyle}>Address: {defaultAccount}</h4>
 			</div>
 			<div className="balanceDisplay">
-				<h3 style={Textstyle}>Balance: {userBalance}</h3>
+				<h4 style={Textstyle}>Balance: {userBalance}</h4>
 			</div>
 			<div className="networkDisplay">
-				<h3 style={Textstyle}>Network: {userNetwork}</h3>
+				<h4 style={Textstyle}>Network: {userNetwork}</h4>
 			</div>
 			{userNetwork ?
 				<div className="swapInformation">
-					<h3 style={Textstyle}>You will be swapping from the {userNetwork} to the {userNetwork === "Ethereum Blockchain" ? "Binance Smart Chain" : "Ethereum Blockchain"}</h3>
+					<h4 style={Textstyle}>You will be swapping from the {userNetwork} to the {userNetwork === "Ethereum Blockchain" ? "Binance Smart Chain" : "Ethereum Blockchain"}</h4>
 				</div> : null
 			}
 			{errorMessage}

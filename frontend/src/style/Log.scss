@@ -8,6 +8,8 @@
   width: 85%;
   max-height: 65vh;
   
+
+ /* 
   &:before {
     content: ' ';
     display: block;
@@ -15,6 +17,7 @@
     background: #C6C6C6;
   }
   
+
   &:after {
     content: '. . .';
     position: absolute;
@@ -26,20 +29,27 @@
     color: #fff;
     line-height: 0;
     letter-spacing: -12px;
-  }
+   
+   
+   }*/ 
 }
 
+
+
 .terminal {
+  overflow: auto;
+  scroll-behavior: auto;
   margin: 20px;
   font-family: monospace;
   font-size: 16px;
   color: #22da26;
   
   .command { 
+    
     width: 0%;
     white-space: nowrap;
     overflow: hidden;
-    animation: write-command 5s both;
+    animation: write-command 1s both;
     
     &:before {
       content: '$ ';
@@ -48,16 +58,16 @@
   }
   
   .log {
-    white-space: nowrap;
+    max-width: 100%;
     overflow: hidden;
   }
 
   p:nth-child(2) {
-    animation-delay: 2s;
+    animation-delay: 1s;
   }
   
   p:nth-child(3) {
-    animation-delay: 8s;
+    animation-delay: 1s;
   }
 }
 

@@ -1,11 +1,11 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import socketIOClient from "socket.io-client";
 
 export default class Logs extends Component {
   state = {
     logs: [],
   };
-
+ 
 
   componentDidMount() {
     let ioClient = socketIOClient.connect("http://localhost:3002");
@@ -37,16 +37,18 @@ export default class Logs extends Component {
 
   render() {
     return (
+      <Fragment>
+      <div class="terminalbar"></div>
       <div class="window">
         <div class="terminal">
-          <p class="command">Arbitrage Console is ready.</p>
-          
+          <p id="command" class="command">Arbitrage Console is ready.</p>  
             {this.state.logs.map((subItems, sIndex) => {
               return <p class="log"><span key={sIndex}> {subItems}</span></p>;
             })}
           
         </div>
       </div>
+      </Fragment>
     );
   }
 }
