@@ -38,16 +38,17 @@ class ArbitrageService {
 				logger.info("ETH network: Current price BLXM " + ethers.utils.formatEther(poolPriceEth) + " USD");
 				logger.info("BSC network: Current price BLXM " + ethers.utils.formatEther(poolPriceBsc) + " USD");
 
-				await this._startArbitrageCycle(poolPriceBsc, poolPriceEth);
+				let newPoolPrices = await this._startArbitrageCycle(poolPriceBsc, poolPriceEth);
+
+				poolPriceBsc = newPoolPrices.poolPriceBsc;
+				poolPriceEth = newPoolPrices.poolPriceEth;
+
 				if (this._stopCycle) {
 					this._isRunning = false;
 					app.logEvent.emit("cycleCompleted", true);
 
 					return false;
 				}
-
-				poolPriceBsc = await this._bscContracts.getPoolPrice();
-				poolPriceEth = await this._ethContracts.getPoolPrice();
 			}
 
 			this._isRunning = false;
@@ -110,11 +111,18 @@ class ArbitrageService {
 
 			// TODO: use response from startArbitrageTransferFromEthToBsc (result), workaround because value is null
 			let postUsdBalanceBsc = await this._bscContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
-
 			let profit = ethers.utils.formatEther(postUsdBalanceBsc) - ethers.utils.formatEther(preUsdBalanceBsc);
-			let absoluteProfit = await this._calculateAbitrageProfit(result.swapAmount, poolPriceEth, profit);
+			
+			let	endPoolPriceBsc = await this._bscContracts.getPoolPrice();
+			let endPoolPriceEth = await this._ethContracts.getPoolPrice();
+
+			let endtotalArbitrageBlxmBsc = await this._bscContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
+
+			let absoluteProfit = await this._calculateAbitrageProfit(result.swapAmount, poolPriceBsc, endPoolPriceBsc, totalArbitrageBlxmBsc, endtotalArbitrageBlxmBsc, profit);
 
 			await this._databaseService.AddData({ "profit": absoluteProfit, "network": "BSC", "isArbitrageSwap": true }, Profit);
+
+			return { poolPriceBsc: endPoolPriceBsc, poolPriceEth: endPoolPriceEth};
 		}
 		else {
 			adjustmentValue = AdjustmentValueService.getAdjustmentValue(totalPoolBlxmBSC, totalPoolUsdcBSC, totalPoolBlxmETH, totalPoolUsdcETH);
@@ -131,11 +139,18 @@ class ArbitrageService {
 
 			// TODO: use response from startArbitrageTransferFromEthToBsc (result), workaround because value is null
 			let postUsdBalanceEth = await this._ethContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
-
 			let profit = ethers.utils.formatEther(postUsdBalanceEth) - ethers.utils.formatEther(preUsdBalanceEth);
-			let absoluteProfit = await this._calculateAbitrageProfit(result.swapAmount, poolPriceBsc, profit);
+
+			let	endPoolPriceBsc = await this._bscContracts.getPoolPrice();
+			let endPoolPriceEth = await this._ethContracts.getPoolPrice();
+
+			let endtotalArbitrageBlxmEth = await this._ethContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
+
+			let absoluteProfit = await this._calculateAbitrageProfit(result.swapAmount, poolPriceEth, endPoolPriceEth, totalArbitrageBlxmEth, endtotalArbitrageBlxmEth, profit);
 
 			await this._databaseService.AddData({ "profit": absoluteProfit, "network": "ETH", "isArbitrageSwap": true }, Profit);
+
+			return { poolPriceBsc: endPoolPriceBsc, poolPriceEth: endPoolPriceEth};
 		}
 	}
 
@@ -311,17 +326,24 @@ class ArbitrageService {
 		return { profit: profit, swapAmount: totalAdjustmentValue };
 	}
 
-	async _calculateAbitrageProfit(swapAmountBlxm, startPriceCheapBLXM, profit) {
+	async _calculateAbitrageProfit(swapAmountBlxm, startPriceCheapBLXM, endPriceExpensiveBlXM, startTotalBLXM, endTotalBLXM, profit) {
 		swapAmountBlxm = ethers.utils.formatEther(swapAmountBlxm);
 		startPriceCheapBLXM = ethers.utils.formatEther(startPriceCheapBLXM);
+		endPriceExpensiveBlXM = ethers.utils.formatEther(endPriceExpensiveBlXM);
+		startTotalBLXM = ethers.utils.formatEther(startTotalBLXM);
+		endTotalBLXM = ethers.utils.formatEther(endTotalBLXM);
+
 
 		//Calculate how much the abitrage costs us 
 		let inputFactor = swapAmountBlxm * startPriceCheapBLXM; //Cheap BLXM
 
-		//Calculate the loss that happens because of changed price in our abitrage wallet 
-		let absoluteAbitrageProfit = profit - inputFactor;
+		let capitalLoss = (startTotalBLXM * startPriceCheapBLXM) - (endTotalBLXM * endPriceExpensiveBlXM);
 
-		logger.info("Input factor:   " + inputFactor + " USD");
+		//Calculate the loss that happens because of changed price in our abitrage wallet 
+		let absoluteAbitrageProfit = profit - inputFactor - capitalLoss;
+
+		logger.info("Capital loss : [" + capitalLoss + "] USD");
+		logger.info("Input factor:  [" + inputFactor + "] USD");
 		logger.info("The abitrage trade made in sum : [" + absoluteAbitrageProfit + "] USD absolute profit");
 
 		return absoluteAbitrageProfit;
