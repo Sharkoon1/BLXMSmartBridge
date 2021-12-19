@@ -26,12 +26,26 @@ export default function App() {
         }
     }
 
+    function onClick2() {
+        const root = document.getElementById("root");
+        const root1 = document.getElementById("root1");
+        const buttons = document.getElementById("buttons");
+
+        root.style.display = "block";
+        root1.style.display = "block";
+        buttons.style.display = "none";
+        
+    }
+
+
      
     return (
         <div class="topnav">
-        <a href="" class="active"> <img class="image" src="../bloxmove.png"></img></a>
+        <a href="#swap" class="active" onClick={onClick2}> <img class="image" src="../bloxmove.png"></img></a>
             <div id="myLinks" style={{ display: show ? "block" : "none" }}>
-                <button id="adminButton" onClick={onClick}>Admin</button>
+            <a href="#admin" onClick={onClick}>
+                Admin
+            </a>
             </div>
             
             <button class="icon" onClick={() => setShow((s) => !s)}> 

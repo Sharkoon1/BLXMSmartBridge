@@ -69,7 +69,7 @@ logEvent.on("logMessage", function(msg) {
 	io.sockets.emit("log", msg);
 });
 
-server.listen(3002);
+server.listen(3020);
 
 // register arbitrage cron job 
 cronJobs.registerArbitrageJob();
