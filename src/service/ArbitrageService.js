@@ -56,9 +56,13 @@ class ArbitrageService {
 
 
 	async startSingleArbitrageCycle() {
+		logger.info("Starting single AbitrageService cycle ...");
+
 		let poolPriceBsc = await this._bscContracts.getPoolPrice();
 		let poolPriceEth = await this._ethContracts.getPoolPrice();
-		await this._startArbitrageCycle(poolPriceBsc, poolPriceEth);
+		this._startArbitrageCycle(poolPriceBsc, poolPriceEth).then(function () {
+			app.logEvent.emit("cycleCompleted", true);
+		});
 	}
 
 	async _startArbitrageCycle(poolPriceBsc, poolPriceEth) {
