@@ -17,7 +17,6 @@ const WalletCardEthers = () => {
 			window.ethereum.request({ method: "eth_requestAccounts" })
 				.then(result => {
 					accountChangedHandler(result[0]);
-					setConnButtonText("Wallet Connected");
 					getAccountBalance(result[0]);
 				})
 				.catch(error => {
@@ -57,9 +56,15 @@ const WalletCardEthers = () => {
 			} else {
 				console.log("Network not defined!");
 			}
-			const contract = new ethers.Contract(tokenContractAddress, genericErc20Abi, provider.getSigner());
-			const balance = await contract.balanceOf(account);
-			setUserBalance(ethers.utils.formatEther(balance.toString()));
+			try {
+				const contract = new ethers.Contract(tokenContractAddress, genericErc20Abi, provider.getSigner());
+				const balance = await contract.balanceOf(account);
+				setUserBalance(ethers.utils.formatEther(balance.toString()));
+				setConnButtonText("Wallet Connected");
+			} catch(error){
+				setErrorMessage("Network you are operating in is not defined!")
+			}
+
 		})();
 	};
 
@@ -92,11 +97,11 @@ const WalletCardEthers = () => {
 			}
 		</div>
 	);
-	
+	const buttonTooltip = "Click here to connect your wallet once connected to BSC Testnet or Rinkeby Testnet."
 	return (
 		<div className="walletCard w-full lg:w-1/2 shadow-lg mx-auto rounded-xl bg-white mx-auto">
-			<button onClick={connectWalletHandler} className="button">{connButtonText}</button>
-			{connButtonText === "Wallet Connected" ? dataDisplay : null}
+			<button onClick={connectWalletHandler} className="button" title = {connButtonText !== "Wallet Connected" ? buttonTooltip: null}>{connButtonText}</button>
+			{connButtonText === "Wallet Connected" && errorMessage===null ? dataDisplay : null}
 			<ErrorMessage message={errorMessage} />
 		</div>
 	);

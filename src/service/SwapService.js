@@ -48,7 +48,7 @@ class SwapService {
 		amount = ethers.utils.parseEther(String(amount));
 		// Get the address of the expensive Network
 		const ExpensiveNetwork = await this.getExpensiveNetwork() ? "BSC" : "ETH";
-		// Check whether the swap is targeting the expensive network TODO wrong comparison
+		// Check whether the swap is targeting the expensive network 
 		const swapToExpensiveNetwork = ExpensiveNetwork === outputNetwork ? true : false;
 
 		if (swapToExpensiveNetwork) {
