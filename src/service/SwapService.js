@@ -48,7 +48,7 @@ class SwapService {
 		amount = ethers.utils.parseEther(String(amount));
 		// Get the address of the expensive Network
 		const ExpensiveNetwork = await this.getExpensiveNetwork() ? "BSC" : "ETH";
-		// Check whether the swap is targeting the expensive network TODO wrong comparison
+		// Check whether the swap is targeting the expensive network 
 		const swapToExpensiveNetwork = ExpensiveNetwork === outputNetwork ? true : false;
 
 		if (swapToExpensiveNetwork) {
@@ -58,38 +58,30 @@ class SwapService {
 			let poolPriceBsc = await this._bscContracts.getPoolPrice();
 			let poolPriceEth = await this._ethContracts.getPoolPrice();
 
-			let totalPoolBlxmBSC = await this._bscContracts.getPoolNumberOfBlxmToken();
-			let totalPoolUsdcBSC = await this._bscContracts.getPoolNumberOfUsdToken();
-			let totalPoolBlxmETH = await this._ethContracts.getPoolNumberOfBlxmToken();
-			let totalPoolUsdcETH = await this._ethContracts.getPoolNumberOfUsdToken();
-		
 			let totalArbitrageBlxmBsc = await this._bscContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 			let totalArbitrageBlxmEth = await this._ethContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
-			let totalArbitrageUsdcBsc = await this._bscContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
-			let totalArbitrageUsdcEth = await this._ethContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
-
-			let adjustmentValue;
-			let adjustmentValueUsd;
-
-			let minimumSwapAmountValue = await this._evaluationService.minimumSwapAmount(poolPriceBsc, poolPriceEth, totalArbitrageBlxmEth, totalArbitrageBlxmBsc, totalArbitrageUsdcEth, totalArbitrageUsdcBsc);
 
 			// A swap is happening towards the cheap network 
 			if (outputNetwork === "BSC") {
-				adjustmentValue = AdjustmentValueService.getAdjustmentValue(totalPoolBlxmBSC, totalPoolBlxmBSC, totalPoolBlxmETH, totalPoolUsdcETH);
-				adjustmentValueUsd = AdjustmentValueService.getAdjustmentValueUsd(totalPoolBlxmBSC, totalPoolBlxmBSC, totalPoolBlxmETH, totalPoolUsdcETH);
+				if (totalArbitrageBlxmBsc > 0) {
+					await this.ArbitrageServiceInstance._bridgeAndSwapToBsc(amount)
+					const exchangeRate = poolPriceEth / poolPriceBsc;
+					let profit = amount.mul(ethers.utils.parseEther(exchangeRate.toString())).div(ethers.utils.parseEther((10 ** 18).toString())).sub(amount);
+					return await this._bscContracts.blxmTokenContract.transferTokens(publicAddress, amount.add(profit).div(2));
 
-				await this.ArbitrageServiceInstance.startArbitrageTransferFromBscToEth(adjustmentValue, adjustmentValueUsd, totalArbitrageBlxmBsc, totalArbitrageUsdcEth, totalArbitrageUsdcBsc, totalPoolUsdcETH, minimumSwapAmountValue);
-				const exchangeRate = poolPriceEth/poolPriceBsc;
-				let profit = amount.mul(ethers.utils.parseEther(exchangeRate.toString())).div(ethers.utils.parseEther((10**18).toString())).sub(amount);
-				await this._bscContracts.blxmTokenContract.transferTokens(publicAddress, amount.add(profit).div(2));
-			} else {
-				adjustmentValue = AdjustmentValueService.getAdjustmentValue(totalPoolBlxmETH, totalPoolUsdcETH, totalPoolBlxmBSC, totalPoolUsdcBSC);
-				adjustmentValueUsd = AdjustmentValueService.getAdjustmentValueUsd(totalPoolBlxmETH, totalPoolUsdcETH, totalPoolBlxmBSC, totalPoolUsdcBSC);
+				} else {
+					await this.swapViaBridge(outputNetwork, amount, publicAddress);
+				}
+			} else if (outputNetwork === "ETH") {
+				if (totalArbitrageBlxmEth > 0) {
+					await this.ArbitrageServiceInstance._bridgeAndSwapToEth(amount)
+					const exchangeRate = poolPriceEth / poolPriceBsc;
+					let profit = amount.mul(ethers.utils.parseEther(exchangeRate.toString())).div(ethers.utils.parseEther((10 ** 18).toString())).sub(amount);
+					return await this._ethContracts.blxmTokenContract.transferTokens(publicAddress, amount.add(profit).div(2));
 
-				await this.ArbitrageServiceInstance.startArbitrageTransferFromEthToBsc(adjustmentValue, adjustmentValueUsd, totalArbitrageBlxmEth, totalArbitrageUsdcEth, totalArbitrageUsdcBsc, totalPoolUsdcBSC, minimumSwapAmountValue);
-				const exchangeRate = poolPriceBsc/poolPriceEth;
-				let profit = amount.mul(ethers.utils.parseEther(exchangeRate.toString())).div(ethers.utils.parseEther((10**18).toString())).sub(amount);
-				await this._ethContracts.blxmTokenContract.transferTokens(publicAddress, amount.add(profit).div(2));
+				} else {
+					await this.swapViaBridge(outputNetwork, amount, publicAddress);
+				}
 			}
 		}
 	}
