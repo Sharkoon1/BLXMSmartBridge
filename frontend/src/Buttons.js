@@ -1,55 +1,81 @@
-import React, { useState, useEffect } from "react";
+import React, { Component, Fragment } from "react";
+import socketIOClient from "socket.io-client";
 import "./style/Buttons.css";
 
-const Buttons = () => {
-	const runningMessage = "Job running";
-	const notRunningMessage = "Job not running";
-	const [errorMessage, setErrorMessage] = useState(null);
-	const [connButtonText, setConnButtonText] = useState("");
+export default class Buttons extends Component  {
 
+	constructor(props) {
+		super(props);
+		this.state = {
+			connButtonText: 'Job not running',
+			startIsDisabled: false,
+			toggleIsDisabled: false
+		  };
+
+		this.toggleJobStatus = this.toggleJobStatus.bind(this);  
+	}
+
+
+	componentDidMount() {
+
+	 fetch("http://localhost:3001/api/toggleArbitrage",
+				{
+					method: "get",
+				}).then(response => response.json())
+				.then(result => {
+					if(result) {
+						this.setState({connButtonText: 'Job running'});
+					}
 	
-	const startArbitrage = () => {
+					else {
+						this.setState({connButtonText: 'Job not running'});
+					}
+				});
+
+
+		let ioClient = socketIOClient.connect("http://localhost:3002");
+	
+		ioClient.on("connection", (socket) => {
+		  console.log("connected!");
+		});
+	
+		ioClient.on("cycleCompleted", (msg) => { 
+		  console.log("cycle completed");
+		  this.setState({ toggleIsDisabled:false, startIsDisabled: false}); 
+		});
+	  
+	}
+
+	startArbitrage() {
 
 		fetch("http://localhost:3001/api/singleArbitrage",
 			{
 				method: "post",
-			}).then(() => {
-		})
-			.catch(error => {
-				setErrorMessage(error.message);
 			});
 	};
 
-	useEffect(() => {
-		fetch("http://localhost:3001/api/toggleArbitrage",
-			{
-				method: "get",
-			}).then(response => response.json())
-			.then(data => setConnButtonText(data ? runningMessage : notRunningMessage));
-	});
+	toggleJobStatus()  {
+		if(this.state.connButtonText === 'Job not running') {
+			this.setState({connButtonText: 'Job running', startIsDisabled: true});
+		}
 
-	const toggleJobStatus = () => {
+		else {
+			this.setState({connButtonText: 'Job not running', toggleIsDisabled: true});
+		}
+
 		fetch("http://localhost:3001/api/toggleArbitrage",
 			{
 				method: "post",
-			}).then(response => response.json())
-			.then(data => setConnButtonText(data ? runningMessage : notRunningMessage)
-			)
-			.catch(error => {
-				setErrorMessage(error.message);
-			});
+			}).then(response => console.log(response.json()));
 	};
-	const Buttonstyle = {
-		margin: "50px"
-	};
-	return (
-		<div className="adminPanel">
-			
-			<button onClick={startArbitrage} className="button" id="runSingle" >Run Single Arbitrage Cycle</button>
-			<button onClick={toggleJobStatus} className="button" id="toggleStatus">{connButtonText}</button>
-			{errorMessage}
-		</div>
-	);
-};
 
-export default Buttons;
+
+	render() {
+		return (
+			<div className="adminPanel">
+				<button disabled={this.state.startIsDisabled} onClick={this.startArbitrage} className="button arbiToggle" id="runSingle" >Run Single Arbitrage Cycle</button>
+				<button disabled={this.state.toggleIsDisabled} onClick={this.toggleJobStatus} className="button arbiToggle" id="toggleStatus">{this.state.connButtonText}</button>
+			</div>
+		);
+	  }
+}

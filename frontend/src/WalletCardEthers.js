@@ -12,7 +12,6 @@ const WalletCardEthers = () => {
 
 	const connectWalletHandler = () => {
 		if (window.ethereum && window.ethereum.isMetaMask) {
-			console.log("MetaMask Here!");
 
 			window.ethereum.request({ method: "eth_requestAccounts" })
 				.then(result => {
@@ -73,27 +72,30 @@ const WalletCardEthers = () => {
 	window.ethereum.on("accountsChanged", accountChangedHandler);
 
 	window.ethereum.on("chainChanged", chainChangedHandler);
-
-
-	return (
-		<div  className="walletCard w-full lg:w-1/2 shadow-lg mx-auto rounded-xl bg-white mx-auto">
-			<button onClick={connectWalletHandler} className="button">{connButtonText}</button>
-			<div className="displayWalletDetails">
-				<div className="accountDisplay">
-					<h4 className="displayWalletDetailsText" >Address: {defaultAccount}</h4>
-				</div>
-				<div className="balanceDisplay">
-					<h4 className="displayWalletDetailsText" >Balance: {userBalance}</h4>
-				</div>
-				<div className="networkDisplay">
-					<h4 className="displayWalletDetailsText">Network: {userNetwork}</h4>
-				</div>
-				{userNetwork ?
-					<div className="swapInformation">
-						<h4  className="displayWalletDetailsText">You will be swapping from the {userNetwork} to the {userNetwork === "Ethereum Blockchain" ? "Binance Smart Chain" : "Ethereum Blockchain"}</h4>
-					</div> : null
-				}
+	const dataDisplay = (
+		<div className="displayWalletDetails">
+			<div className="accountDisplay">
+				<h4 className="displayWalletDetailsText">Address: {defaultAccount}</h4>
 			</div>
+			<div className="balanceDisplay">
+				<h4 className="displayWalletDetailsText">Balance: {userBalance}</h4>
+			</div>
+			<div className="networkDisplay">
+				<h4 className="displayWalletDetailsText">Network: {userNetwork}</h4>
+			</div>
+			{
+				userNetwork ?
+					<div className="swapInformation">
+						<h4 className="displayWalletDetailsText">You will be swapping from the {userNetwork} to the {userNetwork === "Ethereum Blockchain" ? "Binance Smart Chain" : "Ethereum Blockchain"}</h4>
+					</div> : null
+			}
+		</div>
+	);
+	
+	return (
+		<div className="walletCard w-full lg:w-1/2 shadow-lg mx-auto rounded-xl bg-white mx-auto">
+			<button onClick={connectWalletHandler} className="button">{connButtonText}</button>
+			{connButtonText === "Wallet Connected" ? dataDisplay : null}
 			{errorMessage}
 		</div>
 	);

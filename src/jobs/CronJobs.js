@@ -24,11 +24,10 @@ class CronJobs {
 		if (!this.taskRunning) {
 			this.taskRunning = true;
 			this._arbitrageService._stopCycle = false;
-			this._task.start();
+			this._arbitrageService.startArbitrage();
 		} else {
 			this.taskRunning = false;
 			this._arbitrageService._stopCycle = true;
-			this._task.stop();
 		}
 	}
 }

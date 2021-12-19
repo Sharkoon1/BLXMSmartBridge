@@ -9,6 +9,10 @@
   
 }
 
+.arbiToggle:disabled {
+    background-color: #333;
+}
+
 #runSingle, #toggleStatus { 
     width: 85%; 
     display: inline;
