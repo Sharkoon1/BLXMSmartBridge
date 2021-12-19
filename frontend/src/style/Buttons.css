@@ -4,8 +4,10 @@
     text-align: center;
     margin-left: 0;
     margin-right: 0;
-    
-  
+}
+
+.arbiToggle:disabled {
+    background-color: #333;
 }
 
 #runSingle, #toggleStatus { 
