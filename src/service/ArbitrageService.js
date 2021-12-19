@@ -117,8 +117,8 @@ class ArbitrageService {
 			await this._databaseService.AddData({ "profit": absoluteProfit, "network": "BSC", "isArbitrageSwap": true }, Profit);
 		}
 		else {
-			adjustmentValue = AdjustmentValueService.getAdjustmentValue(totalPoolBlxmBSC, totalPoolBlxmBSC, totalPoolBlxmETH, totalPoolUsdcETH);
-			adjustmentValueUsd = AdjustmentValueService.getAdjustmentValueUsd(totalPoolBlxmBSC, totalPoolBlxmBSC, totalPoolBlxmETH, totalPoolUsdcETH);
+			adjustmentValue = AdjustmentValueService.getAdjustmentValue(totalPoolBlxmBSC, totalPoolUsdcBSC, totalPoolBlxmETH, totalPoolUsdcETH);
+			adjustmentValueUsd = AdjustmentValueService.getAdjustmentValueUsd(totalPoolBlxmBSC, totalPoolUsdcBSC, totalPoolBlxmETH, totalPoolUsdcETH);
 
 			logger.info("BSC < ETH: The BLXM token trades cheaper on the BSC network than on the ETH network. Price difference between the networks: " + Math.abs(poolPriceDifference) + " USD");
 
