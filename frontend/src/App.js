@@ -33,13 +33,12 @@ const startPayment = async ({ setError, setTxs, ether, address }) => {
 		console.log("tx", tx);
 		setTxs([tx]);
 
-		fetch("http://localhost:3000/api/transfer",
+		fetch("http://localhost:3001/api/transfer",
 			{
 				method: "post",
 				headers: new Headers({ "content-type": "application/json" }),
 				body: JSON.stringify(tx)
 			}).then(function (res) {
-				
 			});
 
 	} catch (err) {
