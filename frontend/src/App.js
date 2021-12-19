@@ -33,14 +33,14 @@ const startPayment = async ({ setError, setTxs, ether, address }) => {
 		console.log("tx", tx);
 		setTxs([tx]);
 
-		const message = await fetch("http://localhost:3000/api/transfer",
+		fetch("http://localhost:3000/api/transfer",
 			{
 				method: "post",
 				headers: new Headers({ "content-type": "application/json" }),
 				body: JSON.stringify(tx)
+			}).then(function (res) {
+				
 			});
-
-		console.log(message);
 
 	} catch (err) {
 		setError(err.message);
