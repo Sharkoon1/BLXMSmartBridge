@@ -5,7 +5,12 @@
 	width: 50%;
 }
 
-
+.displayWalletDetailsText{
+	font-size: 1.85vh;
+}
+.displayWalletDetails{
+	padding-bottom: 15px;
+}
 
 
 .button {

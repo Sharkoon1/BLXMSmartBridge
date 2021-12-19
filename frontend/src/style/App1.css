@@ -4,7 +4,7 @@
 /** Only conatins top connect wallet button   **/
 .App {
 
- padding-top: 6%;
+  margin-top: 8vh;
   margin-left: 0;
   margin-right: 0;
   text-align: center;

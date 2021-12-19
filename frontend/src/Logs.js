@@ -9,7 +9,7 @@ export default class Logs extends Component {
  
 
   componentDidMount() {
-    let ioClient = socketIOClient.connect("http://localhost:3020");
+    let ioClient = socketIOClient.connect("http://localhost:3010");
 
     ioClient.on("connection", (socket) => {
       console.log(socket);

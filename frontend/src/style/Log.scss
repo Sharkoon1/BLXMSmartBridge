@@ -4,12 +4,12 @@
   color: #fff;
   overflow-x: hidden;
   position: relative;
-  margin-top: 9vh;
+  margin-top: 8vh;
   margin-left: auto;
   margin-right: auto;
  
   width: 85%;
-  max-height: 65vh;
+  max-height: 60vh;
   
 
  /* 
@@ -72,6 +72,10 @@
   p:nth-child(3) {
     animation-delay: 1s;
   }
+}
+
+@media only screen and (max-width: 1023px) {
+ .window {  width: 100%; }
 }
 
 @keyframes write-command {

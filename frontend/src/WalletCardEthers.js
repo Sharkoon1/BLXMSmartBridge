@@ -74,26 +74,26 @@ const WalletCardEthers = () => {
 
 	window.ethereum.on("chainChanged", chainChangedHandler);
 
-	const Textstyle = {
-		color: "black",
-	};
+
 	return (
 		<div  className="walletCard w-full lg:w-1/2 shadow-lg mx-auto rounded-xl bg-white mx-auto">
 			<button onClick={connectWalletHandler} className="button">{connButtonText}</button>
-			<div className="accountDisplay">
-				<h4 style={Textstyle}>Address: {defaultAccount}</h4>
+			<div className="displayWalletDetails">
+				<div className="accountDisplay">
+					<h4 className="displayWalletDetailsText" >Address: {defaultAccount}</h4>
+				</div>
+				<div className="balanceDisplay">
+					<h4 className="displayWalletDetailsText" >Balance: {userBalance}</h4>
+				</div>
+				<div className="networkDisplay">
+					<h4 className="displayWalletDetailsText">Network: {userNetwork}</h4>
+				</div>
+				{userNetwork ?
+					<div className="swapInformation">
+						<h4  className="displayWalletDetailsText">You will be swapping from the {userNetwork} to the {userNetwork === "Ethereum Blockchain" ? "Binance Smart Chain" : "Ethereum Blockchain"}</h4>
+					</div> : null
+				}
 			</div>
-			<div className="balanceDisplay">
-				<h4 style={Textstyle}>Balance: {userBalance}</h4>
-			</div>
-			<div className="networkDisplay">
-				<h4 style={Textstyle}>Network: {userNetwork}</h4>
-			</div>
-			{userNetwork ?
-				<div className="swapInformation">
-					<h4 style={Textstyle}>You will be swapping from the {userNetwork} to the {userNetwork === "Ethereum Blockchain" ? "Binance Smart Chain" : "Ethereum Blockchain"}</h4>
-				</div> : null
-			}
 			{errorMessage}
 		</div>
 	);

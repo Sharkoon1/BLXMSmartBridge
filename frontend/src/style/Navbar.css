@@ -18,12 +18,19 @@
   
   /* Style the hamburger menu */
   .topnav .icon {
-    background: #ddd;
+    height: 48px;
+    background: #333;
     display: block;
     position: absolute;
     right: 0;
     top: 0;
   }
+  .topnav .icon:hover {
+  background-color: #ddd;
+  }
+
+
+
   
   /* Add a grey background color on mouse-over */
   .topnav a:hover {
@@ -34,12 +41,16 @@
   /* Style the active link (or home/logo) */
   .active {
     background-color: #4CAF50;
-    color: white;
+    color: #333;
   }
   .image{
-     width: 20px;
+     width: 100px;
   }
   
   .burgerbar{
-      width: 48px;
+      width: 40px;
+      padding-left: 10px;
+      padding-right: 10px ;
+     
   }
+ 

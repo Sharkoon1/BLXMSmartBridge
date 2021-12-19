@@ -41,7 +41,7 @@ export default function App() {
      
     return (
         <div class="topnav">
-        <a href="#swap" class="active" onClick={onClick2}> <img class="image" src="../bloxmove.png"></img></a>
+        <a href="#swap" class="active" onClick={onClick2}> <img class="image" src="../Bloxmove-Logo.png"></img></a>
             <div id="myLinks" style={{ display: show ? "block" : "none" }}>
             <a href="#admin" onClick={onClick}>
                 Admin

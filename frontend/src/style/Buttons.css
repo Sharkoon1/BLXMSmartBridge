@@ -4,12 +4,13 @@
     text-align: center;
     margin-left: 0;
     margin-right: 0;
+    margin-top: 2vh;
     
   
 }
 
 #runSingle, #toggleStatus { 
-    width: 50%; 
+    width: 85%; 
     display: inline;
     margin: 5px;}
 
