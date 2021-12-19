@@ -12,7 +12,7 @@ class StandardDeviationService {
 		return averageStandardDeviation;
 	}
 
-	// for testing
+	// Implement random walk 
 	getStandardDeviation() {
 		return 1;
 	}
