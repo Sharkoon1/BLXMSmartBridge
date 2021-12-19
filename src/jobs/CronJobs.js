@@ -17,15 +17,18 @@ class CronJobs {
 		this._task = cron.schedule("*/10 * * * * *", () => {	
 			this._arbitrageService.startArbitrage();
 		});
+		this._task.stop();
 	}
 
 	toggleJob() {
 		if (!this.taskRunning) {
+			this.taskRunning = true;
 			this._arbitrageService._stopCycle = false;
-			this._task.startTask();
+			this._task.start();
 		} else {
+			this.taskRunning = false;
 			this._arbitrageService._stopCycle = true;
-			this._task.stopTask();
+			this._task.stop();
 		}
 	}
 }

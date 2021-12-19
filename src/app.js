@@ -44,6 +44,8 @@ app.use(function (req, res, next) {
 	next();
 });
 
+app.listen(3001);
+
 const server = require("http").createServer();
 
 const io = require("socket.io")(server,{
@@ -74,11 +76,9 @@ logEvent.on("cycleCompleted", function(isCompleted) {
 	io.sockets.emit("cycleCompleted", isCompleted);
 });
 
-server.listen(3020);
+server.listen(3002);
 
-// register arbitrage cron job 
 cronJobs.registerArbitrageJob();
-cronJobs.stopTask();
 
 module.exports = app;
 
