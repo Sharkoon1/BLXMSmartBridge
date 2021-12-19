@@ -19,16 +19,14 @@ class CronJobs {
 		});
 	}
 
-	startTask() {
-		this._arbitrageService._stopCycle = false;
-		this._task.start();
-		this.taskRunning = true;
-	}
-
-	stopTask() {
-		this._task.stop();
-		this.taskRunning = false;
-		this._arbitrageService._stopCycle = true;
+	toggleJob() {
+		if (!this.taskRunning) {
+			this._arbitrageService._stopCycle = false;
+			this._task.startTask();
+		} else {
+			this._arbitrageService._stopCycle = true;
+			this._task.stopTask();
+		}
 	}
 }
 

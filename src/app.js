@@ -69,6 +69,11 @@ logEvent.on("logMessage", function(msg) {
 	io.sockets.emit("log", msg);
 });
 
+
+logEvent.on("cycleCompleted", function(isCompleted) {
+	io.sockets.emit("cycleCompleted", isCompleted);
+});
+
 server.listen(3020);
 
 // register arbitrage cron job 

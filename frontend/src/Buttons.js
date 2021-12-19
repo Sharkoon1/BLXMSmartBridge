@@ -18,6 +18,7 @@ const Buttons = () => {
 				setErrorMessage(error.message);
 			});
 	};
+
 	useEffect(() => {
 		fetch("http://localhost:3000/api/toggleArbitrage",
 			{
