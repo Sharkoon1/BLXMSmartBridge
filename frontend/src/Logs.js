@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from "react";
 import socketIOClient from "socket.io-client";
+import Buttons from "./Buttons";
 
 export default class Logs extends Component {
   state = {
@@ -38,7 +39,7 @@ export default class Logs extends Component {
   render() {
     return (
       <Fragment>
-      <div class="terminalbar"></div>
+   
       <div class="window">
         <div class="terminal">
           <p id="command" class="command">Arbitrage Console is ready.</p>  
@@ -48,6 +49,7 @@ export default class Logs extends Component {
           
         </div>
       </div>
+      <Buttons />
       </Fragment>
     );
   }

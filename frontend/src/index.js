@@ -11,6 +11,8 @@ import Navbar from "./Navbar";
 import {Log} from "./components/log";
 import Logs from "./Logs";
 
+
+
 //const rootElement = document.getElementById("Admin");
 const navbar = document.getElementById("navbar");
 ReactDOM.render(
@@ -23,7 +25,6 @@ const rootElement = document.getElementById("root");
 ReactDOM.render(
 	<StrictMode>
 		<App1 />
-		<Logs />
 	</StrictMode>,
 	rootElement
 );
@@ -38,7 +39,7 @@ ReactDOM.render(
 const rootElement2 = document.getElementById("buttons");
 ReactDOM.render(
 	<StrictMode>
-		<Buttons />
+		<Logs />
 	</StrictMode>,
 	rootElement2
 );
