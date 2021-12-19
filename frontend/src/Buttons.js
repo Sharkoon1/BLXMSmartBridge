@@ -75,8 +75,8 @@ export default class Buttons extends Component  {
 	render() {
 		return (
 			<div className="adminPanel">
-				<button disabled={this.state.startIsDisabled} onClick={this.startArbitrage} className="button arbiToggle" id="runSingle" >Run Single Arbitrage Cycle</button>
-				<button disabled={this.state.toggleIsDisabled} onClick={this.toggleJobStatus} className="button arbiToggle" id="toggleStatus">{this.state.connButtonText}</button>
+				<button disabled={this.state.startIsDisabled} onClick={this.startArbitrage} className="button arbiToggle" id="runSingle" title={this.state.toggleIsDisabled ? "You have to end the currently running job to start a single arbitrage cycle.." : "Click here to start a single arbitrage cycle."}>Run Single Arbitrage Cycle</button>
+				<button disabled={this.state.toggleIsDisabled} onClick={this.toggleJobStatus} className="button arbiToggle" id="toggleStatus" title={this.state.toggleIsDisabled ? "Once the job running in the background is finished you can again start a new job run." : "Click here to start a new Job run."}>{this.state.connButtonText}</button>
 			</div>
 		);
 	  }
