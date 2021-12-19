@@ -9,15 +9,14 @@ export default class Logs extends Component {
  
 
   componentDidMount() {
-    let ioClient = socketIOClient.connect("http://localhost:3020");
+    let ioClient = socketIOClient.connect("http://localhost:3002");
 
     ioClient.on("connection", (socket) => {
       console.log(socket);
       console.log("connected!");
     });
 
-    ioClient.on("log", (msg) => {
-      console.log(this);
+    ioClient.on("log", (msg) => { 
       this.setState({ logs: [...this.state.logs, msg] }); //simple value
     });
   }
@@ -33,7 +32,6 @@ export default class Logs extends Component {
     this.setState({
       text: 'Arbitrage is running...'
     });
-    console.log("test");
   }
 
   render() {
