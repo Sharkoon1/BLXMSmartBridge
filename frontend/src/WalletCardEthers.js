@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { ethers } from "ethers";
 import "./style/WalletCard.css";
+import ErrorMessage from "./ErrorMessage";
 
 const WalletCardEthers = () => {
 
@@ -96,7 +97,7 @@ const WalletCardEthers = () => {
 		<div className="walletCard w-full lg:w-1/2 shadow-lg mx-auto rounded-xl bg-white mx-auto">
 			<button onClick={connectWalletHandler} className="button">{connButtonText}</button>
 			{connButtonText === "Wallet Connected" ? dataDisplay : null}
-			{errorMessage}
+			<ErrorMessage message={errorMessage} />
 		</div>
 	);
 };
