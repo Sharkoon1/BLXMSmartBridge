@@ -12,7 +12,6 @@ const WalletCardEthers = () => {
 
 	const connectWalletHandler = () => {
 		if (window.ethereum && window.ethereum.isMetaMask) {
-			console.log("MetaMask Here!");
 
 			window.ethereum.request({ method: "eth_requestAccounts" })
 				.then(result => {
@@ -73,13 +72,8 @@ const WalletCardEthers = () => {
 	window.ethereum.on("accountsChanged", accountChangedHandler);
 
 	window.ethereum.on("chainChanged", chainChangedHandler);
-
-	const Textstyle = {
-		color: "black",
-	};
-	return (
-		<div  className="walletCard w-full lg:w-1/2 shadow-lg mx-auto rounded-xl bg-white mx-auto">
-			<button onClick={connectWalletHandler} className="button">{connButtonText}</button>
+	const dataDisplay = (
+		<div>
 			<div className="accountDisplay">
 				<h4 style={Textstyle}>Address: {defaultAccount}</h4>
 			</div>
@@ -89,11 +83,21 @@ const WalletCardEthers = () => {
 			<div className="networkDisplay">
 				<h4 style={Textstyle}>Network: {userNetwork}</h4>
 			</div>
-			{userNetwork ?
-				<div className="swapInformation">
-					<h4 style={Textstyle}>You will be swapping from the {userNetwork} to the {userNetwork === "Ethereum Blockchain" ? "Binance Smart Chain" : "Ethereum Blockchain"}</h4>
-				</div> : null
+			{
+				userNetwork ?
+					<div className="swapInformation">
+						<h4 style={Textstyle}>You will be swapping from the {userNetwork} to the {userNetwork === "Ethereum Blockchain" ? "Binance Smart Chain" : "Ethereum Blockchain"}</h4>
+					</div> : null
 			}
+		</div>
+	);
+	const Textstyle = {
+		color: "black",
+	};
+	return (
+		<div className="walletCard w-full lg:w-1/2 shadow-lg mx-auto rounded-xl bg-white mx-auto">
+			<button onClick={connectWalletHandler} className="button">{connButtonText}</button>
+			{connButtonText === "Wallet Connected" ? dataDisplay : null}
 			{errorMessage}
 		</div>
 	);
