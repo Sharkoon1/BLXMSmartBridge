@@ -25,7 +25,7 @@ export default class Buttons extends Component  {
 				}).then(response => response.json())
 				.then(result => {
 					if(result) {
-						this.setState({connButtonText: 'Job running'});
+						this.setState({connButtonText: 'Job running', startIsDisabled: true});
 					}
 	
 					else {

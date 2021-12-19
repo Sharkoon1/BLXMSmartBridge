@@ -21,9 +21,9 @@ router.post("/", (req, res, next) => {
 	const network = req.body.chainId === BNC ? "BTC" : "ETH";
 	const amount = parseInt(req.body.data.slice(74), 16)/10**18;
 	//console.log(address, network, amount);
-	swapService.swap(network, amount, address);
-	res.send("success");
-
+	swapService.swap(network, amount, address).then(function () {
+		res.send("success");
+	});
 });
 
 module.exports = router;

@@ -12,7 +12,6 @@ export default class Logs extends Component {
     let ioClient = socketIOClient.connect("http://localhost:3002");
 
     ioClient.on("connection", (socket) => {
-      console.log(socket);
       console.log("connected!");
     });
 
