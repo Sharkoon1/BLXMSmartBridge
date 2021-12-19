@@ -7,7 +7,8 @@ const Contracts = require("../contracts/Contracts");
 const DataBaseService = require("./DataBaseService");
 const Profit = require("../models/Profit");
 const EvaluationService = require("./EvaluationService");
- 
+const app = require("../app");
+
 class ArbitrageService {
 
 	constructor(bridgeService, walletContainer) {
@@ -23,6 +24,7 @@ class ArbitrageService {
 	}
 
 	async startArbitrage() {
+		if (!this._isRunning) {
 			this._isRunning = true;
 			this._stopCycle = false;
 
@@ -38,6 +40,9 @@ class ArbitrageService {
 
 				await this._startArbitrageCycle(poolPriceBsc, poolPriceEth);
 				if (this._stopCycle) {
+					this._isRunning = false;
+					app.logEvent.emit("cycleCompleted", true);
+
 					return false;
 				}
 
@@ -46,6 +51,7 @@ class ArbitrageService {
 			}
 
 			this._isRunning = false;
+		}
 	}
 
 

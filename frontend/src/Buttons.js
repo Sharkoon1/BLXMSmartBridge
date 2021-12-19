@@ -7,9 +7,10 @@ const Buttons = () => {
 	const [errorMessage, setErrorMessage] = useState(null);
 	const [connButtonText, setConnButtonText] = useState("");
 
+	
 	const startArbitrage = () => {
 
-		fetch("http://localhost:3000/api/singleArbitrage",
+		fetch("http://localhost:3001/api/singleArbitrage",
 			{
 				method: "post",
 			}).then(() => {
@@ -18,8 +19,9 @@ const Buttons = () => {
 				setErrorMessage(error.message);
 			});
 	};
+
 	useEffect(() => {
-		fetch("http://localhost:3000/api/toggleArbitrage",
+		fetch("http://localhost:3001/api/toggleArbitrage",
 			{
 				method: "get",
 			}).then(response => response.json())
@@ -27,7 +29,7 @@ const Buttons = () => {
 	});
 
 	const toggleJobStatus = () => {
-		fetch("http://localhost:3000/api/toggleArbitrage",
+		fetch("http://localhost:3001/api/toggleArbitrage",
 			{
 				method: "post",
 			}).then(response => response.json())
