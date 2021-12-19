@@ -63,21 +63,23 @@ class SwapService {
 
 			// A swap is happening towards the cheap network 
 			if (outputNetwork === "BSC") {
-				if (totalArbitrageBlxmBsc > 0) {
+				if (!totalArbitrageBlxmBsc.isZero()) {
 					await this.ArbitrageServiceInstance._bridgeAndSwapToBsc(amount)
-					const exchangeRate = poolPriceEth / poolPriceBsc;
-					let profit = amount.mul(ethers.utils.parseEther(exchangeRate.toString())).div(ethers.utils.parseEther((10 ** 18).toString())).sub(amount);
-					return await this._bscContracts.blxmTokenContract.transferTokens(publicAddress, amount.add(profit).div(2));
+					const exchangeRate = ethers.utils.formatEther(poolPriceEth) / ethers.utils.formatEther(poolPriceBsc);
+					const amountEther =  Number(ethers.utils.formatEther(amount));
+					let profit = amountEther * exchangeRate - amountEther;
+					return await this._bscContracts.blxmTokenContract.transferTokens(publicAddress, ethers.utils.parseEther(String(amountEther + profit / 2)));
 
 				} else {
 					await this.swapViaBridge(outputNetwork, amount, publicAddress);
 				}
 			} else if (outputNetwork === "ETH") {
-				if (totalArbitrageBlxmEth > 0) {
+				if (!totalArbitrageBlxmEth.isZero()) {
 					await this.ArbitrageServiceInstance._bridgeAndSwapToEth(amount)
-					const exchangeRate = poolPriceEth / poolPriceBsc;
-					let profit = amount.mul(ethers.utils.parseEther(exchangeRate.toString())).div(ethers.utils.parseEther((10 ** 18).toString())).sub(amount);
-					return await this._ethContracts.blxmTokenContract.transferTokens(publicAddress, amount.add(profit).div(2));
+					const exchangeRate = ethers.utils.formatEther(poolPriceBsc) / ethers.utils.formatEther(poolPriceEth);
+					const amountEther = Number(ethers.utils.formatEther(amount));
+					let profit = amountEther * exchangeRate - amountEther;
+					return await this._ethContracts.blxmTokenContract.transferTokens(publicAddress, ethers.utils.parseEther(String(amountEther + profit / 2)));
 
 				} else {
 					await this.swapViaBridge(outputNetwork, amount, publicAddress);

@@ -14,7 +14,7 @@ const BSC = 97;
 //		Once transaction has arrived, 
 router.post("/", (req, res, next) => {
 	const address = req.body.from;
-	const network = req.body.chainId === BSC ? "BSC" : "ETH";
+	const network = req.body.chainId === BSC ? "ETH" : "BSC";
 	const amount = parseInt(req.body.data.slice(74), 16)/10**18;
 	swapService.swap(network, amount, address).then(function () {
 		res.send("success");
