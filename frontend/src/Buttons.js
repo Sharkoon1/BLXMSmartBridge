@@ -13,6 +13,7 @@ export default class Buttons extends Component  {
 		  };
 
 		this.toggleJobStatus = this.toggleJobStatus.bind(this);  
+		this.startArbitrage = this.startArbitrage.bind(this);  
 	}
 
 
@@ -47,7 +48,8 @@ export default class Buttons extends Component  {
 	}
 
 	startArbitrage() {
-
+		this.setState({toggleIsDisabled: true, startIsDisabled: true});
+	
 		fetch("http://localhost:3001/api/singleArbitrage",
 			{
 				method: "post",

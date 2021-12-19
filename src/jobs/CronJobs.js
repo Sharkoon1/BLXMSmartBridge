@@ -20,6 +20,10 @@ class CronJobs {
 		this._task.stop();
 	}
 
+	singleArbitrage() {
+		this._arbitrageService.startSingleArbitrageCycle();
+	}
+
 	toggleJob() {
 		if (!this.taskRunning) {
 			this.taskRunning = true;
