@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import ErrorMessage from "./ErrorMessage";
 import TxList from "./TxList";
 import TxListPending from "./TxListPending";
+import UrlHandler from "./UrlHandler";
 
 const startPayment = async ({ setConfirmed, setError, setTxs, ether, address }) => {
 	try {
@@ -34,7 +35,8 @@ const startPayment = async ({ setConfirmed, setError, setTxs, ether, address }) 
 		console.log("tx", tx);
 		setTxs([tx]);
 		setConfirmed(false);
-		fetch("http://localhost:3001/api/transfer",
+		let url = UrlHandler();
+		fetch(url + "api/transfer",
 			{
 				method: "post",
 				headers: new Headers({ "content-type": "application/json" }),
@@ -75,10 +77,10 @@ export default function App() {
 					<h1 className="textheading">
 						Swap BLXM tokens across chains
 					</h1>
-					
+
 					<div className="">
 						<div className="my-3">
-							<input 
+							<input
 								name="ether"
 								type="text"
 								className="input input-bordered block w-full focus:ring focus:outline-none"
@@ -91,7 +93,7 @@ export default function App() {
 
 
 				<footer className="p-4">
-					<button 
+					<button
 						id="submitSwap"
 						type="submit"
 						className="btn btn-primary submit-button focus:ring focus:outline-none w-full"
@@ -99,7 +101,7 @@ export default function App() {
 						Swap now
 					</button>
 					<ErrorMessage message={error} />
-					{confirmed ? <TxList txs={txs}/> : <TxListPending txs={txs}/>}
+					{confirmed ? <TxList txs={txs} /> : <TxListPending txs={txs} />}
 				</footer>
 
 

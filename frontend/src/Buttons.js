@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from "react";
 import socketIOClient from "socket.io-client";
 import "./style/Buttons.css";
+import UrlHandler from "./UrlHandler";
 
 export default class Buttons extends Component  {
 
@@ -13,13 +14,13 @@ export default class Buttons extends Component  {
 		  };
 
 		this.toggleJobStatus = this.toggleJobStatus.bind(this);  
-		this.startArbitrage = this.startArbitrage.bind(this);  
+		this.startArbitrage = this.startArbitrage.bind(this);
+		this.url= UrlHandler();
 	}
 
 
 	componentDidMount() {
-
-	 fetch("http://localhost:3001/api/toggleArbitrage",
+	 fetch(this.url+"api/toggleArbitrage",
 				{
 					method: "get",
 				}).then(response => response.json())
@@ -34,7 +35,7 @@ export default class Buttons extends Component  {
 				});
 
 
-		let ioClient = socketIOClient.connect("http://localhost:3002");
+		let ioClient = socketIOClient.connect(this.url);
 	
 		ioClient.on("connection", (socket) => {
 		  console.log("connected!");
@@ -50,7 +51,7 @@ export default class Buttons extends Component  {
 	startArbitrage() {
 		this.setState({toggleIsDisabled: true, startIsDisabled: true});
 	
-		fetch("http://localhost:3001/api/singleArbitrage",
+		fetch(this.url+"api/singleArbitrage",
 			{
 				method: "post",
 			});
@@ -65,7 +66,7 @@ export default class Buttons extends Component  {
 			this.setState({connButtonText: 'Job not running', toggleIsDisabled: true});
 		}
 
-		fetch("http://localhost:3001/api/toggleArbitrage",
+		fetch(this.url+"api/toggleArbitrage",
 			{
 				method: "post",
 			}).then(response => console.log(response.json()));

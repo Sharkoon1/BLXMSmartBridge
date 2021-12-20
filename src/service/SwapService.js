@@ -1,8 +1,5 @@
-const logger = require("../logger/logger");
 const { ethers } = require("ethers");
-
 const ArbitrageService = require("./ArbitrageService");
-const AdjustmentValueService = require("./AdjustmentValueService");
 const BridgeService = require("./BridgeService");
 const Contracts = require("../contracts/Contracts");
 const constants = require("../constants");
