@@ -3,6 +3,8 @@
 .textheading{
   text-align: center;
   font-size: 3vh;
+  color: #333 !important;
+
 }
 
 #submitSwap{
@@ -14,7 +16,8 @@
 .input{
   font-size: 1.5rem;
   height: 6vh;
-  color: #333 !important;
+  background-color: grey !important;
+  color: white;
 }
 
 input::-webkit-input-placeholder {
