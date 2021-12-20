@@ -7,20 +7,14 @@
   margin-top: 8vh;
   margin-left: auto;
   margin-right: auto;
- 
   width: 85%;
   max-height: 50vh;
-  
-
- /* 
-  &:before {
+ /* &:before {
     content: ' ';
     display: block;
     height: 48px;
     background: #C6C6C6;
-  }
-  
-
+ }
   &:after {
     content: '. . .';
     position: absolute;
@@ -32,13 +26,9 @@
     color: #fff;
     line-height: 0;
     letter-spacing: -12px;
-   
-   
-   }*/ 
+ }
+ */
 }
-
-
-
 .terminal {
   overflow: auto;
   scroll-behavior: auto;
@@ -46,103 +36,81 @@
   font-family: monospace;
   font-size: 16px;
   color: #22da26;
-  
-  .command { 
-    
-    width: 0%;
-    white-space: nowrap;
-    overflow: hidden;
-    animation: write-command 1s both;
-    
-    &:before {
-      content: '$ ';
-      color: #22da26;
-    }
-  }
-  
-  .log {
-    max-width: 100%;
-    overflow: hidden;
-  }
-
-  p:nth-child(2) {
-    animation-delay: 1s;
-  }
-  
-  p:nth-child(3) {
-    animation-delay: 1s;
-  }
 }
-
+.terminal .command {
+  width: 0%;
+  white-space: nowrap;
+  overflow: hidden;
+  animation: write-command 1s both;
+}
+.terminal .command:before {
+  content: '$ ';
+  color: #22da26;
+}
+.terminal .log {
+  max-width: 100%;
+  overflow: hidden;
+}
+.terminal p:nth-child(2) {
+  animation-delay: 1s;
+}
+.terminal p:nth-child(3) {
+  animation-delay: 1s;
+}
 @media only screen and (max-width: 1023px) {
- .window {  width: 100%; }
+  .window {
+    width: 100%;
+ }
 }
-
 @keyframes write-command {
   0% {
     width: 0%;
-  }
-  
-  
+ }
   100% {
     width: 100%;
-  }
+ }
 }
-
 @keyframes write-log {
   0% {
     height: 0;
-  }
-  
+ }
   16% {
     height: 0;
-  }
-  
+ }
   17% {
     height: 18px;
-  }
-  
+ }
   33% {
     height: 18px;
-  }
-  
+ }
   34% {
     height: 37px;
-  }
-  
+ }
   51% {
     height: 37px;
-  }
-  
+ }
   52% {
     height: 55px;
-  }
-  
+ }
   69% {
     height: 55px;
-  }
-  
+ }
   70% {
     height: 74px;
-  }
-  
+ }
   87% {
     height: 74px;
-  }
-  
+ }
   88% {
     height: 92px;
-  }
-  
+ }
   88% {
     height: 92px;
-  }
-  
+ }
   99% {
     height: 92px;
-  }
-  
+ }
   100% {
     height: 110px;
-  }
+ }
 }
