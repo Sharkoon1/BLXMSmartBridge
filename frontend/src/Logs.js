@@ -2,6 +2,7 @@ import React, { Component, Fragment } from "react";
 import socketIOClient from "socket.io-client";
 import Buttons from "./Buttons";
 import "./style/Log.css";
+import UrlHandler from "./UrlHandler";
 
 export default class Logs extends Component {
   state = {
@@ -10,7 +11,7 @@ export default class Logs extends Component {
  
 
   componentDidMount() {
-    let ioClient = socketIOClient.connect("http://localhost:8080");
+    let ioClient = socketIOClient.connect("https://server-smart-bridge.herokuapp.com/");
 
     ioClient.on("connection", (socket) => {
       console.log("connected!");
