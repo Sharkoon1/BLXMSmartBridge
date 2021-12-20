@@ -44,9 +44,10 @@ app.use(function (req, res, next) {
 	next();
 });
 
-app.listen(3001);
+var server;
 
-const server = require("http").createServer();
+// localhost
+server = require("http").createServer(app);
 
 const io = require("socket.io")(server,{
 	cors: {
@@ -69,14 +70,14 @@ exports.logEvent = logEvent;
 
 logEvent.on("logMessage", function(msg) {
 	io.sockets.emit("log", msg);
-});
+}); 
 
 
 logEvent.on("cycleCompleted", function(isCompleted) {
 	io.sockets.emit("cycleCompleted", isCompleted);
 });
 
-server.listen(3002);
+server.listen(process.env.PORT || 8080);
 
 cronJobs.registerArbitrageJob();
 

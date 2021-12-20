@@ -19,7 +19,7 @@ export default class Buttons extends Component  {
 
 	componentDidMount() {
 
-	 fetch("http://localhost:3001/api/toggleArbitrage",
+	 fetch("http://localhost:8080/api/toggleArbitrage",
 				{
 					method: "get",
 				}).then(response => response.json())
@@ -34,7 +34,7 @@ export default class Buttons extends Component  {
 				});
 
 
-		let ioClient = socketIOClient.connect("http://localhost:3002");
+		let ioClient = socketIOClient.connect("http://localhost:8080");
 	
 		ioClient.on("connection", (socket) => {
 		  console.log("connected!");
@@ -50,7 +50,7 @@ export default class Buttons extends Component  {
 	startArbitrage() {
 		this.setState({toggleIsDisabled: true, startIsDisabled: true});
 	
-		fetch("http://localhost:3001/api/singleArbitrage",
+		fetch("http://localhost:8080/api/singleArbitrage",
 			{
 				method: "post",
 			});
@@ -65,7 +65,7 @@ export default class Buttons extends Component  {
 			this.setState({connButtonText: 'Job not running', toggleIsDisabled: true});
 		}
 
-		fetch("http://localhost:3001/api/toggleArbitrage",
+		fetch("http://localhost:8080/api/toggleArbitrage",
 			{
 				method: "post",
 			}).then(response => console.log(response.json()));
