@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from "react";
 import socketIOClient from "socket.io-client";
 import Buttons from "./Buttons";
+import "./style/Log.css";
 
 export default class Logs extends Component {
   state = {
