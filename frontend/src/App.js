@@ -2,8 +2,9 @@ import { useState } from "react";
 import { ethers } from "ethers";
 import ErrorMessage from "./ErrorMessage";
 import TxList from "./TxList";
+import TxListPending from "./TxListPending";
 
-const startPayment = async ({ setError, setTxs, ether, address }) => {
+const startPayment = async ({ setConfirmed, setError, setTxs, ether, address }) => {
 	try {
 		console.log("Account " + address);
 		const BLXM_TOKEN_ADDRESS_BSC = "0x6703bB029a9B2d44f8e21Ec7f635C5A0b06743Fa";
@@ -32,13 +33,14 @@ const startPayment = async ({ setError, setTxs, ether, address }) => {
 		console.log({ ether, addr: address });
 		console.log("tx", tx);
 		setTxs([tx]);
-
+		setConfirmed(false);
 		fetch("http://localhost:3001/api/transfer",
 			{
 				method: "post",
 				headers: new Headers({ "content-type": "application/json" }),
 				body: JSON.stringify(tx)
 			}).then(function (res) {
+				setConfirmed(true);
 			});
 
 	} catch (err) {
@@ -49,12 +51,14 @@ const startPayment = async ({ setError, setTxs, ether, address }) => {
 export default function App() {
 	const [error, setError] = useState();
 	const [txs, setTxs] = useState([]);
+	const [confirmed, setConfirmed] = useState();
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		const data = new FormData(e.target);
 		setError();
 		await startPayment({
+			setConfirmed,
 			setError,
 			setTxs,
 			ether: data.get("ether"),
@@ -95,7 +99,7 @@ export default function App() {
 						Swap now
 					</button>
 					<ErrorMessage message={error} />
-					<TxList txs={txs} />
+					{confirmed ? <TxList txs={txs}/> : <TxListPending txs={txs}/>}
 				</footer>
 
 
