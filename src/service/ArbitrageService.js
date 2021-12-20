@@ -103,18 +103,18 @@ class ArbitrageService {
 			logger.info("ETH < BSC: The BLXM token trades cheaper on the ETH network than on the BSC network. Price difference between the networks: " + Math.abs(poolPriceDifference) + " USD");
 
 			result = await this.startArbitrageTransferFromEthToBsc(adjustmentValue, adjustmentValueUsd, totalArbitrageBlxmEth, totalArbitrageUsdcEth, totalArbitrageUsdcBsc, totalPoolUsdcBSC, minimumSwapAmountValue);
+		
+			let	endPoolPriceBsc = await this._bscContracts.getPoolPrice();
+			let endPoolPriceEth = await this._ethContracts.getPoolPrice();
 
 			// cancel cycle
 			if (result === -1) {
-				return;
+				return { poolPriceBsc: endPoolPriceBsc, poolPriceEth: endPoolPriceEth};
 			}
 
 			// TODO: use response from startArbitrageTransferFromEthToBsc (result), workaround because value is null
 			let postUsdBalanceBsc = await this._bscContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 			let profit = ethers.utils.formatEther(postUsdBalanceBsc) - ethers.utils.formatEther(preUsdBalanceBsc);
-			
-			let	endPoolPriceBsc = await this._bscContracts.getPoolPrice();
-			let endPoolPriceEth = await this._ethContracts.getPoolPrice();
 
 			let endtotalArbitrageBlxmBsc = await this._bscContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 
@@ -132,17 +132,17 @@ class ArbitrageService {
 
 			result = await this.startArbitrageTransferFromBscToEth(adjustmentValue, adjustmentValueUsd, totalArbitrageBlxmBsc, totalArbitrageUsdcEth, totalArbitrageUsdcBsc, totalPoolUsdcETH, minimumSwapAmountValue);
 
+			let	endPoolPriceBsc = await this._bscContracts.getPoolPrice();
+			let endPoolPriceEth = await this._ethContracts.getPoolPrice();
+
 			// cancel cycle
 			if (result === -1) {
-				return;
+				return { poolPriceBsc: endPoolPriceBsc, poolPriceEth: endPoolPriceEth};
 			}
 
 			// TODO: use response from startArbitrageTransferFromEthToBsc (result), workaround because value is null
 			let postUsdBalanceEth = await this._ethContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 			let profit = ethers.utils.formatEther(postUsdBalanceEth) - ethers.utils.formatEther(preUsdBalanceEth);
-
-			let	endPoolPriceBsc = await this._bscContracts.getPoolPrice();
-			let endPoolPriceEth = await this._ethContracts.getPoolPrice();
 
 			let endtotalArbitrageBlxmEth = await this._ethContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 
