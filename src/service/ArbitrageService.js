@@ -120,10 +120,7 @@ class ArbitrageService {
 			// TODO: use response from startArbitrageTransferFromEthToBsc (result), workaround because value is null
 			let postUsdBalanceBsc = await this._bscContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 			let profit = ethers.utils.formatEther(postUsdBalanceBsc) - ethers.utils.formatEther(preUsdBalanceBsc);
-			logger.info(profit);
-			logger.info(ethers.utils.formatEther(preUsdBalanceBsc));
-			logger.info(ethers.utils.formatEther(postUsdBalanceBsc));
-
+			
 			let endtotalArbitrageBlxmBsc = await this._bscContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 
 			let absoluteProfit = await this._calculateAbitrageProfit(result.swapAmount, poolPriceEth, endPoolPriceBsc, totalArbitrageBlxmBsc, endtotalArbitrageBlxmBsc, profit);
@@ -151,10 +148,6 @@ class ArbitrageService {
 			// TODO: use response from startArbitrageTransferFromEthToBsc (result), workaround because value is null
 			let postUsdBalanceEth = await this._ethContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 			let profit = ethers.utils.formatEther(postUsdBalanceEth) - ethers.utils.formatEther(preUsdBalanceEth);
-
-			logger.info(profit);
-			logger.info(ethers.utils.formatEther(preUsdBalanceEth));
-			logger.info(ethers.utils.formatEther(postUsdBalanceEth));
 
 			let endtotalArbitrageBlxmEth = await this._ethContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 
