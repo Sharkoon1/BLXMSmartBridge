@@ -211,6 +211,7 @@ class ArbitrageService {
 				totalAdjustmentValue = Utility.bigNumberMin(adjustmentValueUSDC, totalArbitrageUsdcBsc);
 
 				// bridge usdc from bsc to eth
+				logger.warn("Not enough USDC Liquidity in ETH. Need to bridge USDC from BSC to ETH.");
 				await this._bridgeService.bridgeUSDTokenBscToEth(totalAdjustmentValue);
 			}
 
@@ -288,6 +289,7 @@ class ArbitrageService {
 				}
 
 				// bridge usdc from eth to bsc
+				logger.warn("Not enough USDC Liquidity in BSC. Need to bridge USDC from ETH to BSC.");
 				await this._bridgeService.bridgeUSDTokenEthToBsc(totalAdjustmentValue);
 			}
 
