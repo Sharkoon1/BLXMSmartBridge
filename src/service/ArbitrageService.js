@@ -8,6 +8,7 @@ const DataBaseService = require("./DataBaseService");
 const Profit = require("../models/Profit");
 const EvaluationService = require("./EvaluationService");
 const app = require("../app");
+const { format } = require("winston");
 
 class ArbitrageService {
 
@@ -61,6 +62,10 @@ class ArbitrageService {
 
 		let poolPriceBsc = await this._bscContracts.getPoolPrice();
 		let poolPriceEth = await this._ethContracts.getPoolPrice();
+
+		logger.info("ETH network: Current price BLXM " + ethers.utils.formatEther(poolPriceEth) + " USD");
+		logger.info("BSC network: Current price BLXM " + ethers.utils.formatEther(poolPriceBsc) + " USD");
+		
 		this._startArbitrageCycle(poolPriceBsc, poolPriceEth).then(function () {
 			app.logEvent.emit("cycleCompleted", true);
 		});
@@ -115,12 +120,15 @@ class ArbitrageService {
 			// TODO: use response from startArbitrageTransferFromEthToBsc (result), workaround because value is null
 			let postUsdBalanceBsc = await this._bscContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 			let profit = ethers.utils.formatEther(postUsdBalanceBsc) - ethers.utils.formatEther(preUsdBalanceBsc);
+			logger.info(profit);
+			logger.info(ethers.utils.formatEther(preUsdBalanceBsc));
+			logger.info(ethers.utils.formatEther(postUsdBalanceBsc));
 
 			let endtotalArbitrageBlxmBsc = await this._bscContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 
-			let absoluteProfit = await this._calculateAbitrageProfit(result.swapAmount, poolPriceBsc, endPoolPriceBsc, totalArbitrageBlxmBsc, endtotalArbitrageBlxmBsc, profit);
+			let absoluteProfit = await this._calculateAbitrageProfit(result.swapAmount, poolPriceEth, endPoolPriceBsc, totalArbitrageBlxmBsc, endtotalArbitrageBlxmBsc, profit);
 
-			await this._databaseService.AddData({ "profit": absoluteProfit, "network": "BSC", "isArbitrageSwap": true }, Profit);
+			//await this._databaseService.AddData({ "profit": absoluteProfit, "network": "BSC", "isArbitrageSwap": true }, Profit);
 
 			return { poolPriceBsc: endPoolPriceBsc, poolPriceEth: endPoolPriceEth};
 		}
@@ -144,11 +152,15 @@ class ArbitrageService {
 			let postUsdBalanceEth = await this._ethContracts.usdTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 			let profit = ethers.utils.formatEther(postUsdBalanceEth) - ethers.utils.formatEther(preUsdBalanceEth);
 
+			logger.info(profit);
+			logger.info(ethers.utils.formatEther(preUsdBalanceEth));
+			logger.info(ethers.utils.formatEther(postUsdBalanceEth));
+
 			let endtotalArbitrageBlxmEth = await this._ethContracts.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_WALLET_ADDRESS);
 
-			let absoluteProfit = await this._calculateAbitrageProfit(result.swapAmount, poolPriceEth, endPoolPriceEth, totalArbitrageBlxmEth, endtotalArbitrageBlxmEth, profit);
+			let absoluteProfit = await this._calculateAbitrageProfit(result.swapAmount, poolPriceBsc, endPoolPriceEth, totalArbitrageBlxmEth, endtotalArbitrageBlxmEth, profit);
 
-			await this._databaseService.AddData({ "profit": absoluteProfit, "network": "ETH", "isArbitrageSwap": true }, Profit);
+			//await this._databaseService.AddData({ "profit": absoluteProfit, "network": "ETH", "isArbitrageSwap": true }, Profit);
 
 			return { poolPriceBsc: endPoolPriceBsc, poolPriceEth: endPoolPriceEth};
 		}
@@ -337,12 +349,12 @@ class ArbitrageService {
 		//Calculate how much the abitrage costs us 
 		let inputFactor = swapAmountBlxm * startPriceCheapBLXM; //Cheap BLXM
 
-		let capitalLoss = (startTotalBLXM * startPriceCheapBLXM) - (endTotalBLXM * endPriceExpensiveBlXM);
+		//let capitalLoss = (startTotalBLXM * startPriceCheapBLXM) - (endTotalBLXM * endPriceExpensiveBlXM);
 
 		//Calculate the loss that happens because of changed price in our abitrage wallet 
-		let absoluteAbitrageProfit = profit - inputFactor - capitalLoss;
+		let absoluteAbitrageProfit = profit  -inputFactor;
 
-		logger.info("Capital loss : [" + capitalLoss + "] USD");
+		//logger.info("Capital loss : [" + capitalLoss + "] USD");
 		logger.info("Input factor:  [" + inputFactor + "] USD");
 		logger.info("The abitrage trade made in sum : [" + absoluteAbitrageProfit + "] USD absolute profit");
 
