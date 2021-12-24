@@ -50,7 +50,7 @@ const startPayment = async ({ setConfirmed, setError, setTxs, ether, address }) 
 					setConfirmed(true);
 				});
 		} else {
-			setError(`Not enough liquidity in ${networkName === "bnbt"? "BSC":"ETH"} network!`);
+			setError(`Not enough liquidity in ${networkName === "bnbt"? "ETH":"BSC"} network!`);
 		}
 
 	} catch (err) {

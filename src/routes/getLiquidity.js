@@ -16,7 +16,7 @@ let router = express.Router();
 
 router.post("/", (req, res, next) => {
 	const network = req.body.targetNetwork;
-	const contract = network === BSC ? _bscContracts : _ethContracts;
+	const contract = network === BSC ? _ethContracts : _bscContracts;
 	contract.blxmTokenContract.getTokenBalance(constants.BRIDGE_WALLET_ADDRESS).then((result) => {
 		if (!result.isZero()) {
 			res.status(200).send("success");
