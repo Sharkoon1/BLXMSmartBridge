@@ -40,16 +40,16 @@ export default function App() {
 
      
     return (
-        <div class="topnav">
-        <a href="#swap" class="active" onClick={onClick2}> <img class="image" src="../Bloxmove-Logo.png"></img></a>
+        <div className="topnav">
+        <a href="#swap" className="active" onClick={onClick2}> <img className="image" src="../Bloxmove-Logo.png"></img></a>
             <div id="myLinks" style={{ display: show ? "block" : "none" }}>
             <a href="#admin" onClick={onClick}>
                 Admin
             </a>
             </div>
             
-            <button class="icon" onClick={() => setShow((s) => !s)}> 
-                <img class="burgerbar" src='../burger_line.png'></img>
+            <button className="icon" onClick={() => setShow((s) => !s)}> 
+                <img className="burgerbar" src='../burger_line.png'></img>
             </button>
         </div>
       );

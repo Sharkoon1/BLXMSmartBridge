@@ -8,7 +8,7 @@ export default function UrlHandler(){
 		default:
 			url = 'http://localhost:8080/';
 	}
-	return 'https://server-smart-bridge.herokuapp.com/';
+	return url;
 }
 
 

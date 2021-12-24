@@ -7,19 +7,16 @@ import UrlHandler from "./UrlHandler";
 
 const startPayment = async ({ setConfirmed, setError, setTxs, ether, address }) => {
 	try {
-		console.log("Account " + address);
 		const BLXM_TOKEN_ADDRESS_BSC = "0x6703bB029a9B2d44f8e21Ec7f635C5A0b06743Fa";
 		const BLXM_TOKEN_ADDRESS_ETH = "0xb5382dfba952a41a2f2d0b7313c3578b83d32be0";
 		const ArbitrageWallet = "0x626FB960A26681F7B0FD3E0c19D09fC440d2FF74";
-		console.log(ArbitrageWallet);
 
 		const genericErc20Abi = require("./abi/erc20_abi.json");
 
 		const provider = new ethers.providers.Web3Provider(window.ethereum);
-		console.log("Provider ");
 
 		const networkName = await (await provider.getNetwork()).name;
-		console.log(networkName);
+		console.log("Target Network "+networkName);
 		let tokenContractAddress;
 		if (networkName === "bnbt") {
 			tokenContractAddress = BLXM_TOKEN_ADDRESS_BSC;
@@ -28,22 +25,33 @@ const startPayment = async ({ setConfirmed, setError, setTxs, ether, address }) 
 		} else {
 			console.log("Network not defined!");
 		}
-		const contract = new ethers.Contract(tokenContractAddress, genericErc20Abi, provider.getSigner());
-		console.log("Contract " + contract);
-		const tx = await contract.transfer(ArbitrageWallet, ethers.utils.parseEther(ether));
-		console.log({ ether, addr: address });
-		console.log("tx", tx);
-		setTxs([tx]);
-		setConfirmed(false);
 		let url = UrlHandler();
-		fetch(url + "api/transfer",
-			{
-				method: "post",
-				headers: new Headers({ "content-type": "application/json" }),
-				body: JSON.stringify(tx)
-			}).then(function (res) {
-				setConfirmed(true);
-			});
+		let result = await fetch(url + "api/getLiquidity",
+		{
+			method: "post",
+			headers: new Headers({ "content-type": "application/json" }),
+			body: JSON.stringify({targetNetwork:networkName})
+		})
+		if (result.status === 200){
+			console.log(result.status);
+			const contract = new ethers.Contract(tokenContractAddress, genericErc20Abi, provider.getSigner());
+			let tx = await contract.transfer(ArbitrageWallet, ethers.utils.parseEther(ether));
+			await tx.wait();
+			console.log({ ether, addr: address });
+			console.log("tx", tx);
+			setConfirmed(false);
+			setTxs([tx]);
+			fetch(url + "api/transfer",
+				{
+					method: "post",
+					headers: new Headers({ "content-type": "application/json" }),
+					body: JSON.stringify(tx)
+				}).then(function (res) {
+					setConfirmed(true);
+				});
+		} else {
+			setError(`Not enough liquidity in ${networkName === "bnbt"? "BSC":"ETH"} network!`);
+		}
 
 	} catch (err) {
 		setError(err.message);

@@ -39,11 +39,11 @@ export default class Logs extends Component {
     return (
       <Fragment>
    
-      <div class="window">
-        <div class="terminal">
-          <p id="command" class="command">Arbitrage Console is ready.</p>  
+      <div className="window">
+        <div className="terminal">
+          <p id="command" className="command">Arbitrage Console is ready.</p>  
             {this.state.logs.map((subItems, sIndex) => {
-              return <p class="log"><span key={sIndex}> {subItems}</span></p>;
+              return <p className="log"><span key={sIndex}> {subItems}</span></p>;
             })}
           
         </div>
