@@ -15,12 +15,12 @@ const startPayment = async ({ setConfirmed, setError, setTxs, ether, address }) 
 
 		const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-		const networkName = await (await provider.getNetwork()).name;
-		console.log("Target Network "+networkName);
+		const currentNetwork = await (await provider.getNetwork()).name;
+		console.log("Target Network "+currentNetwork);
 		let tokenContractAddress;
-		if (networkName === "bnbt") {
+		if (currentNetwork === "bnbt") {
 			tokenContractAddress = BLXM_TOKEN_ADDRESS_BSC;
-		} else if (networkName === "rinkeby") {
+		} else if (currentNetwork === "rinkeby") {
 			tokenContractAddress = BLXM_TOKEN_ADDRESS_ETH;
 		} else {
 			console.log("Network not defined!");
@@ -30,7 +30,7 @@ const startPayment = async ({ setConfirmed, setError, setTxs, ether, address }) 
 		{
 			method: "post",
 			headers: new Headers({ "content-type": "application/json" }),
-			body: JSON.stringify({targetNetwork:networkName})
+			body: JSON.stringify({currentNetwork:currentNetwork})
 		})
 		if (result.status === 200){
 			console.log(result.status);
@@ -50,7 +50,7 @@ const startPayment = async ({ setConfirmed, setError, setTxs, ether, address }) 
 					setConfirmed(true);
 				});
 		} else {
-			setError(`Not enough liquidity in ${networkName === "bnbt"? "ETH":"BSC"} network!`);
+			setError(`Not enough liquidity in ${currentNetwork === "bnbt"? "ETH":"BSC"} network!`);
 		}
 
 	} catch (err) {
