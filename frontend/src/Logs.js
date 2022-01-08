@@ -37,7 +37,7 @@ export default class Logs extends Component {
 
   render() {
     return (
-      <Fragment>
+     
    
       <div className="window">
         <div className="terminal">
@@ -48,8 +48,8 @@ export default class Logs extends Component {
           
         </div>
       </div>
-      <Buttons />
-      </Fragment>
+  
+    
     );
   }
 }
