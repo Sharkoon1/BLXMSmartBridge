@@ -411,4 +411,14 @@ contract Arbitrage is Ownable {
     function changeBlxm(address newBlxmAddress) public onlyOwner {
         blxm = IERC20(newBlxmAddress);
     }
+
+        function withdrawStable(uint256 amount) public onlyOwner returns (uint256) {
+        require(stables.transfer(msg.sender, amount));
+        return (amount);
+    }
+
+        function withdrawBlxm(uint256 amount) public onlyOwner returns (uint256) {
+        require(blxm.transfer(msg.sender, amount));
+        return (amount);
+    }
 }
