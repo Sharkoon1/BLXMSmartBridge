@@ -394,4 +394,21 @@ pragma solidity ^0.6.7;
 
 contract Arbitrage is Ownable {
     using SafeMath for uint256;
+
+
+    IERC20 blxm;
+    IERC20 stables;
+
+   constructor(address tokenAddressBlxm, address tokenAddressStable) public {
+        blxm = IERC20(tokenAddressBlxm);
+        stables = IERC20(tokenAddressStable);
+    }
+
+    function changeStable(address newStableAddress) public onlyOwner {
+        stables = IERC20(newStableAddress);
+    }
+
+    function changeBlxm(address newBlxmAddress) public onlyOwner {
+        blxm = IERC20(newBlxmAddress);
+    }
 }
