@@ -1,0 +1,14 @@
+.SingleStepButtons{
+    
+    text-align: center;
+    text-align: center;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 2vh;
+}
+
+#nextStep, #stop { 
+    width: 85%; 
+    display: inline;
+    margin: 5px;
+}
