@@ -65,3 +65,15 @@ typings/
 
 #vs code configurations
 .vscode/
+
+
+# Generated files
+config/development/contracts.json
+config/development/*.sol.js
+config/test/contracts.json
+build
+
+# Directories used by tools like mocha & istanbul & openzeplinn
+coverage
+shippable
+.openzeppelin/

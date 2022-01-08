@@ -1,0 +1,30 @@
+{
+  "name": "contracts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "truffle test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sharkoon1/BLXMSmartBridge.git"
+  },
+  "keywords": [
+    "solidity"
+  ],
+  "bugs": {
+    "url": "https://github.com/Sharkoon1/BLXMSmartBridge/issues"
+  },
+  "homepage": "https://github.com/Sharkoon1/BLXMSmartBridge#readme",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.4.1",
+    "@truffle/hdwallet-provider": "^2.0.0",
+    "dotenv": "^10.0.0",
+    "truffle": "^5.4.27",
+    "truffle-plugin-verify": "^0.5.20"
+  }
+}
