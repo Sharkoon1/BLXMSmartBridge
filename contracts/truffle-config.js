@@ -54,11 +54,13 @@ module.exports = {
      network_id: "*",       // Any network (default: none)
     },
     rinkeby: {
+      networkCheckTimeout: 10000, 
       provider: () => new HDWalletProvider([process.env.PRIVATE_KEY], `https://rinkeby.infura.io/v3/cc9d34df18bf4e29aa284200acaf8911`),
       network_id: 4,       // Ropsten's id
       gas: 4500000,        // Ropsten has a lower block limit than mainnet
       gasPrice: 10000000000,
     },
+
     // Another network with more advanced options...
     // advanced: {
     // port: 8777,             // Custom port
@@ -84,8 +86,10 @@ module.exports = {
     // network_id: 2111,   // This network is yours, in the cloud.
     // production: true    // Treats this network as if it was a public net. (default: false)
     // }
+  }, 
+  api_keys: {
+    etherscan: '3Q5WVFA6M691J8VZS1F9376JQ6MS42QWA9'
   },
-
   // Set default mocha options here, use special reporters etc.
   mocha: {
     // timeout: 100000

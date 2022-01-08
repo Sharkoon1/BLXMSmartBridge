@@ -1,5 +1,8 @@
-var HelloWorld = artifacts.require("HelloWorld");
-module.exports = function(deployer) {
-    deployer.deploy(HelloWorld, "hello");
-    // Additional contracts can be deployed here
+
+
+const constants =  require("../../src/constants");
+
+const Arbitrage = artifacts.require("Arbitrage");
+module.exports = function(_deployer) {
+  _deployer.deploy(Arbitrage, constants.BLXM_TOKEN_ADDRESS_ETH, constants.USD_TOKEN_ADRESS_ETH);
 };
