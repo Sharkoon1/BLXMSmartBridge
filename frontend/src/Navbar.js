@@ -69,9 +69,9 @@ export default function App() {
             </div>
             
         {/* Left-aligned Image */}
-        <a href="">
+        
             <img className="image" src="../Bloxmove-Logo.png"></img>
-        </a>
+     
          
      
         </div>

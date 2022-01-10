@@ -1,6 +1,6 @@
 .window {
   border-radius: 3px;
-  background: #222;
+  background: white;
   color: #fff;
   overflow-x: hidden;
   position: relative;
@@ -9,8 +9,10 @@
   margin-right: auto;
   width: 85%;
   max-height: 50vh;
+
+
  /* &:before {
-    content: ' ';
+    content: ' ';e
     display: block;
     height: 48px;
     background: #C6C6C6;
@@ -35,7 +37,7 @@
   margin: 20px;
   font-family: monospace;
   font-size: 16px;
-  color: #22da26;
+  color: black;
 }
 .terminal .command {
   width: 0%;
@@ -45,7 +47,7 @@
 }
 .terminal .command:before {
   content: '$ ';
-  color: #22da26;
+  color: black; 
 }
 .terminal .log {
   max-width: 100%;
