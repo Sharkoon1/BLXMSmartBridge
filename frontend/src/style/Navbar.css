@@ -1,61 +1,47 @@
 /* Style the navigation menu */
 .topnav {
-    overflow: hidden;
-    background-color: #333;
-    position: relative;
-  }
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 20px;
+  margin-top: 10px;
+}
 
-  .subheading{
-    padding-left: 5% !important;
-    color: red;
-  }
-  
-  
-  
-  /* Style navigation menu links */
-  .topnav a {
-    color: white;
-    padding: 14px 16px;
-    text-decoration: none;
-    font-size: 17px;
-    display: block;
-  }
-  
-  /* Style the hamburger menu */
-  .topnav .icon {
-    height: 48px;
-    background: #333;
-    display: block;
-    position: absolute;
-    right: 0;
-    top: 0;
-  }
-  .topnav .icon:hover {
-  background-color: #ddd;
-  }
-
-
+.image {
+  float: left;
+  padding: 14px 16px;
+  display:inline-block;
+  width: 200px; 
+}
 
   
-  /* Add a grey background color on mouse-over */
-  .topnav a:hover {
-    background-color: #ddd;
-    color: black;
-  }
   
-  /* Style the active link (or home/logo) */
-  .active {
-    background-color: #4CAF50;
-    color: #333;
-  }
-  .image{
-     width: 100px;
-  }
+.topnav-centered{
+  margin-top: 3px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: inline-block;
+  border-radius: 16px;
+  background-color: rgb(255, 255, 255);
+  border: 1px solid rgb(237, 238, 242);
+  box-shadow: rgb(0 0 0 / 2%) 0px 6px 10px;
+
+}
+.topnav-centered a {
+  display: inline-block;
+  padding: 10px;
+}
+
+.topnav-centered-focus {
+  border-radius: 14px;
+  font-weight: 600;
+  color: rgb(0, 0, 0);
+  background-color: rgb(247, 248, 250);
+}
   
-  .burgerbar{
-      width: 40px;
-      padding-left: 10px;
-      padding-right: 10px ;
-     
-  }
+
+  
+
+  
  
