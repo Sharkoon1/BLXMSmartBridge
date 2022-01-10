@@ -11,15 +11,25 @@ export default function App() {
         const root = document.getElementById("root");
         const root1 = document.getElementById("root1");
         const buttons = document.getElementById("buttons");
+        const singlestep = document.getElementById("singlestep")
+        const fullautonomous = document.getElementById("fullautonomous");
+        const dashboard = document.getElementById("dashboard");
+       
 
 
         if(root.style.display === "none" || root1.style.display === "none") {
             root.style.display = "block";
             root1.style.display = "block";
             buttons.style.display = "none";
+            fullautonomous.classList.remove("topnav-centered-focus");
+            singlestep.classList.add("topnav-centered-focus");
+            dashboard.classList.remove("topnav-centered-focus");
         }
         
         else {
+            fullautonomous.classList.add("topnav-centered-focus");
+            singlestep.classList.remove("topnav-centered-focus");
+            dashboard.classList.remove("topnav-centered-focus");
             root.style.display = "none";
             root1.style.display = "none";
             buttons.style.display = "block";
@@ -30,9 +40,18 @@ export default function App() {
         const root = document.getElementById("root");
         const root1 = document.getElementById("root1");
         const buttons = document.getElementById("buttons");
+        const singlestep = document.getElementById("singlestep")
+        const fullautonomous = document.getElementById("fullautonomous");
+        const dashboard = document.getElementById("dashboard");
 
-        root.style.display = "block";
-        root1.style.display = "block";
+        singlestep.classList.remove("topnav-centered-focus");
+        fullautonomous.classList.remove("topnav-centered-focus");
+        dashboard.classList.add("topnav-centered-focus");
+
+
+
+        root.style.display = "none";
+        root1.style.display = "none";
         buttons.style.display = "none";
         
     }
@@ -41,15 +60,21 @@ export default function App() {
      
     return (
         <div className="topnav">
-        <a href="" className="active" onClick={onClick2}> <img className="image" src="../Bloxmove-Logo.png"></img></a>
-            <div id="myLinks" style={{ display: show ? "block" : "none" }}>
-              <a href="#singlestep" onClick={onClick}>Single Step</a>
-              <a href="#fullautonomous" onClick={onClick}>Full Autonomous</a>
+        
+        {/* Centered Nav */}
+        <div className="topnav-centered">
+                <a href="#singlestep" id="singlestep" className="topnav-centered-focus" onClick={onClick}>Single Step</a>
+                <a href="#fullautonomous" id="fullautonomous" className="" onClick={onClick}>Full Autonomous</a>
+                <a href="#dashboard" id="dashboard" className="" onClick={onClick2}>Dashboard</a>
             </div>
             
-            <button className="icon" onClick={() => setShow((s) => !s)}> 
-                <img className="burgerbar" src='../burger_line.png'></img>
-            </button>
+        {/* Left-aligned Image */}
+        <a href="">
+            <img className="image" src="../Bloxmove-Logo.png"></img>
+        </a>
+         
+     
         </div>
+
       );
     }

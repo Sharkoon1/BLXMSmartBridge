@@ -41,7 +41,6 @@ ReactDOM.render(
 //);
 
 //####### Abitrage Console Full Autonomous ####### 
-
 const rootElement2 = document.getElementById("buttons");
 ReactDOM.render(
 	<StrictMode>
