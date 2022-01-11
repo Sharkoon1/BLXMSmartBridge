@@ -16,6 +16,15 @@ class ArbitrageContract extends BaseContract {
 		return await this._contract.swapStableToBasic(amount);
 
     }
+
+	async changeBasic(address) {
+		return await this._contract.changeBasic(address);
+	}
+
+	async changeStable(address) {
+		return await this._contract.changeStable(address);
+	}
+
 }
 
 module.exports = PoolContract;
