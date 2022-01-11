@@ -60,6 +60,14 @@ module.exports = {
       gas: 4500000,        // Ropsten has a lower block limit than mainnet
       gasPrice: 10000000000,
     },
+    bsc: {
+      networkCheckTimeout: 10000, 
+      provider: () => new HDWalletProvider([process.env.PRIVATE_KEY], `https://data-seed-prebsc-2-s3.binance.org:8545/`),
+      network_id: 97,       // Ropsten's id
+      gas: 4500000,        // Ropsten has a lower block limit than mainnet
+      gasPrice: 10000000000,
+    },
+
 
     // Another network with more advanced options...
     // advanced: {
@@ -88,7 +96,8 @@ module.exports = {
     // }
   }, 
   api_keys: {
-    etherscan: '3Q5WVFA6M691J8VZS1F9376JQ6MS42QWA9'
+    etherscan: '3Q5WVFA6M691J8VZS1F9376JQ6MS42QWA9',
+    bscscan: 'UW1YBRNBF2YFV1CIB6HY515S3GR2XGWKNF'
   },
   // Set default mocha options here, use special reporters etc.
   mocha: {

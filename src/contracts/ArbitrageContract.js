@@ -9,11 +9,11 @@ class ArbitrageContract extends BaseContract {
 	}
 
 	async swapBasicToStable(amount) {
-		return await this._contract.swapBasicToStable(amount);
+		return await this._contract.swapBasicToStable(this.DecimalToWei(amount));
 	}
 
 	async swapStableToBasic(amount) {
-		return await this._contract.swapStableToBasic(amount);
+		return await this._contract.swapStableToBasic(this.DecimalToWei(amount));
 
 	}
 

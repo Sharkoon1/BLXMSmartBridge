@@ -17,11 +17,11 @@ class ArbitrageService{
 		this._bscContracts = new Contracts("BSC", WalletContainer.ArbitrageWalletBSC);
 
 
-		this.blxmBsc = 150;
-		this.usdcBsc = 200;
+		this.basicBsc = 150;
+		this.stableBsc = 200;
         
-		this.blxmEth = 200;
-		this.usdcEth = 350;
+		this.basicEth = 200;
+		this.stableEth = 350;
 
 		this.poolPriceBsc = 0;
 		this.poolPriceEth = 0;
@@ -29,89 +29,101 @@ class ArbitrageService{
 
 	startArbitrage (){
 
-		this.poolPriceBsc = this.usdcBsc/this.blxmBsc;
-		this.poolPriceEth = this.usdcEth/this.blxmEth;
+		this.poolPriceBsc = this.stableBsc/this.basicBsc;
+		this.poolPriceEth = this.stableEth/this.basicEth;
 
 		if(this.poolPriceEth > this.poolPriceBsc){
-
 			this.calculateSwapEth();
-
 		}
-		else {
-    
-			this.calculateSwapBsc();
-    
-		}
-        
+		else {   
+			this.calculateSwapBsc();  
+		}      
 	}
 
-	calculateSwapEth(){
+	async calculateSwapEth(){
 
-		let blxmCheap = this.blxmBsc;
-		let usdCheap = this.usdcBsc;
-		let blxmExpensive = this.blxmEth;
-		let usdExpensive = this.usdcEth;
-		let constantCheap = this.usdcBsc * this.blxmBsc;
-		let constantExpensive = this.usdcEth * this.blxmEth;     
-		let adjustmentValue = this.getAdjustmentValueUsd(blxmCheap, usdCheap, blxmExpensive, constantCheap, constantExpensive);
+		let basicCheap = this.basicBsc;
+		let stableCheap = this.stableBsc;
+		let basicExpensive = this.basicEth;
+		let stableExpensive = this.stableEth;
+		let constantCheap = this.stableBsc * this.basicBsc;
+		let constantExpensive = this.stableEth * this.basicEth;     
+		let adjustmentValueStable = this.getAdjustmentValueUsd(basicCheap, stableCheap, basicExpensive, constantCheap, constantExpensive);
     
-		let usdCheapNew = usdCheap + adjustmentValue;
-		let blxmCheapNew = constantCheap / usdCheapNew;
+		let stableCheapNew = stableCheap + adjustmentValueStable;
+		let basicCheapNew = constantCheap / stableCheapNew;
+
+		let adjustmentValueBasic = basicCheap - basicCheapNew;
     
-		let blxmExpensiveNew = blxmExpensive + blxmCheap - blxmCheapNew;
-		let usdExpensiveNew = constantExpensive / blxmExpensiveNew;
+		let basicExpensiveNew = basicExpensive + basicCheap - basicCheapNew;
+		let stableExpensiveNew = constantExpensive / basicExpensiveNew;
     
-		let profit = usdExpensive - usdExpensiveNew - adjustmentValue;
-    
+		let profit = stableExpensive - stableExpensiveNew - adjustmentValueStable;
+
+		let swapStableTx = this._ethContracts.arbitrageContract.swapBasicToStable(adjustmentValueStable);
+		let swapBasicTx = this._bscContracts.arbitrageContract.swapStableToBasic(adjustmentValueBasic);
+
+		await swapStableTx.wait();
+		await swapBasicTx.wait();
+
 		console.log("poolPriceEth: " + this.poolPriceEth);
 		console.log("poolPriceBsc: " + this.poolPriceBsc);
     
-		console.log("AdjustmentValue: " + adjustmentValue);
+		console.log("AdjustmentValue: " + adjustmentValueStable);
 		console.log("profit (only USDC profit): " + profit);
     
-		console.log("usdcBsc: " + this.usdcBsc + " -> " + "usdcBscNew: " + usdCheapNew);
-		console.log("blxmBsc: " + this.blxmBsc + " -> " + "blxmBscNew: " + blxmCheapNew);
-		console.log("usdcEth: " + this.usdcEth + " -> " + "usdcEthNew: " + usdExpensiveNew);
-		console.log("blxmEth: " + this.blxmEth + " -> " + "blxmEthNew: " + blxmExpensiveNew);
+		console.log("stableBsc: " + this.stableBsc + " -> " + "stableBscNew: " + stableCheapNew);
+		console.log("basicBsc: " + this.basicBsc + " -> " + "basicBscNew: " + basicCheapNew);
+		console.log("stableEth: " + this.stableEth + " -> " + "stableEthNew: " + stableExpensiveNew);
+		console.log("basicEth: " + this.basicEth + " -> " + "basicEthNew: " + basicExpensiveNew);
 	}
 
-	calculateSwapBsc(){
+	async calculateSwapBsc(){
 
-		let blxmCheap = this.blxmEth;
-		let usdCheap = this.usdcEth;
-		let blxmExpensive = this.blxmBsc;
-		let usdExpensive = this.usdcBsc;
-		let constantCheap = this.usdcEth * this.blxmEth;
-		let constantExpensive = this.usdcBsc * this.blxmBsc;   
-		let adjustmentValue = this.getAdjustmentValueUsd(blxmCheap, usdCheap, blxmExpensive, constantCheap, constantExpensive);
+		let basicCheap = this.basicEth;
+		let stableCheap = this.stableEth;
+		let basicExpensive = this.basicBsc;
+		let stableExpensive = this.stableBsc;
+		let constantCheap = this.stableEth * this.basicEth;
+		let constantExpensive = this.stableBsc * this.basicBsc; 
+          
+		let adjustmentValueStable = this.getAdjustmentValueUsd(basicCheap, stableCheap, basicExpensive, constantCheap, constantExpensive);
     
-		let usdCheapNew = usdCheap + adjustmentValue;
-		let blxmCheapNew = constantCheap / usdCheapNew;
+		let stableCheapNew = stableCheap + adjustmentValueStable;
+		let basicCheapNew = constantCheap / stableCheapNew;
+
+		let adjustmentValueBasic = basicCheap - basicCheapNew;
     
-		let blxmExpensiveNew = blxmExpensive + blxmCheap - blxmCheapNew;
-		let usdExpensiveNew = constantExpensive / blxmExpensiveNew;
+		let basicExpensiveNew = basicExpensive + adjustmentValueBasic;
+		let stableExpensiveNew = constantExpensive / basicExpensiveNew;
     
-		let profit = usdExpensive - usdExpensiveNew - adjustmentValue;
-    
+		let profit = stableExpensive - stableExpensiveNew - adjustmentValueStable;
+
+		let swapStableTx = this._ethContracts.arbitrageContract.swapStableToBasic(adjustmentValueStable);
+		let swapBasicTx = this._bscContracts.arbitrageContract.swapBasicToStable(adjustmentValueBasic);
+
+		await swapStableTx.wait();
+		await swapBasicTx.wait();
+
 		console.log("poolPriceEth: " + this.poolPriceEth);
 		console.log("poolPriceBsc: " + this.poolPriceBsc);
     
-		console.log("AdjustmentValue: " + adjustmentValue);
+		console.log("AdjustmentValue: " + adjustmentValueStable);
 		console.log("profit: " + profit);
     
-		console.log("usdcBsc: " + this.usdcBsc + " -> " + "usdcBscNew: " + usdCheapNew);
-		console.log("blxmBsc: " + this.blxmBsc + " -> " + "blxmBscNew: " + blxmCheapNew);
-		console.log("usdcEth: " + this.usdcEth + " -> " + "usdcEthNew: " + usdExpensiveNew);
-		console.log("blxmEth: " + this.blxmEth + " -> " + "blxmEthNew: " + blxmExpensiveNew);
+		console.log("stableBsc: " + this.stableBsc + " -> " + "stableBscNew: " + stableCheapNew);
+		console.log("basicBsc: " + this.basicBsc + " -> " + "basicBscNew: " + basicCheapNew);
+		console.log("stableEth: " + this.stableEth + " -> " + "stableEthNew: " + stableExpensiveNew);
+		console.log("basicEth: " + this.basicEth + " -> " + "basicEthNew: " + basicExpensiveNew);
 	}
 
     
-	getAdjustmentValueUsd(blxmCheap, usdCheap, blxmExpensive, constantCheap, constantExpensive){
+	getAdjustmentValueUsd(basicCheap, stableCheap, basicExpensive, constantCheap, constantExpensive){
 
-		let adjustmentValue = (Math.sqrt(Math.pow(blxmCheap, 2) * constantCheap * constantExpensive + 2 * blxmCheap * blxmExpensive * constantCheap * constantExpensive + 
-        Math.pow(blxmExpensive, 2) * constantCheap * constantExpensive) + 
-        Math.pow(blxmCheap, 2) * (-usdCheap) - 2 * blxmCheap * blxmExpensive * usdCheap + blxmCheap * constantCheap - Math.pow(blxmExpensive, 2) * 
-        usdCheap + blxmExpensive * constantCheap) / (Math.pow(blxmCheap,2) + 2 *blxmCheap * blxmExpensive + Math.pow(blxmExpensive, 2));
+		let adjustmentValue = (Math.sqrt(Math.pow(basicCheap, 2) * constantCheap * constantExpensive + 2 * basicCheap * basicExpensive * constantCheap * constantExpensive + 
+        Math.pow(basicExpensive, 2) * constantCheap * constantExpensive) + 
+        Math.pow(basicCheap, 2) * (-stableCheap) - 2 * basicCheap * basicExpensive * stableCheap + basicCheap * constantCheap - Math.pow(basicExpensive, 2) * 
+        stableCheap + basicExpensive * constantCheap) / (Math.pow(basicCheap,2) + 2 *basicCheap * basicExpensive + Math.pow(basicExpensive, 2));
     
 		return adjustmentValue;
 	}
