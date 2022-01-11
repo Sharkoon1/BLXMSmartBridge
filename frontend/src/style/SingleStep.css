@@ -1,3 +1,31 @@
+.logsBox{
+    position: relative;
+    background: rgb(255, 255, 255);
+    box-shadow: rgb(0 0 0 / 1%) 0px 0px 1px, rgb(0 0 0 / 4%) 0px 4px 8px, rgb(0 0 0 / 4%) 0px 16px 24px, rgb(0 0 0 / 1%) 0px 24px 32px;
+    border-radius: 24px;
+    width: 80%; 
+    margin-left: auto;
+    margin-right: auto;
+}
+  
+
+.settings{
+    padding-top: 20px; 
+    padding-bottom: 20px;
+ 
+}
+
+.settingsImage{
+    position: absolute;
+    right: 3%;
+    top: 25px;
+    width: 32px;
+    height: 32px;
+}
+
+
+
+
 .SingleStepButtons{
     
     text-align: center;
@@ -8,7 +36,10 @@
 }
 
 #nextStep, #stop { 
-    width: 85%; 
+    width: 95%; 
     display: inline;
     margin: 5px;
+}
+#stop{
+    margin-bottom: 20px;
 }

@@ -38,7 +38,7 @@ export default class Logs extends Component {
   render() {
     return (
      
-   
+    
       <div className="window">
         <div className="terminal">
           <p id="command" className="command">Arbitrage Console is ready.</p>  

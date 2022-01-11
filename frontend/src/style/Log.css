@@ -1,14 +1,16 @@
 .window {
   border-radius: 3px;
-  background: white;
-  color: #fff;
+  border-radius: 20px;
+  border: 1px solid rgb(255, 255, 255);
+  background-color: rgb(247, 248, 250);
+  color: black;
   overflow-x: hidden;
   position: relative;
-  margin-top: 8vh;
+  margin-top: 10px;
   margin-left: auto;
   margin-right: auto;
-  width: 85%;
-  max-height: 50vh;
+  width: 95%;
+  max-height: 40vh;
 
 
  /* &:before {
@@ -37,7 +39,7 @@
   margin: 20px;
   font-family: monospace;
   font-size: 16px;
-  color: black;
+ 
 }
 .terminal .command {
   width: 0%;
@@ -59,11 +61,12 @@
 .terminal p:nth-child(3) {
   animation-delay: 1s;
 }
-@media only screen and (max-width: 1023px) {
+/** @media only screen and (max-width: 1023px) {
   .window {
     width: 100%;
  }
-}
+} **/
+
 @keyframes write-command {
   0% {
     width: 0%;

@@ -9,6 +9,7 @@ import Navbar from "./Navbar";
 import Logs from "./Logs";
 import Buttons from "./Buttons";
 import SingleStep from "./SingleStep"
+import FullAutonomous from "./FullAutonomous";
 
 //####### NAVBAR #######
 
@@ -44,8 +45,7 @@ ReactDOM.render(
 const rootElement2 = document.getElementById("buttons");
 ReactDOM.render(
 	<StrictMode>
-		<Logs />
-		<Buttons />
+		<FullAutonomous/>
 	</StrictMode>,
 	rootElement2
 );
