@@ -1,7 +1,7 @@
 var cron = require("node-cron");
 const logger = require("../logger/logger");
 const WalletContainer = require("../wallet/WalletContainer");
-const ArbitrageService = require("../service/ArbitrageService");
+const ArbitrageService = require("../service/ArbitrageServiceV1");
 const BridgeService = require("../service/BridgeService");
 
 class CronJobs {
