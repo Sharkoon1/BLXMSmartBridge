@@ -1,9 +1,8 @@
 const constants = require("../constants");
-const { ethers } = require("ethers");
 require("dotenv").config();
 
 const TokenContract = require("./TokenContract");
-const PoolContract = require("./PoolContract");
+const ArbitrageContract = require("./ArbitrageContract");
 
 class Contracts  {
 	constructor(network, signer) {
@@ -12,31 +11,14 @@ class Contracts  {
 		if(this._network === "BSC") {
 			this.blxmTokenContract = new TokenContract(constants.BLXM_TOKEN_ADDRESS_BSC,  signer);
 			this.usdTokenContract = new TokenContract(constants.USD_TOKEN_ADRESS_BSC, signer);
-			this.poolContract = new PoolContract(constants.POOL_ADDRESS_BSC, signer);
+			this.arbitrageContract = new ArbitrageContract(constants.ARBITRAGE_CONTRACT_ADDRESS_BSC);
 		}
 
 		else {
 			this.blxmTokenContract = new TokenContract(constants.BLXM_TOKEN_ADDRESS_ETH,  signer);
 			this.usdTokenContract = new TokenContract(constants.USD_TOKEN_ADRESS_ETH, signer);
-			this.poolContract = new PoolContract(constants.POOL_ADDRESS_ETH, signer);
+			this.arbitrageContract = new ArbitrageContract(constants.ARBITRAGE_CONTRACT_ADDRESS_ETH);
 		}
-	}
-
-	async getPoolNumberOfBlxmToken(){
-		return await this.blxmTokenContract.getTokenBalance(constants["POOL_ADDRESS_" + this._network]);
-	}
-
-	async getPoolNumberOfUsdToken(){
-		return await this.usdTokenContract.getTokenBalance(constants["POOL_ADDRESS_" + this._network]);
-	}
-
-	async getPoolPrice() {
-		let numberOfBlxmToken = await this.getPoolNumberOfBlxmToken();
-		let numberOfUsdToken = await this.getPoolNumberOfUsdToken();
-
-		var result = (numberOfUsdToken.mul(ethers.BigNumber.from((10**18).toString()))).div(numberOfBlxmToken);
-
-		return result;
 	}
 }
 

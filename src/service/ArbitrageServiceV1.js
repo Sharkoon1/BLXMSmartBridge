@@ -8,7 +8,6 @@ const DataBaseService = require("./DataBaseService");
 const Profit = require("../models/Profit");
 const EvaluationService = require("./EvaluationService");
 const app = require("../app");
-const { format } = require("winston");
 
 class ArbitrageService {
 
