@@ -14,7 +14,9 @@ class ArbitrageContract extends BaseContract {
 
 	async swapStableToBasic(amount) {
 		return await this._contract.swapStableToBasic(amount);
+
 	}
+
 }
 
 module.exports = ArbitrageContract;
