@@ -1,9 +1,10 @@
 import React, { Component, Fragment } from 'react';
 import Logs from './Logs';
 import "./style/SingleStep.css"
+import Buttons from "./Buttons";
 
 
-export default function SingleStep() {
+export default function FullAutonomous() {
     
 
     
@@ -19,8 +20,7 @@ export default function SingleStep() {
 
  
     return (
-        <Fragment>
-   
+      
 
             <div className='logsBox'>
                 <div className='settings'>
@@ -31,13 +31,10 @@ export default function SingleStep() {
                 </div> 
 
                 <Logs/>
-                <div className='SingleStepButtons'>
-                    <button className='button' id='nextStep'>Next Step</button>
-                    <button className='button Stop' id='stop'>Stop</button>
-                </div>
+                <Buttons/>
+                <div style={{paddingBottom:  '20px'}}></div>
             </div> 
 
-        </Fragment>
     );
 }
 
