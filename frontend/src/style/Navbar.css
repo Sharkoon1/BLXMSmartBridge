@@ -1,20 +1,35 @@
 /* Style the navigation menu */
-.topnav {
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 20px;
-  
-}
-
-.image {
+.imageBig {
   float: left;
   padding: 14px 16px;
   display:inline-block;
   width: 200px; 
 }
 
+.imageSmall {
+  display: none;
+  float: left;
+  padding: 14px 16px;
+  width: 94px; 
+}
+
+@media only screen and (max-width: 800px) {
+  .imageBig {
+    display: none;
+  }
+  .imageSmall {
+    display: inline-block;
+  }
+}
   
+.topnav {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 20px;
+  padding-top: 20px;
   
+}
+
 .topnav-centered{
   margin-top: 3px;
   position: absolute;
@@ -41,7 +56,6 @@
 }
   
 
-  
 
   
  
