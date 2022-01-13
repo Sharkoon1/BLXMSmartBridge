@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { Fragment, useState } from "react";
 import "./style/Navbar.css";
 
 
@@ -60,21 +60,18 @@ export default function App() {
      
     return (
         <div className="topnav">
-        
-        {/* Centered Nav */}
-        <div className="topnav-centered">
+            {/* Centered Nav */}
+            <div className="topnav-centered">
                 <a href="#singlestep" id="singlestep" className="topnav-centered-focus" onClick={onClick}>Single Step</a>
                 <a href="#fullautonomous" id="fullautonomous" className="" onClick={onClick}>Full Autonomous</a>
                 <a href="#dashboard" id="dashboard" className="" onClick={onClick2}>Dashboard</a>
             </div>
             
-        {/* Left-aligned Image */}
-        
-            <img className="image" src="../Bloxmove-Logo.png"></img>
-     
-         
-     
+            {/* Left-aligned Image */}
+            <img className="imageBig" src="../Bloxmove-Logo.png"></img>
+            <img className="imageSmall" src="../BLXMToken.png"></img>
         </div>
+
 
       );
     }
