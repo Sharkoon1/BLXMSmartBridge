@@ -5,13 +5,12 @@ const { ethers } = require("ethers");
 
 class BridgeService {
  
-	constructor(walletContainer) {
-		this._walletContainer = walletContainer;
-		this._ethContracts = new Contracts("ETH", this._walletContainer.ArbitrageWalletETH);
-		this._bscContracts = new Contracts("BSC", this._walletContainer.ArbitrageWalletBSC);
+	constructor() {
+		this._ethContracts = new Contracts("ETH");
+		this._bscContracts = new Contracts("BSC");
 
-		this._bridgeEthContracts = new Contracts("ETH", this._walletContainer.BridgeWalletETH);
-		this._bridgeBscContracts = new Contracts("BSC", this._walletContainer.BridgeWalletBSC);
+		this._bridgeEthContracts = new Contracts("ETH");
+		this._bridgeBscContracts = new Contracts("BSC");
 	}	
 
 	async bridgeBLXMTokenEthToBsc(amount) {

@@ -1,11 +1,9 @@
-const AdjustmentValueService = require("./AdjustmentValueService");
 const DataBaseService = require("./DataBaseService");
 const EvaluationService = require("./EvaluationService");
 const logger = require("../logger/logger");
 const constants = require("../constants");
 
 const Contracts = require("../contracts/Contracts");
-const WalletContainer = require("../wallet/WalletContainer");
 
 class ArbitrageService{
 
@@ -13,8 +11,8 @@ class ArbitrageService{
 		this._databaseService = DataBaseService;
 		this._evaluationService = new EvaluationService(this._databaseService);
 
-		this._ethContracts = new Contracts("ETH", WalletContainer.ArbitrageWalletETH);
-		this._bscContracts = new Contracts("BSC", WalletContainer.ArbitrageWalletBSC);
+		this._ethContracts = new Contracts("ETH");
+		this._bscContracts = new Contracts("BSC");
 
 
 		this.basicBsc = 150;
@@ -60,6 +58,14 @@ class ArbitrageService{
     
 		let profit = stableExpensive - stableExpensiveNew - adjustmentValueStable;
 
+		let gasLimitEth = this._ethContracts.arbitrageContract.swapBasicToStableGasLimit(adjustmentValueStable);
+		let gasLimitBsc = this._bscContracts.arbitrageContract.swapStableToBasicGasLimit(adjustmentValueBasic);
+
+		let transactionFees = (await this._bscContracts.provider.provider.getFeeData()).maxFeePerGas.mul(gasLimitBsc) + 
+							  (await this._ethContracts.provider.provider.getFeeData()).maxFeePerGas.mul(gasLimitEth);
+
+		this._evaluationService.minimumSwapAmount(this.poolPriceBsc, this.poolPriceEth, transactionFees);
+
 		let swapStableTx = this._ethContracts.arbitrageContract.swapBasicToStable(adjustmentValueStable);
 		let swapBasicTx = this._bscContracts.arbitrageContract.swapStableToBasic(adjustmentValueBasic);
 
@@ -98,6 +104,14 @@ class ArbitrageService{
 		let stableExpensiveNew = constantExpensive / basicExpensiveNew;
     
 		let profit = stableExpensive - stableExpensiveNew - adjustmentValueStable;
+	
+		let gasLimitEth = this._ethContracts.arbitrageContract.swapStableToBasicGasLimit(adjustmentValueStable);
+		let gasLimitBsc = this._bscContracts.arbitrageContract.swapBasicToStableGasLimit(adjustmentValueBasic);
+
+		let transactionFees = (await this._bscContracts.provider.provider.getFeeData()).maxFeePerGas.mul(gasLimitBsc) + 
+							  (await this._ethContracts.provider.provider.getFeeData()).maxFeePerGas.mul(gasLimitEth);
+
+		this._evaluationService.minimumSwapAmount(this.poolPriceBsc, this.poolPriceEth, transactionFees);
 
 		let swapStableTx = this._ethContracts.arbitrageContract.swapStableToBasic(adjustmentValueStable);
 		let swapBasicTx = this._bscContracts.arbitrageContract.swapBasicToStable(adjustmentValueBasic);
@@ -127,7 +141,6 @@ class ArbitrageService{
     
 		return adjustmentValue;
 	}
-
 }
 
 let arbitrage = new ArbitrageService();

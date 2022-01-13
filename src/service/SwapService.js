@@ -3,18 +3,17 @@ const ArbitrageService = require("./ArbitrageServiceV1");
 const BridgeService = require("./BridgeService");
 const Contracts = require("../contracts/Contracts");
 const constants = require("../constants");
-const walletContainer = require("../wallet/WalletContainer");
 const EvaluationService = require("./EvaluationService");
 
 
 class SwapService {
 
 	constructor() {
-		this._ethContracts = new Contracts("ETH", walletContainer.ArbitrageWalletETH);
-		this._bscContracts = new Contracts("BSC", walletContainer.ArbitrageWalletBSC);
-		this.BridgeServiceInstance = new BridgeService(walletContainer);
+		this._ethContracts = new Contracts("ETH");
+		this._bscContracts = new Contracts("BSC");
+		this.BridgeServiceInstance = new BridgeService();
 		this._evaluationService = new EvaluationService(this._databaseService);
-		this.ArbitrageServiceInstance = new ArbitrageService(this.BridgeServiceInstance, walletContainer);
+		this.ArbitrageServiceInstance = new ArbitrageService(this.BridgeServiceInstance);
 	}
 
 	async getExpensiveNetwork() {
@@ -61,7 +60,7 @@ class SwapService {
 			// A swap is happening towards the cheap network 
 			if (outputNetwork === "BSC") {
 				if (!totalArbitrageBlxmBsc.isZero()) {
-					await this.ArbitrageServiceInstance._bridgeAndSwapToBsc(amount)
+					await this.ArbitrageServiceInstance._bridgeAndSwapToBsc(amount);
 					const exchangeRate = ethers.utils.formatEther(poolPriceEth) / ethers.utils.formatEther(poolPriceBsc);
 					const amountEther =  Number(ethers.utils.formatEther(amount));
 					let profit = amountEther * exchangeRate - amountEther;
@@ -72,7 +71,7 @@ class SwapService {
 				}
 			} else if (outputNetwork === "ETH") {
 				if (!totalArbitrageBlxmEth.isZero()) {
-					await this.ArbitrageServiceInstance._bridgeAndSwapToEth(amount)
+					await this.ArbitrageServiceInstance._bridgeAndSwapToEth(amount);
 					const exchangeRate = ethers.utils.formatEther(poolPriceBsc) / ethers.utils.formatEther(poolPriceEth);
 					const amountEther = Number(ethers.utils.formatEther(amount));
 					let profit = amountEther * exchangeRate - amountEther;

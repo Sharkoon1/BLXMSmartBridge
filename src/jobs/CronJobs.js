@@ -1,13 +1,12 @@
 var cron = require("node-cron");
 const logger = require("../logger/logger");
-const WalletContainer = require("../wallet/WalletContainer");
 const ArbitrageService = require("../service/ArbitrageServiceV1");
 const BridgeService = require("../service/BridgeService");
 
 class CronJobs {
 	constructor() {
-		let bridgeService = new BridgeService(WalletContainer);
-		this._arbitrageService = new ArbitrageService(bridgeService, WalletContainer);
+		let bridgeService = new BridgeService();
+		this._arbitrageService = new ArbitrageService(bridgeService);
 		this._task;
 		this.taskRunning = false;
 	}

@@ -11,13 +11,13 @@ const app = require("../app");
 
 class ArbitrageService {
 
-	constructor(bridgeService, walletContainer) {
+	constructor(bridgeService) {
 		this._bridgeService = bridgeService;
 		this._databaseService = DataBaseService;
 		this._evaluationService = new EvaluationService(this._databaseService);
 
-		this._ethContracts = new Contracts("ETH", walletContainer.ArbitrageWalletETH);
-		this._bscContracts = new Contracts("BSC", walletContainer.ArbitrageWalletBSC);
+		this._ethContracts = new Contracts("ETH");
+		this._bscContracts = new Contracts("BSC");
 
 		this._isRunning = false;
 		this._stopCycle = false;

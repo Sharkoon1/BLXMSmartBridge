@@ -1,14 +1,11 @@
 let express = require("express");
-let ethers = require("ethers");
-const Authentication = require("../middleware/Authentication");
 const Contracts = require("../contracts/Contracts");
 const constants = require("../constants");
-const walletContainer = require("../wallet/WalletContainer");
 
 
 const BSC = "bnbt";
-const _ethContracts = new Contracts("ETH", walletContainer.BridgeWalletETH);
-const _bscContracts = new Contracts("BSC", walletContainer.BridgeWalletBSC);
+const _ethContracts = new Contracts("ETH");
+const _bscContracts = new Contracts("BSC");
 
 let router = express.Router();
 
