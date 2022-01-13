@@ -1,9 +1,10 @@
+require("dotenv").config();
+const { ethers } = require("ethers");
 const AdjustmentValueService = require("./AdjustmentValueService");
 const DataBaseService = require("./DataBaseService");
 const EvaluationService = require("./EvaluationService");
 const logger = require("../logger/logger");
 const constants = require("../constants");
-
 const Contracts = require("../contracts/Contracts");
 const WalletContainer = require("../wallet/WalletContainer");
 
@@ -15,7 +16,6 @@ class ArbitrageService{
 
 		this._ethContracts = new Contracts("ETH", WalletContainer.ArbitrageWalletETH);
 		this._bscContracts = new Contracts("BSC", WalletContainer.ArbitrageWalletBSC);
-
 
 		this.basicBsc = 150;
 		this.stableBsc = 200;
@@ -29,18 +29,36 @@ class ArbitrageService{
 
 	startArbitrage (){
 
+		logger.info("Start AbitrageService ...");
+
 		this.poolPriceBsc = this.stableBsc/this.basicBsc;
 		this.poolPriceEth = this.stableEth/this.basicEth;
 
-		if(this.poolPriceEth > this.poolPriceBsc){
-			this.calculateSwapEth();
+		while (!poolPriceBsc.eq(poolPriceEth)) {
+
+			logger.info("Price difference  found ");
+			logger.info("ETH network: Current price BLXM " + ethers.utils.formatEther(poolPriceEth) + " USD");
+			logger.info("BSC network: Current price BLXM " + ethers.utils.formatEther(poolPriceBsc) + " USD");
+
+			if(this.poolPriceEth > this.poolPriceBsc){
+
+				this.calculateSwapEth();
+			
+			}
+
+			else {
+			
+				this.calculateSwapBsc();  
+			
+			}
 		}
-		else {   
-			this.calculateSwapBsc();  
-		}      
 	}
 
-	async calculateSwapEth(){
+	async startSingleArbitrageCycle() {
+		//TODO
+	}
+
+	async calculateSwapEth(){ // When ETH is more expensive
 
 		let basicCheap = this.basicBsc;
 		let stableCheap = this.stableBsc;
@@ -53,24 +71,24 @@ class ArbitrageService{
 		let stableCheapNew = stableCheap + adjustmentValueStable;
 		let basicCheapNew = constantCheap / stableCheapNew;
 
-		let adjustmentValueBasic = basicCheap - basicCheapNew;
+		let adjustmentValueBasic = basicCheap - basicCheapNew; 
     
 		let basicExpensiveNew = basicExpensive + basicCheap - basicCheapNew;
 		let stableExpensiveNew = constantExpensive / basicExpensiveNew;
     
-		let profit = stableExpensive - stableExpensiveNew - adjustmentValueStable;
+		let profitUsd = stableExpensive - stableExpensiveNew - adjustmentValueStable;
 
-		let swapStableTx = this._ethContracts.arbitrageContract.swapBasicToStable(adjustmentValueStable);
-		let swapBasicTx = this._bscContracts.arbitrageContract.swapStableToBasic(adjustmentValueBasic);
+		let swapBasicToStableTx = this._ethContracts.arbitrageContract.swapBasicToStable(adjustmentValueStable);
+		let swapStableToBasicTx = this._bscContracts.arbitrageContract.swapStableToBasic(adjustmentValueBasic);
 
-		await swapStableTx.wait();
-		await swapBasicTx.wait();
+		await swapBasicToStableTx.wait(); //waits for the promise of swapBasicToStable to be resolved
+		await swapStableToBasicTx.wait(); //waits for the promise of swapStableToBasic to be resolved
 
 		console.log("poolPriceEth: " + this.poolPriceEth);
 		console.log("poolPriceBsc: " + this.poolPriceBsc);
     
 		console.log("AdjustmentValue: " + adjustmentValueStable);
-		console.log("profit (only USDC profit): " + profit);
+		console.log("profitUsd): " + profitUsd);
     
 		console.log("stableBsc: " + this.stableBsc + " -> " + "stableBscNew: " + stableCheapNew);
 		console.log("basicBsc: " + this.basicBsc + " -> " + "basicBscNew: " + basicCheapNew);
@@ -78,7 +96,7 @@ class ArbitrageService{
 		console.log("basicEth: " + this.basicEth + " -> " + "basicEthNew: " + basicExpensiveNew);
 	}
 
-	async calculateSwapBsc(){
+	async calculateSwapBsc(){ // When BSC is more expensive
 
 		let basicCheap = this.basicEth;
 		let stableCheap = this.stableEth;
@@ -97,19 +115,19 @@ class ArbitrageService{
 		let basicExpensiveNew = basicExpensive + adjustmentValueBasic;
 		let stableExpensiveNew = constantExpensive / basicExpensiveNew;
     
-		let profit = stableExpensive - stableExpensiveNew - adjustmentValueStable;
+		let profitUsd = stableExpensive - stableExpensiveNew - adjustmentValueStable;
 
-		let swapStableTx = this._ethContracts.arbitrageContract.swapStableToBasic(adjustmentValueStable);
-		let swapBasicTx = this._bscContracts.arbitrageContract.swapBasicToStable(adjustmentValueBasic);
+		let swapStableToBasicTx = this._ethContracts.arbitrageContract.swapStableToBasic(adjustmentValueStable);
+		let swapBasicToStableTx = this._bscContracts.arbitrageContract.swapBasicToStable(adjustmentValueBasic);
 
-		await swapStableTx.wait();
-		await swapBasicTx.wait();
+		await swapStableToBasicTx.wait(); //waits for the promise of swapStableToBasic to be resolved
+		await swapBasicToStableTx.wait(); //waits for the promise of swapBasicToStable to be resolved
 
 		console.log("poolPriceEth: " + this.poolPriceEth);
 		console.log("poolPriceBsc: " + this.poolPriceBsc);
     
 		console.log("AdjustmentValue: " + adjustmentValueStable);
-		console.log("profit: " + profit);
+		console.log("profitUsd: " + profitUsd);
     
 		console.log("stableBsc: " + this.stableBsc + " -> " + "stableBscNew: " + stableCheapNew);
 		console.log("basicBsc: " + this.basicBsc + " -> " + "basicBscNew: " + basicCheapNew);
