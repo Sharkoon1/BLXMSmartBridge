@@ -16,7 +16,7 @@ export default function FullAutonomous() {
     return (
       <Fragment>
           { showResults ? <SettingsModal/> : null }
-            <div className='logsBox' id='mirkk'>
+            <div className='logsBox'>
                 <div className='settings'>
                     <button className='settingsButton' onClick={onClick} >
                         <img className="settingsImage" src='../settings.png'></img>
@@ -24,7 +24,6 @@ export default function FullAutonomous() {
                 </div> 
                 <Logs/>
                 <Buttons/>
-                <h1> HELLOOOOO</h1>
                 <div style={{paddingBottom:  '20px'}}></div>
             </div> 
         </Fragment>
