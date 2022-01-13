@@ -1,5 +1,5 @@
 const { ethers } = require("ethers");
-const ArbitrageService = require("./ArbitrageService");
+const ArbitrageService = require("./ArbitrageServiceV1");
 const BridgeService = require("./BridgeService");
 const Contracts = require("../contracts/Contracts");
 const constants = require("../constants");

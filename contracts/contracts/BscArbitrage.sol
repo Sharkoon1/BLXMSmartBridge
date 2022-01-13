@@ -11,7 +11,7 @@ contract BscArbitrage is Ownable {
     using SafeMath for uint256;
 
     IPancakeRouter02 pancakeRouter;
-    address public pancakeRouterAddress = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
+    address public pancakeRouterAddress = 0xD99D1c33F9fC3444f8101754aBC46c52416550D1;
 
     IERC20 basics;
     IERC20 stables;
