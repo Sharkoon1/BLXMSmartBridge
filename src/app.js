@@ -1,3 +1,4 @@
+require("dotenv").config();
 var express = require("express");
 var cookieParser = require("cookie-parser");
 var indexRouter = require("./routes/index");
@@ -6,10 +7,8 @@ var apiResponse = require("./helpers/apiResponse");
 var debug = require("debug")("rest-api-nodejs-mongodb:server");
 var http = require("http");
 var cors = require("cors");
-require("dotenv").config();
 
 var EventEmitter = require("events").EventEmitter;
-var cronJobs = require("./jobs/CronJobs");
 var app = express();
 
 app.use(express.json());
@@ -76,7 +75,6 @@ const io = require("socket.io")(server,{
 
 io.on("connection", client => {
 	console.log("Connected!");
-	client.on("event", data => { /* … */ });
 	client.on("disconnect", () => { /* … */ });
 });
 
@@ -93,8 +91,6 @@ logEvent.on("logMessage", function(msg) {
 logEvent.on("cycleCompleted", function(isCompleted) {
 	io.sockets.emit("cycleCompleted", isCompleted);
 });
-
-cronJobs.registerArbitrageJob();
 
 /**
  * Normalize a port into a number, string, or false.
