@@ -1,7 +1,4 @@
-//const { body,validationResult } = require("express-validator");
-//const { sanitizeBody } = require("express-validator");
 const apiResponse = require("../helpers/apiResponse");
-
 
 /**
  * Profit detail.
