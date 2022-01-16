@@ -1,5 +1,5 @@
 require("dotenv").config();
-const OracleContract = require("./OracleContract");
+const OracleContract = require("../contracts/OracleContract");
 
 
 const UniswapOracle = new OracleContract("ETH", "0x38d9eb07a7b8df7d86f440a4a5c4a4c1a27e1a08", "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2");
