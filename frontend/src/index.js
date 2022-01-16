@@ -11,8 +11,9 @@ import Buttons from "./Buttons";
 import SingleStep from "./SingleStep"
 import FullAutonomous from "./FullAutonomous";
 
-//####### NAVBAR #######
+import Dashboad from "./Dashboad";
 
+//####### NAVBAR #######
 const navbar = document.getElementById("navbar");
 ReactDOM.render(
 	<StrictMode>
@@ -22,7 +23,6 @@ ReactDOM.render(
 );
 
 //####### Connect wallet ####### 
-
 //const rootElement = document.getElementById("root");
 //ReactDOM.render(
 //	<StrictMode>
@@ -32,7 +32,6 @@ ReactDOM.render(
 //);
 
 //####### Swap Functionality  ####### 
-
 //const rootElement1 = document.getElementById("root1");
 //ReactDOM.render(
 //	<StrictMode>
@@ -59,4 +58,12 @@ ReactDOM.render(
 	rootElement1
 );
 
+//####### Dashboard ####### 
+const dashboardGraph = document.getElementById("root2");
+ReactDOM.render(
+	<StrictMode>
+		<Dashboad />
+	</StrictMode>,
+	dashboardGraph
+);
 
