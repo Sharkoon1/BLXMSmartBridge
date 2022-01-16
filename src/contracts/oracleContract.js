@@ -9,14 +9,24 @@ class OracleContract{
 	constructor(network, BLXMAddress, stableTokenAddress){
 		switch(network) {
 			case "BSC":
-				this.provider = new ethers.providers.JsonRpcProvider(process.env.PROVIDER_BSC);
+				this.provider = new ethers.providers.JsonRpcProvider(constants.PROVIDER_BSC);
 				this.arbitrageWallet = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
-				this.router = new ethers.Contract(constants.ROUTER_BSC, routerAbi, this.arbitrageWallet);
+				if (process.env.NODE_ENV === "production") {
+					this.router = new ethers.Contract(constants.ROUTER_BSC, routerAbi, this.arbitrageWallet);
+				}
+				else {
+					this.router = new ethers.Contract(constants.ROUTER_BSC_TESTNET, routerAbi, this.arbitrageWallet);
+				}
 				break;
 			case "ETH":
-				this.provider = new ethers.providers.JsonRpcProvider(process.env.PROVIDER_ETH);
+				this.provider = new ethers.providers.JsonRpcProvider(constants.PROVIDER_ETH);
 				this.arbitrageWallet = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
-				this.router = new ethers.Contract(constants.ROUTER_ETH, routerAbi, this.arbitrageWallet);
+				if (process.env.NODE_ENV === "production") {
+					this.router = new ethers.Contract(constants.ROUTER_ETH, routerAbi, this.arbitrageWallet);
+				}
+				else {
+					this.router = new ethers.Contract(constants.ROUTER_ETH_TESTNET, routerAbi, this.arbitrageWallet);
+				}
 		}
 		this.blxmTokenContract = new TokenContract(BLXMAddress,  this.arbitrageWallet);
 		this.stableTokenContract = new TokenContract(stableTokenAddress, this.arbitrageWallet);
@@ -53,7 +63,6 @@ class OracleContract{
 			console.log(error);
 		}
 	}
-
 }
 
 module.exports = OracleContract;
