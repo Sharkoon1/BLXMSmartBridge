@@ -10,6 +10,8 @@ export default function App() {
     function onClick() {
         const root = document.getElementById("root");
         const root1 = document.getElementById("root1");
+        const root2 = document.getElementById("root2");
+        
         const buttons = document.getElementById("buttons");
         const singlestep = document.getElementById("singlestep")
         const fullautonomous = document.getElementById("fullautonomous");
@@ -24,6 +26,7 @@ export default function App() {
             fullautonomous.classList.remove("topnav-centered-focus");
             singlestep.classList.add("topnav-centered-focus");
             dashboard.classList.remove("topnav-centered-focus");
+            root2.style.display = "none";
         }
         
         else {
@@ -32,6 +35,7 @@ export default function App() {
             dashboard.classList.remove("topnav-centered-focus");
             root.style.display = "none";
             root1.style.display = "none";
+            root2.style.display = "none";
             buttons.style.display = "block";
         }
     }
@@ -39,6 +43,8 @@ export default function App() {
     function onClick2() {
         const root = document.getElementById("root");
         const root1 = document.getElementById("root1");
+        const root2 = document.getElementById("root2");
+
         const buttons = document.getElementById("buttons");
         const singlestep = document.getElementById("singlestep")
         const fullautonomous = document.getElementById("fullautonomous");
@@ -53,7 +59,7 @@ export default function App() {
         root.style.display = "none";
         root1.style.display = "none";
         buttons.style.display = "none";
-        
+        root2.style.display = "block";
     }
 
 
