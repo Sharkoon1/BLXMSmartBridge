@@ -4,7 +4,6 @@ const factoryAbi = require("../abi/factory_abi.json");
 const constants = require("../constants");
 const TokenContract = require("./TokenContract");
 const { ethers } = require("ethers");
-require("dotenv").config();
 
 class OracleContract{
 	constructor(network, BLXMAddress, stableTokenAddress){
