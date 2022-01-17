@@ -6,6 +6,8 @@ const EvaluationService = require("./EvaluationService");
 const logger = require("../logger/logger");
 const constants = require("../constants");
 const Contracts = require("../contracts/Contracts");
+const OracleContract = require("../contracts/OracleContract");
+
 
 class ArbitrageService{
 
@@ -16,24 +18,27 @@ class ArbitrageService{
 		this._ethContracts = new Contracts("ETH");
 		this._bscContracts = new Contracts("BSC");
 
-		this.basicBsc = 150;
-		this.stableBsc = 200;
-        
-		this.basicEth = 200;
-		this.stableEth = 350;
-
-		this.poolPriceBsc = 0;
-		this.poolPriceEth = 0;
+		this.UniswapOracle = new OracleContract("ETH", constants.BLXM_TOKEN_ADDRESS_ETH, constants.USD_TOKEN_ADRESS_ETH);
+		this.PancakeOracle = new OracleContract("BSC", constants.BLXM_TOKEN_ADDRESS_BSC, constants.USD_TOKEN_ADRESS_BSC);
+	
+		this.poolPriceEth = null;
+		this.poolPriceBsc = null;
 	}
 
-	startArbitrage (){
+	async startArbitrage (){
 
 		logger.info("Start AbitrageService ...");
 
-		this.poolPriceBsc = this.stableBsc/this.basicBsc;
-		this.poolPriceEth = this.stableEth/this.basicEth;
+		this.poolPriceBsc = await this.PancakeOracle.getPrice()
+		this.poolPriceEth = await this.UniswapOracle.getPrice()
 
 		while (!poolPriceBsc.eq(poolPriceEth)) {
+
+			this.poolPriceBsc = await this.PancakeOracle.getPrice()
+			this.poolPriceEth = await this.UniswapOracle.getPrice()
+
+			let tokenArrayBsc = await this.PancakeOracle.getReserves(); //tokenArrayBsc[0] = stableBsc, tokenArrayBsc[1] = basicBsc
+			let tokenArrayEth = await this.UniswapOracle.getReserves(); //tokenArrayEth[0] = stableEth, tokenArrayEth[1] = basicEth
 
 			logger.info("Price difference  found ");
 			logger.info("ETH network: Current price BLXM " + ethers.utils.formatEther(poolPriceEth) + " USD");
@@ -41,15 +46,17 @@ class ArbitrageService{
 
 			if(this.poolPriceEth > this.poolPriceBsc){
 
-				this.calculateSwapEth();
+				this.calculateSwapEth(tokenArrayBsc[1], tokenArrayBsc[0], tokenArrayEth[1], tokenArrayEth[0]);
 			
 			}
 
 			else {
 			
-				this.calculateSwapBsc();  
+				this.calculateSwapBsc(tokenArrayEth[1], tokenArrayEth[0], tokenArrayBsc[1], tokenArrayBsc[0]);  
 			
 			}
+			console.log("Das Ende der Schleife")
+			break;
 		}
 	}
 
@@ -57,14 +64,11 @@ class ArbitrageService{
 		//TODO
 	}
 
-	async calculateSwapEth(){ // When ETH is more expensive
+	async calculateSwapEth(basicCheap, stableCheap, basicExpensive, stableExpensive){ // When ETH is more expensive
 
-		let basicCheap = this.basicBsc;
-		let stableCheap = this.stableBsc;
-		let basicExpensive = this.basicEth;
-		let stableExpensive = this.stableEth;
-		let constantCheap = this.stableBsc * this.basicBsc;
-		let constantExpensive = this.stableEth * this.basicEth;     
+		let constantCheap = basicCheap * stableCheap;
+		let constantExpensive = basicExpensive * stableExpensive;   
+
 		let adjustmentValueStable = this.getAdjustmentValueUsd(basicCheap, stableCheap, basicExpensive, constantCheap, constantExpensive);
     
 		let stableCheapNew = stableCheap + adjustmentValueStable;
@@ -77,25 +81,25 @@ class ArbitrageService{
     
 		let profitUsd = stableExpensive - stableExpensiveNew - adjustmentValueStable;
 
-		let gasLimitEth = this._ethContracts.arbitrageContract.swapBasicToStableGasLimit(adjustmentValueStable);
-		let gasLimitBsc = this._bscContracts.arbitrageContract.swapStableToBasicGasLimit(adjustmentValueBasic);
-
+		let gasLimitBsc = this._bscContracts.arbitrageContract.swapStableToBasicGasLimit(adjustmentValueStable);
+		let gasLimitEth = this._ethContracts.arbitrageContract.swapBasicToStableGasLimit(adjustmentValueBasic);
+		
 		let transactionFees = (await this._bscContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitBsc) + 
-							  (await this._ethContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitEth);
-
+		(await this._ethContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitEth);
+		
 		this._evaluationService.minimumSwapAmount(this.poolPriceBsc, this.poolPriceEth, transactionFees);
-
-		let swapStableTx = this._ethContracts.arbitrageContract.swapBasicToStable(adjustmentValueStable);
-		let swapBasicTx = this._bscContracts.arbitrageContract.swapStableToBasic(adjustmentValueBasic);
-
-		await swapBasicToStableTx.wait(); //waits for the promise of swapBasicToStable to be resolved
+		
+		let swapStableToBasicTx = this._bscContracts.arbitrageContract.swapStableToBasic(adjustmentValueStable);
+		let swapBasicToStableTx = this._ethContracts.arbitrageContract.swapBasicToStable(adjustmentValueBasic);
+		
 		await swapStableToBasicTx.wait(); //waits for the promise of swapStableToBasic to be resolved
+		await swapBasicToStableTx.wait(); //waits for the promise of swapBasicToStable to be resolved
 
 		console.log("poolPriceEth: " + this.poolPriceEth);
 		console.log("poolPriceBsc: " + this.poolPriceBsc);
     
 		console.log("AdjustmentValue: " + adjustmentValueStable);
-		console.log("profitUsd): " + profitUsd);
+		console.log("profitUsd: " + profitUsd);
     
 		console.log("stableBsc: " + this.stableBsc + " -> " + "stableBscNew: " + stableCheapNew);
 		console.log("basicBsc: " + this.basicBsc + " -> " + "basicBscNew: " + basicCheapNew);
@@ -103,12 +107,8 @@ class ArbitrageService{
 		console.log("basicEth: " + this.basicEth + " -> " + "basicEthNew: " + basicExpensiveNew);
 	}
 
-	async calculateSwapBsc(){ // When BSC is more expensive
+	async calculateSwapBsc(basicCheap, stableCheap, basicExpensive, stableExpensive){ // When BSC is more expensive
 
-		let basicCheap = this.basicEth;
-		let stableCheap = this.stableEth;
-		let basicExpensive = this.basicBsc;
-		let stableExpensive = this.stableBsc;
 		let constantCheap = this.stableEth * this.basicEth;
 		let constantExpensive = this.stableBsc * this.basicBsc; 
           
@@ -122,7 +122,7 @@ class ArbitrageService{
 		let basicExpensiveNew = basicExpensive + adjustmentValueBasic;
 		let stableExpensiveNew = constantExpensive / basicExpensiveNew;
     
-		let profit = stableExpensive - stableExpensiveNew - adjustmentValueStable;
+		let profitUsd = stableExpensive - stableExpensiveNew - adjustmentValueStable;
 	
 		let gasLimitEth = this._ethContracts.arbitrageContract.swapStableToBasicGasLimit(adjustmentValueStable);
 		let gasLimitBsc = this._bscContracts.arbitrageContract.swapBasicToStableGasLimit(adjustmentValueBasic);
