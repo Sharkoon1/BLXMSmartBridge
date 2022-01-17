@@ -1,6 +1,5 @@
 require("dotenv").config();
 const { ethers } = require("ethers");
-const AdjustmentValueService = require("./AdjustmentValueService");
 const DataBaseService = require("./DataBaseService");
 const EvaluationService = require("./EvaluationService");
 const logger = require("../logger/logger");
@@ -29,20 +28,16 @@ class ArbitrageService{
 
 		logger.info("Start AbitrageService ...");
 
-		this.poolPriceBsc = await this.PancakeOracle.getPrice()
-		this.poolPriceEth = await this.UniswapOracle.getPrice()
+		this.poolPriceBsc = await this.PancakeOracle.getPrice();
+		this.poolPriceEth = await this.UniswapOracle.getPrice();
 
-		while (!poolPriceBsc.eq(poolPriceEth)) {
-
-			this.poolPriceBsc = await this.PancakeOracle.getPrice()
-			this.poolPriceEth = await this.UniswapOracle.getPrice()
-
+		while (!this.poolPriceBsc.eq(this.poolPriceEth)) {
 			let tokenArrayBsc = await this.PancakeOracle.getReserves(); //tokenArrayBsc[0] = stableBsc, tokenArrayBsc[1] = basicBsc
 			let tokenArrayEth = await this.UniswapOracle.getReserves(); //tokenArrayEth[0] = stableEth, tokenArrayEth[1] = basicEth
 
 			logger.info("Price difference  found ");
-			logger.info("ETH network: Current price BLXM " + ethers.utils.formatEther(poolPriceEth) + " USD");
-			logger.info("BSC network: Current price BLXM " + ethers.utils.formatEther(poolPriceBsc) + " USD");
+			logger.info("ETH network: Current price BLXM " + ethers.utils.formatEther(this.poolPriceEth) + " USD");
+			logger.info("BSC network: Current price BLXM " + ethers.utils.formatEther(this.poolPriceBsc) + " USD");
 
 			if(this.poolPriceEth > this.poolPriceBsc){
 
@@ -55,7 +50,10 @@ class ArbitrageService{
 				this.calculateSwapBsc(tokenArrayEth[1], tokenArrayEth[0], tokenArrayBsc[1], tokenArrayBsc[0]);  
 			
 			}
-			console.log("Das Ende der Schleife")
+
+			this.poolPriceBsc = await this.PancakeOracle.getPrice();
+			this.poolPriceEth = await this.UniswapOracle.getPrice();
+
 			break;
 		}
 	}

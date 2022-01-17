@@ -9,7 +9,7 @@ class EventLogTransport extends Transport {
 		super(opts);
 	}
 	log(info, callback) {
-		app.logEvent.emit("logMessage", info.message);
+	//	app.logEvent.emit("logMessage", info.message);
 
 		callback();
 	}

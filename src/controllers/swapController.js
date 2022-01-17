@@ -1,5 +1,5 @@
 const apiResponse = require("../helpers/apiResponse");
-const swapService = require("../service/SwapService");
+//const swapService = require("../service/SwapService");
 const Contracts = require("../contracts/Contracts");
 const constants = require("../constants");
 
@@ -18,9 +18,9 @@ exports.swap = [
 			const address = req.body.from;
 			const network = req.body.chainId === BSC ? "ETH" : "BSC";
 			const amount = parseInt(req.body.data.slice(74), 16)/10**18;
-			swapService.swap(network, amount, address).then(function () {
-				res.send("success");
-			});
+			//swapService.swap(network, amount, address).then(function () {
+			//	res.send("success");
+			//});
 		} catch (err) {
 			//throw error in json response with status 500. 
 			return apiResponse.ErrorResponse(res, err);

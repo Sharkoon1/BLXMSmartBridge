@@ -52,7 +52,7 @@ class OracleContract {
 			console.log("An error occured");
 			console.log(error);
 		}
-		return ethers.utils.formatEther(tokenInStable[1]);
+		return tokenInStable[1];
 	}
 
 	async getReserves() {
