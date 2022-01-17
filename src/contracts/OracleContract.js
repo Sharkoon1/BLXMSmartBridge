@@ -6,9 +6,9 @@ const TokenContract = require("./TokenContract");
 const { ethers } = require("ethers");
 require("dotenv").config();
 
-class OracleContract{
-	constructor(network, BLXMAddress, stableTokenAddress){
-		switch(network) {
+class OracleContract {
+	constructor(network, BLXMAddress, stableTokenAddress) {
+		switch (network) {
 			case "BSC":
 				this.provider = new ethers.providers.JsonRpcProvider(process.env.PROVIDER_BSC);
 				this.arbitrageWallet = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
@@ -19,14 +19,19 @@ class OracleContract{
 				this.arbitrageWallet = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
 				this.router = new ethers.Contract(constants.ROUTER_ETH, routerAbi, this.arbitrageWallet);
 		}
-		this.blxmTokenContract = new TokenContract(BLXMAddress,  this.arbitrageWallet);
+		this.blxmTokenContract = new TokenContract(BLXMAddress, this.arbitrageWallet);
 		this.stableTokenContract = new TokenContract(stableTokenAddress, this.arbitrageWallet);
 		this.BLXMTokenAddress = BLXMAddress;
 		this.stableTokenAddress = stableTokenAddress;
-		this.factoryAddress;		
-		this.liquidityPoolAddress;
-		this.factory;
-		this.liquidityPool;
+		this.factory = null;
+		this.liquidityPool = null;
+	}
+
+	async init_liquidityPool() {
+		let factoryAddress = await this.router.factory();
+		this.factory = new ethers.Contract(factoryAddress, factoryAbi, this.arbitrageWallet);
+		let liquidityPoolAddress = await this.factory.getPair(this.BLXMTokenAddress, this.stableTokenAddress);
+		this.liquidityPool = new ethers.Contract(liquidityPoolAddress, liquidityPoolAbi, this.arbitrageWallet);
 	}
 
 	async getPrice() {
@@ -42,11 +47,10 @@ class OracleContract{
 	}
 
 	async getReserves() {
+		if (this.liquidityPool === null && this.factory === null) {
+			await this.init_liquidityPool();
+		}
 		try {
-			let factoryAddress = await this.router.factory();
-			this.factory = new ethers.Contract(factoryAddress, factoryAbi, this.arbitrageWallet);
-			let liquidityPoolAddress = await this.factory.getPair(this.BLXMTokenAddress, this.stableTokenAddress);
-			this.liquidityPool = new ethers.Contract(liquidityPoolAddress, liquidityPoolAbi, this.arbitrageWallet);
 			let reserves = await this.liquidityPool.getReserves();
 			return [ethers.utils.formatEther(reserves[0]), ethers.utils.formatEther(reserves[1])];
 		} catch (error) {
