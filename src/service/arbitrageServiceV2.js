@@ -36,10 +36,10 @@ class ArbitrageService{
 			let tokenArrayEth = await this.UniswapOracle.getReserves(); //tokenArrayEth[0] = stableEth, tokenArrayEth[1] = basicEth
 
 			logger.info("Price difference  found ");
-			logger.info("ETH network: Current price BLXM " + ethers.utils.formatEther(this.poolPriceEth) + " USD");
-			logger.info("BSC network: Current price BLXM " + ethers.utils.formatEther(this.poolPriceBsc) + " USD");
+			logger.info("ETH network: Current price BLXM " + this.poolPriceEth + " USD");
+			logger.info("BSC network: Current price BLXM " + this.poolPriceBsc + " USD");
 
-			if(this.poolPriceEth > this.poolPriceBsc){
+			if(this.poolPriceEth.gt(this.poolPriceBsc)){
 
 				this.calculateSwapEth(tokenArrayBsc[1], tokenArrayBsc[0], tokenArrayEth[1], tokenArrayEth[0]);
 			
@@ -64,8 +64,8 @@ class ArbitrageService{
 
 	async calculateSwapEth(basicCheap, stableCheap, basicExpensive, stableExpensive){ // When ETH is more expensive
 
-		let constantCheap = basicCheap * stableCheap;
-		let constantExpensive = basicExpensive * stableExpensive;   
+		let constantCheap = basicCheap.mul(stableCheap);
+		let constantExpensive = basicExpensive.mul(stableExpensive);   
 
 		let adjustmentValueStable = this.getAdjustmentValueUsd(basicCheap, stableCheap, basicExpensive, constantCheap, constantExpensive);
     
@@ -154,7 +154,7 @@ class ArbitrageService{
 		let adjustmentValue = (Math.sqrt(Math.pow(basicCheap, 2) * constantCheap * constantExpensive + 2 * basicCheap * basicExpensive * constantCheap * constantExpensive + 
         Math.pow(basicExpensive, 2) * constantCheap * constantExpensive) + 
         Math.pow(basicCheap, 2) * (-stableCheap) - 2 * basicCheap * basicExpensive * stableCheap + basicCheap * constantCheap - Math.pow(basicExpensive, 2) * 
-        stableCheap + basicExpensive * constantCheap) / (Math.pow(basicCheap,2) + 2 *basicCheap * basicExpensive + Math.pow(basicExpensive, 2));
+        stableCheap + basicExpensive * constantCheap) / (Math.pow(basicCheap,2) + 2 * basicCheap * basicExpensive + Math.pow(basicExpensive, 2));
     
 		return adjustmentValue;
 	}

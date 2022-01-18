@@ -61,7 +61,7 @@ class OracleContract {
 		}
 		try {
 			let reserves = await this.liquidityPool.getReserves();
-			return [ethers.utils.formatEther(reserves[0]), ethers.utils.formatEther(reserves[1])];
+			return [reserves[0], reserves[1]];
 		} catch (error) {
 			console.log("An error occured");
 			console.log(error);
