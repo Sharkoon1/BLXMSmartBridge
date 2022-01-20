@@ -1,10 +1,14 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import DashboardGraph from './DashboardGraph';
+import RecentTrades from './RecentTrades';
 
 class Dashboad extends Component {
     render() {
         return (
-            <DashboardGraph />
+            <Fragment>
+                <DashboardGraph />
+                <RecentTrades />
+            </Fragment>
         );
     }
 }

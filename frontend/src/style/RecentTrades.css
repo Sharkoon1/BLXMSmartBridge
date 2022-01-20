@@ -1,0 +1,50 @@
+.headingRecentTrades{
+    color: white;
+    padding-left: 10%;
+    padding-top: 20px;
+    padding-bottom: 5px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/**.recentTradesBox{
+    position: relative;
+    background: rgb(255, 255, 255);
+    box-shadow: rgb(0 0 0 / 1%) 0px 0px 1px, rgb(0 0 0 / 4%) 0px 4px 8px, rgb(0 0 0 / 4%) 0px 16px 24px, rgb(0 0 0 / 1%) 0px 24px 32px;
+    border-radius: 24px;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 25px;
+    padding-bottom: 20px;
+}**/
+
+.react-bootstrap-table-pagination-list{
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.react-bootstrap-table{
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.react-bs-table-sizePerPage-dropdown.dropdown{
+    display: none;
+}
+
+
+
+.react-bootstrap-table-pagination-list.col-md-6.col-xs-6.col-sm-6.col-lg-6{
+   
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .pagination li {
+    display: block;
+   }

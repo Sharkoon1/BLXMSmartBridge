@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import {
     LineChart,
     Line,
@@ -30,8 +30,9 @@ const data = [
 class DashboardGraph extends Component {
     render() {
         return (
+            <Fragment>
+            <h1 className='headingDashboardGraph'>Smartbridge Overview</h1>
             <div className='dashboardGraph'>
-               
                     <LineChart className='lineChart' data={data} width={1000} height={300}
                         margin={{ top: 50, right: 30, left: 20, bottom: 20}}>
                         <CartesianGrid strokeDasharray="3 3" />
@@ -42,8 +43,8 @@ class DashboardGraph extends Component {
                         <Line type="monotone" dataKey="Uniswap" stroke="#49956a" activeDot={{ r: 8 }}/>
                         <Line type="monotone" dataKey="Pancakeswap" stroke="#203a4b" />
                     </LineChart>
-          
             </div>
+            </Fragment>
         );
     }
 }
