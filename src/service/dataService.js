@@ -16,7 +16,7 @@ class dataService {
 		this._oracleUniswap.getPrice().then((res) => {
 			//console.log("Price Uniswap");
 			//console.log(+res);
-			DataBaseService.AddData({
+			this._databaseService.AddData({
 				PoolPrice: +ethers.utils.formatEther(res),
 				Network: "ETH",
 			}, PoolPrice);
@@ -24,7 +24,7 @@ class dataService {
 		this._oraclePancakeSwap.getPrice().then((res) => {
 			//console.log("Price Pancakeswap");
 			//console.log(+res);
-			DataBaseService.AddData({
+			this._databaseService.AddData({
 				PoolPrice: +ethers.utils.formatEther(res),
 				Network: "BSC",
 			}, PoolPrice);
@@ -40,15 +40,13 @@ class dataService {
 
 	async getETHPrice(){
 		const price = await this._oracleUniswap.getPrice();
-		return {"Price":price, "Timestamp": new Date.}
+		return {"Price":+ethers.utils.formatEther(price), "Timestamp": new Date().toTimeString()};
 	}
 
 	async getBSCPrice(){
-		const price = await this._oracleUniswap.getPrice();
-		return {"Price":price, "Timestamp": new Date.}
+		const price = await this._oraclePancakeSwap.getPrice();
+		return {"Price":+ethers.utils.formatEther(price), "Timestamp": new Date().toTimeString()};
 	}
-
-
 
 	async standardDeviation(from, to, network) {
 		var priceHistory = [];
@@ -82,7 +80,7 @@ class dataService {
 	}
 }
 
-module.exports = dataService();
+module.exports = dataService;
 
 /* TEST CODE */
 //////////////////////////////////////////////////////
