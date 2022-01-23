@@ -59,7 +59,11 @@ class ArbitrageService{
 	}
 
 	async startSingleArbitrageCycle() {
-		//TODO
+
+		this.singleArbitrageSwitch = true;
+
+		startArbitrage ();
+	
 	}
 
 	async calculateSwapEth(basicCheap, stableCheap, basicExpensive, stableExpensive){ // When ETH is more expensive
@@ -161,4 +165,4 @@ class ArbitrageService{
 }
 
 let arbitrage = new ArbitrageService();
-arbitrage.startArbitrage();
+arbitrage.startSingleArbitrageCycle();
