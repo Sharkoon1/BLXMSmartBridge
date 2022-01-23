@@ -1,0 +1,72 @@
+const routerAbi = require("../abi/router_abi.json");
+const liquidityPoolAbi = require("../abi/liquidityPool_abi.json");
+const factoryAbi = require("../abi/factory_abi.json");
+const constants = require("../constants");
+const TokenContract = require("./TokenContract");
+const { ethers } = require("ethers");
+
+class OracleContract {
+	constructor(network, BLXMAddress, stableTokenAddress) {
+		switch (network) {
+			case "BSC":
+				this.provider = new ethers.providers.JsonRpcProvider(constants.PROVIDER_BSC);
+				this.arbitrageWallet = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
+				if (process.env.NODE_ENV === "production") {
+					this.router = new ethers.Contract(constants.ROUTER_BSC, routerAbi, this.arbitrageWallet);
+				}
+				else {
+					this.router = new ethers.Contract(constants.ROUTER_BSC_TESTNET, routerAbi, this.arbitrageWallet);
+				}
+				break;
+			case "ETH":
+				this.provider = new ethers.providers.JsonRpcProvider(constants.PROVIDER_ETH);
+				this.arbitrageWallet = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
+				if (process.env.NODE_ENV === "production") {
+					this.router = new ethers.Contract(constants.ROUTER_ETH, routerAbi, this.arbitrageWallet);
+				}
+				else {
+					this.router = new ethers.Contract(constants.ROUTER_ETH_TESTNET, routerAbi, this.arbitrageWallet);
+				}
+		}
+		this.blxmTokenContract = new TokenContract(BLXMAddress, this.arbitrageWallet);
+		this.stableTokenContract = new TokenContract(stableTokenAddress, this.arbitrageWallet);
+		this.BLXMTokenAddress = BLXMAddress;
+		this.stableTokenAddress = stableTokenAddress;
+		this.factory = null;
+		this.liquidityPool = null;
+	}
+
+	async init_liquidityPool() {
+		let factoryAddress = await this.router.factory();
+		this.factory = new ethers.Contract(factoryAddress, factoryAbi, this.arbitrageWallet);
+		let liquidityPoolAddress = await this.factory.getPair(this.BLXMTokenAddress, this.stableTokenAddress);
+		this.liquidityPool = new ethers.Contract(liquidityPoolAddress, liquidityPoolAbi, this.arbitrageWallet);
+	}
+
+	async getPrice() {
+		let tokensToSell = this.blxmTokenContract.DecimalToWei(1);
+		let tokenInStable;
+		try {
+			tokenInStable = await this.router.callStatic.getAmountsOut(tokensToSell, [this.BLXMTokenAddress, this.stableTokenAddress]);
+		} catch (error) {
+			console.log("An error occured");
+			console.log(error);
+		}
+		return tokenInStable[1];
+	}
+
+	async getReserves() {
+		if (this.liquidityPool === null && this.factory === null) {
+			await this.init_liquidityPool();
+		}
+		try {
+			let reserves = await this.liquidityPool.getReserves();
+			return [reserves[0], reserves[1]];
+		} catch (error) {
+			console.log("An error occured");
+			console.log(error);
+		}
+	}
+}
+
+module.exports = OracleContract;

@@ -10,8 +10,6 @@ class EvaluationService {
 	}
 
 	async minimumSwapAmount(poolPriceBsc, poolPriceEth, sumFees){
-		poolPriceBsc = ethers.utils.formatEther(poolPriceBsc);
-		poolPriceEth = ethers.utils.formatEther(poolPriceEth);
 
 		let priceExpensiveBLXM;
 		let priceCheapBLXM;

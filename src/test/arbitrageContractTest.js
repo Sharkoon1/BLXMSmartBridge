@@ -1,17 +1,16 @@
 require("dotenv").config();
 const constants = require("../constants");
 const Contracts = require("../contracts/Contracts");
-const WalletContainer = require("../wallet/WalletContainer");
 const { ethers } = require("ethers");
 
 
 class ArbitrageServiceTest{
 
     constructor () {
-        this.contractsEth = new Contracts("eth", WalletContainer.ArbitrageWalletETH);
+        this.contractsBsc = new Contracts("BSC");
     }
 
-    async testEth(){
+    async testBsc(){
     
         console.log("testSwapStableToBasic:");
         await this.testSwapStableToBasic();
@@ -22,17 +21,17 @@ class ArbitrageServiceTest{
     
     async testSwapStableToBasic(){
         
-    let blxmEthBalance = await this.contractsEth.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_CONTRACT_ADDRESS_ETH);
-    let usdEthBalance = await this.contractsEth.usdTokenContract.getTokenBalance(constants.ARBITRAGE_CONTRACT_ADDRESS_ETH);
+    let blxmEthBalance = await this.contractsBsc.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_CONTRACT_ADDRESS_BSC);
+    let usdEthBalance = await this.contractsBsc.usdTokenContract.getTokenBalance(constants.ARBITRAGE_CONTRACT_ADDRESS_BSC);
     
-    let tx = await this.contractsEth.arbitrageContract.swapStableToBasic(5);
+    let tx = await this.contractsBsc.arbitrageContract.swapStableToBasic(5);
     
     await tx.wait();
     
-    let blxmEthBalanceNew = await this.contractsEth.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_CONTRACT_ADDRESS_ETH);
-    let usdEthBalanceNew = await this.contractsEth.usdTokenContract.getTokenBalance(constants.ARBITRAGE_CONTRACT_ADDRESS_ETH);
+    let blxmEthBalanceNew = await this.contractsBsc.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_CONTRACT_ADDRESS_BSC);
+    let usdEthBalanceNew = await this.contractsBsc.usdTokenContract.getTokenBalance(constants.ARBITRAGE_CONTRACT_ADDRESS_BSC);
     
-    let trueFalse = blxmEthBalance < blxmEthBalanceNew && usdEthBalance > usdEthBalanceNew;
+    let trueFalse = blxmEthBalance.lt(blxmEthBalanceNew) && usdEthBalance.gt(usdEthBalanceNew);
 
     if(trueFalse){
         console.log(trueFalse)
@@ -48,15 +47,15 @@ class ArbitrageServiceTest{
     }
     
     async testSwapBasicToStable(){
-        let blxmEthBalance = await this.contractsEth.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_CONTRACT_ADDRESS_ETH);
-        let usdEthBalance = await this.contractsEth.usdTokenContract.getTokenBalance(constants.ARBITRAGE_CONTRACT_ADDRESS_ETH);
+        let blxmEthBalance = await this.contractsBsc.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_CONTRACT_ADDRESS_BSC);
+        let usdEthBalance = await this.contractsBsc.usdTokenContract.getTokenBalance(constants.ARBITRAGE_CONTRACT_ADDRESS_BSC);
         
-        let tx = await this.contractsEth.arbitrageContract.swapBasicToStable(5);
+        let tx = await this.contractsBsc.arbitrageContract.swapBasicToStable(5);
         
         await tx.wait();
         
-        let blxmEthBalanceNew = await this.contractsEth.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_CONTRACT_ADDRESS_ETH);
-        let usdEthBalanceNew = await this.contractsEth.usdTokenContract.getTokenBalance(constants.ARBITRAGE_CONTRACT_ADDRESS_ETH);
+        let blxmEthBalanceNew = await this.contractsBsc.blxmTokenContract.getTokenBalance(constants.ARBITRAGE_CONTRACT_ADDRESS_BSC);
+        let usdEthBalanceNew = await this.contractsBsc.usdTokenContract.getTokenBalance(constants.ARBITRAGE_CONTRACT_ADDRESS_BSC);
         
         if(blxmEthBalance > blxmEthBalanceNew && usdEthBalance < usdEthBalanceNew){
             console.log("true")
@@ -72,5 +71,5 @@ class ArbitrageServiceTest{
     
 }
 
-new ArbitrageServiceTest().testEth();
+new ArbitrageServiceTest().testBsc();
 
