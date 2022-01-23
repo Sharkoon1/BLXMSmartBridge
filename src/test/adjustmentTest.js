@@ -1,35 +1,48 @@
 const { ethers } = require("ethers");
+const bn  = require('bignumber.js');
 
 let two = ethers.BigNumber.from("2")
 let test = ethers.BigNumber.from("-2002019150556163623133199607229336681530")
 let minusOne = ethers.BigNumber.from("-1")
 
-basicCheap = 150
-stableCheap = 200
-basicExpensive = 48
-constantCheap = 30000
-constantExpensive = 8832
+basicCheap = ethers.BigNumber.from("200000000000000000000")
+stableCheap = ethers.BigNumber.from("250000000000000000000")
+basicExpensive = ethers.BigNumber.from("150000000000000000000")
+constantCheap = ethers.BigNumber.from("50000000000000000000000")
+constantExpensive = ethers.BigNumber.from("30000000000000000000000")
 
-getAdjustmentValueUsd(basicCheap, stableCheap, basicExpensive, constantCheap, constantExpensive)
 
-function getAdjustmentValueUsd(basicCheap, stableCheap, basicExpensive, constantCheap, constantExpensive){
+ethers.BigNumber.prototype.sqrt = function() {
+    console.log(this);
+    return ethers.BigNumber.from(new bn(this.toString()).sqrt().toFixed().split('.')[0])
+  }
 
-    let adjustmentValue = (Math.sqrt(Math.pow(basicCheap, 2) * constantCheap * constantExpensive + 2 * basicCheap * basicExpensive * constantCheap * constantExpensive + 
-    Math.pow(basicExpensive, 2) * constantCheap * constantExpensive) + Math.pow(basicCheap, 2) * (-stableCheap) - 2 * basicCheap * basicExpensive * stableCheap + basicCheap * constantCheap - Math.pow(basicExpensive, 2) * 
-    stableCheap + basicExpensive * constantCheap) / (Math.pow(basicCheap,2) + 2 * basicCheap * basicExpensive + Math.pow(basicExpensive, 2));
+  console.log(ethers.BigNumber.prototype);
 
-    console.log(adjustmentValue);
-};
 
 function getAdjustmentValueUsdWithBigNumOperators(basicCheap, stableCheap, basicExpensive, constantCheap, constantExpensive){
 
-    let adjustmentValue = ((basicCheap.pow(2).mul(constantCheap).mul(constantExpensive).add(two).mul(basicCheap).mul(basicExpensive)
-    .mul(constantCheap).mul(constantExpensive).add(basicExpensive.pow(2)).mul(constantCheap).mul(constantExpensive)).pow(0.5).add(basicCheap.pow(2)).mul(stableCheap.mul(minusOne)).sub 2 * basicCheap * basicExpensive * stableCheap + basicCheap * constantCheap - Math.pow(basicExpensive, 2) * 
-    stableCheap + basicExpensive * constantCheap) / (Math.pow(basicCheap,2) + 2 * basicCheap * basicExpensive + Math.pow(basicExpensive, 2));
+    let term1 = basicCheap.pow(2).mul(constantCheap).mul(constantExpensive);
+    let term2 = two.mul(basicCheap).mul(basicExpensive).mul(constantCheap).mul(constantExpensive);
+    let term3 = basicExpensive.pow(2).mul(constantCheap).mul(constantExpensive);
+    let term4 = basicCheap.pow(2).mul(stableCheap.mul(minusOne));
+    let term5 = two.mul(basicCheap).mul(basicExpensive).mul(stableCheap);
+    let term6 = basicCheap.mul(constantCheap);
+    let term7 = basicExpensive.pow(2).mul(stableCheap);
+    let term8 = basicExpensive.mul(constantCheap);
 
-    console.log(adjustmentValue);
+    let term9 = basicCheap.pow(2);
+    let term10 = two.mul(basicCheap).mul(basicExpensive);
+    let term11 =  basicExpensive.pow(2);
+
+
+    let adjustmentValue = ((term1.add(term2).add(term3)).sqrt().add(term4).sub(term5).add(term6).sub(term7).add(term8)).div((term9.add(term10.add(term11))));
+
+    console.log(ethers.utils.formatEther((term1.add(term2).add(term3)).sqrt().add(term4).sub(term5).add(term6).sub(term7).add(term8)));
+    console.log(ethers.utils.formatEther((term9.add(term10.add(term11)))));
+
+    console.log(ethers.utils.formatEther(adjustmentValue));
 };
 
-console.log(two.mul(minusOne))
-
+getAdjustmentValueUsdWithBigNumOperators(basicCheap, stableCheap, basicExpensive, constantCheap, constantExpensive);
 
