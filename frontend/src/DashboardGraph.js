@@ -12,6 +12,19 @@ import {
 
 import "./style/DashboardGraph.css"
 
+async function getData(){
+	fetch(url + "api/oracle/price",
+	{
+		method: "get",
+		headers: new Headers({ "content-type": "application/json" }),
+	}).then(function (res) {
+		console.log(res.data.UniBLXMPrice.Price);
+		console.log(res.data.UniBLXMPrice.Timestamp);
+		console.log(res.data.PancakeSwapPrice);
+		console.log(res.data.PancakeSwapPrice);
+	});
+}
+
 const data = [
     { timestamp: "16.01.2022, 16:05", Pancakeswap: 2.5, Uniswap: 2.3, },
     { timestamp: "16.01.2022, 16:06", Pancakeswap: 2.6, Uniswap: 2.4, },
