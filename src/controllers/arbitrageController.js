@@ -1,4 +1,6 @@
 const apiResponse = require("../helpers/apiResponse");
+const ArbitrageService = require("../service/ArbitrageServicev2");
+
 
 /**
  * Start single arbitrage.
@@ -25,7 +27,17 @@ exports.startSingleArbitrage = [
  exports.toggleArbitrage = [
 	function (req, res) {
         try {
-			res.sendStatus(200);
+			if(ArbitrageService.isRunning) {
+				this.stopCycle = true;
+
+				return apiResponse.successResponseWithData(res, "stopping the cycle", { "ArbitrageCycleStatus": ArbitrageService.isRunning });
+			}
+
+			else {
+				ArbitrageService.startArbitrage();
+
+				return apiResponse.successResponseWithData(res, "started the arbitrage service", { "ArbitrageCycleStatus": ArbitrageService.isRunning });
+			}
 		} catch (err) {
 			//throw error in json response with status 500. 
 			return apiResponse.ErrorResponse(res, err);
@@ -41,7 +53,7 @@ exports.startSingleArbitrage = [
  exports.currentArbitrageStatus = [
 	function (req, res) {
         try {
-			res.sendStatus(200);
+			return apiResponse.successResponseWithData(res, "success", { "ArbitrageCycleStatus": ArbitrageService.isRunning });
 		} catch (err) {
 			//throw error in json response with status 500. 
 			return apiResponse.ErrorResponse(res, err);
