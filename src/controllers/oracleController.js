@@ -1,5 +1,4 @@
 const apiResponse = require("../helpers/apiResponse");
-const DataBaseService = require("../service/DataBaseService");
 const dataService = require("../service/dataService");
 
 /**
@@ -10,14 +9,9 @@ const dataService = require("../service/dataService");
 exports.price = [
 	function (req, res) {
 		try {
-			const tempdataService = new dataService(DataBaseService);
-			let UniData;
-			let PancakeData;
-			(async ()=>{
-				UniData = await tempdataService.getETHPrice();
-				PancakeData = await tempdataService.getBSCPrice();
-				return apiResponse.successResponseWithData(res, "Operation success", { "UniBLXMPrice": UniData, "PancakeBLXMPrice": PancakeData });
-			})();
+			let UniData = dataService.getETHPrice();
+			let PancakeData = dataService.getBSCPrice();
+			return apiResponse.successResponseWithData(res, "Operation success", { "UniBLXMPrice": UniData, "PancakeBLXMPrice": PancakeData });
 		} catch (err) {
 			//throw error in json response with status 500. 
 			return apiResponse.ErrorResponse(res, err);
