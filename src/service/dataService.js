@@ -19,7 +19,7 @@ class dataService {
 		this._oracleUniswap.getPrice().then((res) => {
 			//console.log("Price Uniswap");
 			//console.log(+res);
-			const price = +ethers.utils.formatEther(res);
+			const price = res.toNumber();
 			let dateTimeArray = new Date().toJSON().split("T");
 			let date = dateTimeArray[0].split("-").reverse().join(".");
 			let time = dateTimeArray[1].split(".")[0].split(":").slice(0, 2).join(":");
@@ -32,7 +32,7 @@ class dataService {
 		this._oraclePancakeSwap.getPrice().then((res) => {
 			//console.log("Price Pancakeswap");
 			//console.log(+res);
-			const price = +ethers.utils.formatEther(res);
+			const price = res.toNumber();
 			let dateTimeArray = new Date().toJSON().split("T");
 			let date = dateTimeArray[0].split("-").reverse().join(".");
 			let time = dateTimeArray[1].split(".")[0].split(":").slice(0, 2).join(":");

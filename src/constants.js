@@ -1,7 +1,7 @@
 module.exports = Object.freeze({
 	//PROVIDER_BSC: "https://data-seed-prebsc-2-s3.binance.org:8545/" , //Testnet
 	//PROVIDER_ETH: "https://rinkeby.infura.io/v3/cc9d34df18bf4e29aa284200acaf8911", //Testnet
-	ROVIDER_BSC: "https://bsc-dataseed1.binance.org/" , //Mainnet
+	PROVIDER_BSC: "https://bsc-dataseed1.binance.org/" , //Mainnet
 	PROVIDER_ETH: "https://mainnet.infura.io/v3/f18fcafb7053463d9183260a2bdbf968", //Mainnet
 	ARBITRAGE_CONTRACT_ADDRESS_ETH: "0xC50c71F6B2C454def7d7c7DB94952ae6d5Fae844",
 	ARBITRAGE_CONTRACT_ADDRESS_BSC: "0x5fB36e5A813b8F6fb8efb06f88526B0999D033C4",
