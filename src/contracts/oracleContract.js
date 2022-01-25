@@ -4,6 +4,8 @@ const factoryAbi = require("../abi/factory_abi.json");
 const constants = require("../constants");
 const TokenContract = require("./TokenContract");
 const { ethers } = require("ethers");
+const BigNumber  = require('bignumber.js');
+
 
 class OracleContract {
 	constructor(network, BLXMAddress, stableTokenAddress) {
@@ -52,7 +54,7 @@ class OracleContract {
 			console.log("An error occured");
 			console.log(error);
 		}
-		return tokenInStable[1];
+		return new BigNumber(ethers.utils.formatEther(tokenInStable[1]));
 	}
 
 	async getReserves() {
@@ -61,7 +63,9 @@ class OracleContract {
 		}
 		try {
 			let reserves = await this.liquidityPool.getReserves();
-			return [reserves[0], reserves[1]];
+			let reservesStable = new BigNumber(ethers.utils.formatEther(reserves[0]));
+			let reservesBasic = new BigNumber(ethers.utils.formatEther(reserves[1]));
+			return [reservesStable, reservesBasic];
 		} catch (error) {
 			console.log("An error occured");
 			console.log(error);
