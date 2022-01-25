@@ -6,7 +6,7 @@ const logger = require("../logger/logger");
 const constants = require("../constants");
 const Contracts = require("../contracts/Contracts");
 const OracleContract = require("../contracts/OracleContract");
-const BigNumber  = require('bignumber.js');
+const BigNumber  = require("bignumber.js");
 
 
 
@@ -59,11 +59,9 @@ class ArbitrageService{
 	}
 
 	async startSingleArbitrageCycle() {
-
 		this.singleArbitrageSwitch = true;
 
-		startArbitrage ();
-	
+		this.startArbitrage ();
 	}
 
 	async calculateSwapEth(basicCheap, stableCheap, basicExpensive, stableExpensive){ // When ETH is more expensive
@@ -91,8 +89,8 @@ class ArbitrageService{
 		
 		this._evaluationService.minimumSwapAmount(this.poolPriceBsc, this.poolPriceEth, transactionFees);
 	*/	
-		let swapStableToBasicTx = this._bscContracts.arbitrageContract.swapStableToBasic(this.toEthersBigNumber(adjustmentValueStable));
-		let swapBasicToStableTx = this._ethContracts.arbitrageContract.swapBasicToStable(this.toEthersBigNumber(adjustmentValueBasic));
+		let swapStableToBasicTx = await this._bscContracts.arbitrageContract.swapStableToBasic(this.toEthersBigNumber(adjustmentValueStable));
+		let swapBasicToStableTx = await this._ethContracts.arbitrageContract.swapBasicToStable(this.toEthersBigNumber(adjustmentValueBasic));
 		
 		await swapStableToBasicTx.wait(); //waits for the promise of swapStableToBasic to be resolved
 		await swapBasicToStableTx.wait(); //waits for the promise of swapBasicToStable to be resolved
@@ -117,7 +115,7 @@ class ArbitrageService{
 		let constantExpensive = stableExpensive.multipliedBy(basicExpensive); 
           
 		let adjustmentValueStable = this.getAdjustmentValueUsd(basicCheap, stableCheap, basicExpensive, constantCheap, constantExpensive);
-    
+
 		let stableCheapNew = stableCheap.plus(adjustmentValueStable);
 		let basicCheapNew = constantCheap.div(stableCheapNew);
 
@@ -136,8 +134,8 @@ class ArbitrageService{
 
 		this._evaluationService.minimumSwapAmount(this.poolPriceBsc, this.poolPriceEth, transactionFees);
 */
-		let swapStableToBasicTx = this._ethContracts.arbitrageContract.swapStableToBasic(this.toEthersBigNumber(adjustmentValueStable));
-		let swapBasicToStableTx = this._bscContracts.arbitrageContract.swapBasicToStable(this.toEthersBigNumber(adjustmentValueBasic));
+		let swapStableToBasicTx = await this._ethContracts.arbitrageContract.swapStableToBasic(this.toEthersBigNumber(adjustmentValueStable));
+		let swapBasicToStableTx = await this._bscContracts.arbitrageContract.swapBasicToStable(this.toEthersBigNumber(adjustmentValueBasic));
 
 		await swapStableToBasicTx.wait(); //waits for the promise of swapStableToBasic to be resolved
 		await swapBasicToStableTx.wait(); //waits for the promise of swapBasicToStable to be resolved
@@ -175,7 +173,7 @@ class ArbitrageService{
 		let adjustmentValue = ((term1.plus(term2).plus(term3).squareRoot()).plus(term4).minus(term5).plus(term6).minus(term7).plus(term8)).dividedBy((term9.plus(term10.plus(term11))));
 		
 		return adjustmentValue;
-	  };
+	}
 
 	async getPoolPrices(){
 		this.poolPriceBsc = await this.PancakeOracle.getPrice();
