@@ -20,9 +20,9 @@ export default class Buttons extends Component  {
 
 
 	componentDidMount() {
-	 fetch(this.url+"api/toggleArbitrage",
+	 fetch(this.url+"api/arbitrage/toggle",
 				{
-					method: "get",
+					method: "post",
 				}).then(response => response.json())
 				.then(result => {
 					if(result) {
@@ -51,7 +51,7 @@ export default class Buttons extends Component  {
 	startArbitrage() {
 		this.setState({toggleIsDisabled: true, startIsDisabled: true});
 	
-		fetch(this.url+"api/singleArbitrage",
+		fetch(this.url+"api/single",
 			{
 				method: "post",
 			});
@@ -66,9 +66,9 @@ export default class Buttons extends Component  {
 			this.setState({connButtonText: 'Job not running', toggleIsDisabled: true});
 		}
 
-		fetch(this.url+"api/toggleArbitrage",
+		fetch(this.url+"api/status",
 			{
-				method: "post",
+				method: "get",
 			}).then(response => console.log(response.json()));
 	};
 
