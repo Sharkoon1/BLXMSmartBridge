@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const PoolPrice = require("../models/PoolPrice");
 const OracleContract = require("../contracts/oracleContract");
+const DataBaseService = require("../service/DataBaseService");
 const { ethers } = require("ethers");
 
 class dataService {
@@ -10,22 +11,34 @@ class dataService {
 		this._oracleUniswap = new OracleContract("ETH", "0x38d9eb07a7b8df7d86f440a4a5c4a4c1a27e1a08", "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2");
 		this._oraclePancakeSwap = new OracleContract("BSC", "0x40e51e0ec04283e300f12f6bb98da157bb22036e", "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c");
 		setInterval(this.getPoolData.bind(this), queryIntervalSeconds * 1000);
+		this.cachedUniswapPrice = {};
+		this.cachedPancakePrice = {};
 	}
 
 	getPoolData() {
 		this._oracleUniswap.getPrice().then((res) => {
 			//console.log("Price Uniswap");
 			//console.log(+res);
+			const price = +ethers.utils.formatEther(res);
+			let dateTimeArray = new Date().toJSON().split("T");
+			let date = dateTimeArray[0].split("-").reverse().join(".");
+			let time = dateTimeArray[1].split(".")[0].split(":").slice(0, 2).join(":");
+			this.cachedUniswapPrice = { "Price": price, "Timestamp": date + ", " + time };
 			this._databaseService.AddData({
-				PoolPrice: +ethers.utils.formatEther(res),
+				PoolPrice: price,
 				Network: "ETH",
 			}, PoolPrice);
 		});
 		this._oraclePancakeSwap.getPrice().then((res) => {
 			//console.log("Price Pancakeswap");
 			//console.log(+res);
+			const price = +ethers.utils.formatEther(res);
+			let dateTimeArray = new Date().toJSON().split("T");
+			let date = dateTimeArray[0].split("-").reverse().join(".");
+			let time = dateTimeArray[1].split(".")[0].split(":").slice(0, 2).join(":");
+			this.cachedPancakePrice = { "Price": price, "Timestamp": date + ", " + time };
 			this._databaseService.AddData({
-				PoolPrice: +ethers.utils.formatEther(res),
+				PoolPrice: price,
 				Network: "BSC",
 			}, PoolPrice);
 		});
@@ -38,14 +51,12 @@ class dataService {
 		return mongoose.Types.ObjectId(hexSeconds + "0000000000000000");
 	}
 
-	async getETHPrice(){
-		const price = await this._oracleUniswap.getPrice();
-		return {"Price":+ethers.utils.formatEther(price), "Timestamp": new Date().toTimeString()};
+	getETHPrice() {
+		return this.cachedUniswapPrice;
 	}
 
-	async getBSCPrice(){
-		const price = await this._oraclePancakeSwap.getPrice();
-		return {"Price":+ethers.utils.formatEther(price), "Timestamp": new Date().toTimeString()};
+	getBSCPrice() {
+		return this.cachedPancakePrice;
 	}
 
 	async standardDeviation(from, to, network) {
@@ -80,7 +91,7 @@ class dataService {
 	}
 }
 
-module.exports = dataService;
+module.exports = new dataService(DataBaseService);
 
 /* TEST CODE */
 //////////////////////////////////////////////////////
