@@ -13,19 +13,19 @@ export default class Buttons extends Component  {
 			toggleIsDisabled: false
 		  };
 
-		this.toggleJobStatus = this.toggleJobStatus.bind(this);  
+		this.toggleJob = this.toggleJob.bind(this);  
 		this.startArbitrage = this.startArbitrage.bind(this);
 		this.url= UrlHandler();
 	}
 
 
 	componentDidMount() {
-	 fetch(this.url+"api/arbitrage/toggle",
+	 fetch(this.url+"api/arbitrage/status",
 				{
-					method: "post",
+					method: "get",
 				}).then(response => response.json())
 				.then(result => {
-					if(result) {
+					if(result.data.ArbitrageCycleStatus) {
 						this.setState({connButtonText: 'Job running', startIsDisabled: true});
 					}
 	
@@ -51,25 +51,25 @@ export default class Buttons extends Component  {
 	startArbitrage() {
 		this.setState({toggleIsDisabled: true, startIsDisabled: true});
 	
-		fetch(this.url+"api/single",
+		fetch(this.url+"api/arbitrage/single",
 			{
 				method: "post",
 			});
 	};
 
-	toggleJobStatus()  {
-		if(this.state.connButtonText === 'Job not running') {
-			this.setState({connButtonText: 'Job running', startIsDisabled: true});
-		}
-
-		else {
-			this.setState({connButtonText: 'Job not running', toggleIsDisabled: true});
-		}
-
-		fetch(this.url+"api/status",
+	toggleJob()  {
+		fetch(this.url+"api/arbitrage/toggle",
 			{
-				method: "get",
-			}).then(response => console.log(response.json()));
+				method: "post",
+			}).then(response => response.json().then(result => {
+				if(result.data.ArbitrageCycleStatus) {
+					this.setState({connButtonText: 'Job running', startIsDisabled: true});
+				}
+
+				else {
+					this.setState({connButtonText: 'Job not running'});
+				}
+			}));
 	};
 
 
@@ -77,7 +77,7 @@ export default class Buttons extends Component  {
 		return (
 			<div className="adminPanel">
 		
-				<button disabled={this.state.toggleIsDisabled} onClick={this.toggleJobStatus} className="button arbiToggle" id="toggleStatus" title={this.state.toggleIsDisabled ? "Once the job running in the background is finished you can again start a new job run." : "Click here to start a new Job run."}>{this.state.connButtonText}</button>
+				<button disabled={this.state.toggleIsDisabled} onClick={this.toggleJob} className="button arbiToggle" id="toggleStatus" title={this.state.toggleIsDisabled ? "Once the job running in the background is finished you can again start a new job run." : "Click here to start a new Job run."}>{this.state.connButtonText}</button>
 			</div>
 		);
 	  }

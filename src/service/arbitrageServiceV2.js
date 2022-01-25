@@ -7,11 +7,10 @@ const constants = require("../constants");
 const Contracts = require("../contracts/Contracts");
 const OracleContract = require("../contracts/OracleContract");
 const BigNumber  = require("bignumber.js");
+const app = require("../app");
 
 
-
-class ArbitrageService{
-
+class ArbitrageService {
 	constructor(){
 		this._databaseService = DataBaseService;
 		//this._evaluationService = new EvaluationService(this._databaseService);
@@ -24,9 +23,14 @@ class ArbitrageService{
 	
 		this.poolPriceEth;
 		this.poolPriceBsc;
+
+		this.isRunning = false;
+		this.stopCycle = false;
 	}
 
 	async startArbitrage (){
+		this.stopCycle = false;
+		this.isRunning = true;
 
 		logger.info("Start AbitrageService ...");
 
@@ -41,21 +45,24 @@ class ArbitrageService{
 			logger.info("BSC network: Current price = " + this.poolPriceBsc + " USD/BLXM");
 
 			if(this.poolPriceEth.gt(this.poolPriceBsc)){
-
-				this.calculateSwapEth(tokenArrayBsc[1], tokenArrayBsc[0], tokenArrayEth[1], tokenArrayEth[0]);
-			
+				this.calculateSwapEth(tokenArrayBsc[1], tokenArrayBsc[0], tokenArrayEth[1], tokenArrayEth[0]);	
 			}
 
 			else {
-			
 				this.calculateSwapBsc(tokenArrayEth[1], tokenArrayEth[0], tokenArrayBsc[1], tokenArrayBsc[0]);  
-			
+			}
+
+			if(this.stopCycle) {
+				this.isRunning = false;
+				app.logEvent.emit("cycleCompleted", true);
+
+				break;
 			}
 
 			await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
-
-			break;
 		}
+
+		this.isRunning = false;
 	}
 
 	async startSingleArbitrageCycle() {
@@ -186,5 +193,4 @@ class ArbitrageService{
 	}
 }
 
-let arbitrage = new ArbitrageService();
-arbitrage.startArbitrage();
+module.exports = new ArbitrageService();
