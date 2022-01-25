@@ -11,7 +11,7 @@ exports.price = [
 		try {
 			let UniData = dataService.getETHPrice();
 			let PancakeData = dataService.getBSCPrice();
-			return apiResponse.successResponseWithData(res, "Operation success", { "UniBLXMPrice": UniData, "PancakeBLXMPrice": PancakeData });
+			return apiResponse.successResponseWithData(res, "Operation success", { UniBLXMPrice: UniData, PancakeBLXMPrice: PancakeData });
 		} catch (err) {
 			//throw error in json response with status 500. 
 			return apiResponse.ErrorResponse(res, err);
