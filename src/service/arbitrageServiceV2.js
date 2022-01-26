@@ -32,7 +32,7 @@ class ArbitrageService {
 		this.stopCycle = false;
 		this.isRunning = true;
 
-		logger.info("Start AbitrageService ...");
+		logger.info("Start AbitrageService ..."); 
 
 		await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
 
@@ -85,14 +85,13 @@ class ArbitrageService {
     
 		let profitUsd = stableExpensive.minus(stableExpensiveNew).minus(this.adjustmentValueStable);
 
-		/*	
 		let gasLimitBsc = this._bscContracts.arbitrageContract.swapStableToBasicGasLimit(adjustmentValueStable);
 		let gasLimitEth = this._ethContracts.arbitrageContract.swapBasicToStableGasLimit(adjustmentValueBasic);
 		let transactionFees = (await this._bscContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitBsc) + 
-		(await this._ethContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitEth);
+							  (await this._ethContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitEth);
 		
 		this._evaluationService.minimumSwapAmount(this.poolPriceBsc, this.poolPriceEth, transactionFees);
-	*/	
+	
 
 	}		
 
@@ -131,14 +130,13 @@ class ArbitrageService {
     
 		let profitUsd = stableExpensive.minus(stableExpensiveNew).minus(this.adjustmentValueStable);
 	
-		/*
 		let gasLimitEth = this._ethContracts.arbitrageContract.swapStableToBasicGasLimit(adjustmentValueStable);
 		let gasLimitBsc = this._bscContracts.arbitrageContract.swapBasicToStableGasLimit(adjustmentValueBasic);
 		let transactionFees = (await this._bscContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitBsc) + 
 							  (await this._ethContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitEth);
 
 		this._evaluationService.minimumSwapAmount(this.poolPriceBsc, this.poolPriceEth, transactionFees);
-*/
+
 	}
 
 	async swapBsc(){

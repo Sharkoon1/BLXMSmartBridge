@@ -10,7 +10,13 @@ class Contracts  {
 
 		switch(network) {
 			case "BSC":
-				this.provider = new ethers.providers.JsonRpcProvider(constants.PROVIDER_BSC);
+				if (process.env.NODE_ENV === "production") { 
+					this.provider = new ethers.providers.JsonRpcProvider(constants.PROVIDER_BSC);
+				}
+				else {
+					this.provider = new ethers.providers.JsonRpcProvider(constants.PROVIDER_BSC_TEST);
+				}
+
 				this.arbitrageWallet = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
 				
 				this.blxmTokenContract = new TokenContract(constants.BLXM_TOKEN_ADDRESS_BSC,  this.arbitrageWallet);
@@ -18,7 +24,12 @@ class Contracts  {
 				this.arbitrageContract = new ArbitrageContract(constants.ARBITRAGE_CONTRACT_ADDRESS_BSC, this.arbitrageWallet);
 				break;
 			case "ETH":
-				this.provider = new ethers.providers.JsonRpcProvider(constants.PROVIDER_ETH);
+				if (process.env.NODE_ENV === "production") { 
+					this.provider = new ethers.providers.JsonRpcProvider(constants.PROVIDER_ETH);
+				}
+				else {
+					this.provider = new ethers.providers.JsonRpcProvider(constants.PROVIDER_ETH_TEST);
+				}
 				this.arbitrageWallet = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
 
 				this.blxmTokenContract = new TokenContract(constants.BLXM_TOKEN_ADDRESS_ETH,  this.arbitrageWallet);

@@ -1,15 +1,14 @@
 const { ethers } = require("ethers");
 const logger = require("../logger/logger");
-const StandardDeviationService = require("./StandardDeviationService");
+const DataService = require("./DataService");
 
 class EvaluationService {
 
-	constructor(databaseService) {
-		this._databaseService = databaseService;
-		this._standardDeviationService = new StandardDeviationService(this._databaseService);
+	constructor() {
+		this._dataService = DataService;
 	}
 
-	async minimumSwapAmount(poolPriceBsc, poolPriceEth, sumFees){
+	async minimumSwapAmount(poolPriceBsc, poolPriceEth, sumFees, currentNetwork){
 
 		let priceExpensiveBLXM;
 		let priceCheapBLXM;
@@ -22,7 +21,7 @@ class EvaluationService {
 			priceCheapBLXM = poolPriceBsc;
 		}
         
-		let standardDeviation = this._standardDeviationService.getStandardDeviation();
+		let standardDeviation = this._dataService.getStandardDeviation(currentNetwork);
     
 		if (priceCheapBLXM + standardDeviation <  priceExpensiveBLXM) {
 			var minimumSwapAmount = -( sumFees )/(priceCheapBLXM  + standardDeviation  - priceExpensiveBLXM); 

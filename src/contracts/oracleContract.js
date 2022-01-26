@@ -4,29 +4,33 @@ const factoryAbi = require("../abi/factory_abi.json");
 const constants = require("../constants");
 const TokenContract = require("./TokenContract");
 const { ethers } = require("ethers");
-const BigNumber  = require('bignumber.js');
+const BigNumber  = require("bignumber.js");
 
 
 class OracleContract {
 	constructor(network, BLXMAddress, stableTokenAddress) {
 		switch (network) {
 			case "BSC":
-				this.provider = new ethers.providers.JsonRpcProvider(constants.PROVIDER_BSC);
-				this.arbitrageWallet = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
 				if (process.env.NODE_ENV === "production") {
+					this.provider = new ethers.providers.JsonRpcProvider(constants.PROVIDER_BSC);
+					this.arbitrageWallet = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
 					this.router = new ethers.Contract(constants.ROUTER_BSC, routerAbi, this.arbitrageWallet);
 				}
 				else {
+					this.provider = new ethers.providers.JsonRpcProvider(constants.PROVIDER_BSC_TEST);
+					this.arbitrageWallet = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
 					this.router = new ethers.Contract(constants.ROUTER_BSC_TESTNET, routerAbi, this.arbitrageWallet);
 				}
 				break;
 			case "ETH":
-				this.provider = new ethers.providers.JsonRpcProvider(constants.PROVIDER_ETH);
-				this.arbitrageWallet = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
 				if (process.env.NODE_ENV === "production") {
+					this.provider = new ethers.providers.JsonRpcProvider(constants.PROVIDER_ETH);
+					this.arbitrageWallet = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
 					this.router = new ethers.Contract(constants.ROUTER_ETH, routerAbi, this.arbitrageWallet);
 				}
 				else {
+					this.provider = new ethers.providers.JsonRpcProvider(constants.PROVIDER_ETH_TEST);
+					this.arbitrageWallet = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
 					this.router = new ethers.Contract(constants.ROUTER_ETH_TESTNET, routerAbi, this.arbitrageWallet);
 				}
 		}

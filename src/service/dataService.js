@@ -2,17 +2,18 @@ const mongoose = require("mongoose");
 const PoolPrice = require("../models/PoolPrice");
 const OracleContract = require("../contracts/oracleContract");
 const DataBaseService = require("../service/DataBaseService");
-const { ethers } = require("ethers");
+const constants = require("../constants");
 
-class dataService {
+class DataService {
 
-	constructor(dataBaseService, queryIntervalSeconds = 10) {
-		this._databaseService = dataBaseService;
-		this._oracleUniswap = new OracleContract("ETH", "0x38d9eb07a7b8df7d86f440a4a5c4a4c1a27e1a08", "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2");
-		this._oraclePancakeSwap = new OracleContract("BSC", "0x40e51e0ec04283e300f12f6bb98da157bb22036e", "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c");
+	constructor(queryIntervalSeconds = 10) {
+		this._databaseService = DataBaseService;
+		this._oracleUniswap = new OracleContract("ETH", constants.BLXM_TOKEN_ADDRESS_ETH, constants.USD_TOKEN_ADRESS_ETH);
+		this._oraclePancakeSwap = new OracleContract("BSC", constants.BLXM_TOKEN_ADDRESS_BSC, constants.USD_TOKEN_ADRESS_BSC);
 		setInterval(this.getPoolData.bind(this), queryIntervalSeconds * 1000);
 		this.cachedUniswapPrice = {};
 		this.cachedPancakePrice = {};
+		this.slippageWindow;
 	}
 
 	getPoolData() {
@@ -59,6 +60,10 @@ class dataService {
 		return this.cachedPancakePrice;
 	}
 
+	async getStandardDeviation(network) {
+		return await this.standardDeviation(this.slippageWindow * 60, 0, network);
+	}
+
 	async standardDeviation(from, to, network) {
 		var priceHistory = [];
 		//get data from db
@@ -91,7 +96,7 @@ class dataService {
 	}
 }
 
-module.exports = new dataService(DataBaseService);
+module.exports = new DataService();
 
 /* TEST CODE */
 //////////////////////////////////////////////////////
