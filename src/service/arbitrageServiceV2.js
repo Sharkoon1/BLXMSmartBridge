@@ -111,7 +111,7 @@ class ArbitrageService {
 
 		let transactionFees = (await this._bscContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitBsc).add(
 							  (await this._ethContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitEth));
-		
+		 
 		this.minimumSwapAmount = await this._evaluationService.minimumSwapAmount(this.poolPriceBsc, this.poolPriceEth, this.fromEthersToBigNumber(transactionFees));
 	}		
 
@@ -191,7 +191,7 @@ class ArbitrageService {
 		let term11 = basicExpensive.exponentiatedBy(2);    
 		
 		let adjustmentValue = ((term1.plus(term2).plus(term3).squareRoot()).plus(term4).minus(term5).plus(term6).minus(term7).plus(term8)).dividedBy((term9.plus(term10.plus(term11))));
-		
+
 		return adjustmentValue;
 	}
 

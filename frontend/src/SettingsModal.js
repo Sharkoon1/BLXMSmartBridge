@@ -7,7 +7,6 @@ export default function SettingsModal() {
     const [slippageWindow, setSlippage] = useState(0);
 
     useEffect(() => {   
-
         fetch(url +"api/slippage/",
         {
             method: "get",

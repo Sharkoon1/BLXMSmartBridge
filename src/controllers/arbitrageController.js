@@ -1,6 +1,6 @@
 const apiResponse = require("../helpers/apiResponse");
 const ArbitrageService = require("../service/ArbitrageServicev2");
-
+const SingleStepArbitrageService = require("../service/SingleStepArbitrageService");
 
 /**
  * Start single arbitrage.
@@ -54,6 +54,74 @@ exports.startSingleArbitrage = [
 	function (req, res) {
         try {
 			return apiResponse.successResponseWithData(res, "success", { "ArbitrageCycleStatus": ArbitrageService.isRunning });
+		} catch (err) {
+			//throw error in json response with status 500. 
+			return apiResponse.ErrorResponse(res, err);
+		}
+	}
+];
+
+/**
+ * Single step arbitrage mode.
+ *  
+ * @returns {Object}
+ */
+ exports.singleStep = [
+	function (req, res) {
+        try {
+			let stepStatus = req.body.stepStatus;
+
+            if(stepStatus) {
+                SingleStepArbitrageService.startSingleStepArbitrage(stepStatus);
+
+                return apiResponse.successResponse(res, "Arbitrage step status: " + stepStatus + " has been successful.");
+            }
+            else {
+                return apiResponse.validationError(res, "Arbitrage step status was missing.", {"stepStatus": stepStatus});
+            }
+			
+		} catch (err) {
+			//throw error in json response with status 500. 
+			return apiResponse.ErrorResponse(res, err);
+		}
+	}
+];
+
+/**
+ * Sets the single step status.
+ *  
+ * @returns {Object}
+ */
+ exports.setStepStatus = [
+	function (req, res) {
+        try {
+			let stepStatus = req.body.stepStatus;
+
+            if(stepStatus) {
+				SingleStepArbitrageService.stepStatus = 1;
+
+                return apiResponse.successResponse(res, "Arbitrage step status: " + stepStatus + " has been successful.");
+            }
+            else {
+                return apiResponse.validationError(res, "Arbitrage step status was missing.", {"stepStatus": stepStatus});
+            }
+			
+		} catch (err) {
+			//throw error in json response with status 500. 
+			return apiResponse.ErrorResponse(res, err);
+		}
+	}
+];
+
+/**
+ * Gets the arbitrage single step status.
+ *  
+ * @returns {Object}
+ */
+ exports.getStepStatus = [
+	function (req, res) {
+        try {
+			return apiResponse.successResponseWithData(res, "success", { "stepStatus": SingleStepArbitrageService.stepStatus });
 		} catch (err) {
 			//throw error in json response with status 500. 
 			return apiResponse.ErrorResponse(res, err);
