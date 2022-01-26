@@ -13,7 +13,7 @@ class DataService {
 		setInterval(this.getPoolData.bind(this), queryIntervalSeconds * 1000);
 		this.cachedUniswapPrice = {};
 		this.cachedPancakePrice = {};
-		this.slippageWindow;
+		this.slippageWindow = 60;
 	}
 
 	getPoolData() {
