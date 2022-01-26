@@ -32,7 +32,7 @@ class ArbitrageService {
 		this.stopCycle = false;
 		this.isRunning = true;
 
-		logger.info("Start AbitrageService ...");
+		logger.info("Start AbitrageService ..."); 
 
 		await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
 
@@ -88,14 +88,13 @@ class ArbitrageService {
     
 		let profitUsd = stableExpensive.minus(stableExpensiveNew).minus(adjustmentValueStable);
 
-		/*	
 		let gasLimitBsc = this._bscContracts.arbitrageContract.swapStableToBasicGasLimit(adjustmentValueStable);
 		let gasLimitEth = this._ethContracts.arbitrageContract.swapBasicToStableGasLimit(adjustmentValueBasic);
 		let transactionFees = (await this._bscContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitBsc) + 
-		(await this._ethContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitEth);
+							  (await this._ethContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitEth);
 		
 		this._evaluationService.minimumSwapAmount(this.poolPriceBsc, this.poolPriceEth, transactionFees);
-	*/	
+
 		let swapStableToBasicTx = await this._bscContracts.arbitrageContract.swapStableToBasic(this.toEthersBigNumber(adjustmentValueStable));
 		let swapBasicToStableTx = await this._ethContracts.arbitrageContract.swapBasicToStable(this.toEthersBigNumber(adjustmentValueBasic));
 		
@@ -133,14 +132,13 @@ class ArbitrageService {
     
 		let profitUsd = stableExpensive.minus(stableExpensiveNew).minus(adjustmentValueStable);
 	
-		/*
 		let gasLimitEth = this._ethContracts.arbitrageContract.swapStableToBasicGasLimit(adjustmentValueStable);
 		let gasLimitBsc = this._bscContracts.arbitrageContract.swapBasicToStableGasLimit(adjustmentValueBasic);
 		let transactionFees = (await this._bscContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitBsc) + 
 							  (await this._ethContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitEth);
 
 		this._evaluationService.minimumSwapAmount(this.poolPriceBsc, this.poolPriceEth, transactionFees);
-*/
+
 		let swapStableToBasicTx = await this._ethContracts.arbitrageContract.swapStableToBasic(this.toEthersBigNumber(adjustmentValueStable));
 		let swapBasicToStableTx = await this._bscContracts.arbitrageContract.swapBasicToStable(this.toEthersBigNumber(adjustmentValueBasic));
 
