@@ -16,9 +16,25 @@ const DataService = require("../service/DataService");
             }
 
             else {
-                return apiResponse.validationError(res, "Slippage window from request was 0 or empty", {"SlippageData": req.body.slippageWindow});
+                return apiResponse.validationError(res, "Slippage window from request was 0 or empty", {"SlippageWindow": req.body.slippageWindow});
             }
 			
+		} catch (err) {
+			//throw error in json response with status 500. 
+			return apiResponse.ErrorResponse(res, err);
+		}
+	}
+];
+
+/**
+ * Gets the slippage Window.
+ *  
+ * @returns {Object}
+ */
+ exports.getSlippageWindow = [
+	function (req, res) {
+        try {
+			return apiResponse.successResponseWithData(res, "success", { "SlippageWindow": DataService.slippageWindow });
 		} catch (err) {
 			//throw error in json response with status 500. 
 			return apiResponse.ErrorResponse(res, err);

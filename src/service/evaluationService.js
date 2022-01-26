@@ -1,4 +1,3 @@
-const { ethers } = require("ethers");
 const logger = require("../logger/logger");
 const DataService = require("./DataService");
 
@@ -13,7 +12,7 @@ class EvaluationService {
 		let priceExpensiveBLXM;
 		let priceCheapBLXM;
     
-		if(poolPriceBsc > poolPriceEth){
+		if(poolPriceBsc.gt(poolPriceEth)) {
 			priceExpensiveBLXM = poolPriceBsc;
 			priceCheapBLXM = poolPriceEth;
 		} else {
@@ -21,12 +20,12 @@ class EvaluationService {
 			priceCheapBLXM = poolPriceBsc;
 		}
         
-		let standardDeviation = this._dataService.getStandardDeviation(currentNetwork);
+		let standardDeviation = await this._dataService.getStandardDeviation(currentNetwork);
     
-		if (priceCheapBLXM + standardDeviation <  priceExpensiveBLXM) {
-			var minimumSwapAmount = -( sumFees )/(priceCheapBLXM  + standardDeviation  - priceExpensiveBLXM); 
+		if (priceCheapBLXM.plus(standardDeviation).lt(priceExpensiveBLXM)) {
+			var minimumSwapAmount = (( sumFees ).dividedBy((priceCheapBLXM.plus(standardDeviation).minus(priceExpensiveBLXM)))).multipliedBy(-1); 
 
-			logger.info("Minimum swap amount: " + minimumSwapAmount);
+			logger.info("Evaluation service calculated minimum swap amount: " + minimumSwapAmount);
 
 			return minimumSwapAmount;  
 		} else {
@@ -35,4 +34,4 @@ class EvaluationService {
 	}
 }
 
-module.exports = EvaluationService;
+module.exports = new EvaluationService();

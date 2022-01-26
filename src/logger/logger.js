@@ -1,7 +1,6 @@
 const { createLogger, format, transports } = require("winston");
 const app = require("../app");
 const Transport = require("winston-transport");
-const util = require("util");
 
 
 class EventLogTransport extends Transport {
@@ -9,7 +8,7 @@ class EventLogTransport extends Transport {
 		super(opts);
 	}
 	log(info, callback) {
-	//	app.logEvent.emit("logMessage", info.message);
+		app.logEvent.emit("logMessage", info.message);
 
 		callback();
 	}

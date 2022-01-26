@@ -6,6 +6,9 @@ let router = express.Router();
 router.post("/single", ArbitrageController.startSingleArbitrage);
 router.post("/toggle",  ArbitrageController.toggleArbitrage);
 router.get("/status", ArbitrageController.currentArbitrageStatus);
+router.post("/singleStep", ArbitrageController.singleStep);
+router.post("/stepStatus", ArbitrageController.setStepStatus);
+router.get("/stepStatus", ArbitrageController.getStepStatus);
 
 module.exports = router;
 
