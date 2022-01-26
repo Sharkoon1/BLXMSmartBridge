@@ -1,7 +1,7 @@
 require("dotenv").config();
 const { ethers } = require("ethers");
 const DataBaseService = require("./DataBaseService");
-//const EvaluationService = require("./EvaluationService");
+const EvaluationService = require("./EvaluationService");
 const logger = require("../logger/logger");
 const constants = require("../constants");
 const Contracts = require("../contracts/Contracts");
@@ -13,7 +13,7 @@ const app = require("../app");
 class ArbitrageService {
 	constructor(){
 		this._databaseService = DataBaseService;
-		//this._evaluationService = new EvaluationService(this._databaseService);
+		this._evaluationService = EvaluationService;
 
 		this._ethContracts = new Contracts("ETH");
 		this._bscContracts = new Contracts("BSC");
@@ -85,8 +85,8 @@ class ArbitrageService {
     
 		let profitUsd = stableExpensive.minus(stableExpensiveNew).minus(this.adjustmentValueStable);
 
-		let gasLimitBsc = this._bscContracts.arbitrageContract.swapStableToBasicGasLimit(adjustmentValueStable);
-		let gasLimitEth = this._ethContracts.arbitrageContract.swapBasicToStableGasLimit(adjustmentValueBasic);
+		let gasLimitBsc = this._bscContracts.arbitrageContract.swapStableToBasicGasLimit(this.adjustmentValueStable);
+		let gasLimitEth = this._ethContracts.arbitrageContract.swapBasicToStableGasLimit(this.adjustmentValueBasic);
 		let transactionFees = (await this._bscContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitBsc) + 
 							  (await this._ethContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitEth);
 		
@@ -109,8 +109,6 @@ class ArbitrageService {
 		console.log("poolPriceBsc: " + this.poolPriceBsc);
     
 		console.log("AdjustmentValue: " + this.adjustmentValueStable);
-		console.log("profitUsd: " + profitUsd);
-
 	}
 
 	async calculateSwapBsc(basicCheap, stableCheap, basicExpensive, stableExpensive){ // When BSC is more expensive
@@ -130,8 +128,8 @@ class ArbitrageService {
     
 		let profitUsd = stableExpensive.minus(stableExpensiveNew).minus(this.adjustmentValueStable);
 	
-		let gasLimitEth = this._ethContracts.arbitrageContract.swapStableToBasicGasLimit(adjustmentValueStable);
-		let gasLimitBsc = this._bscContracts.arbitrageContract.swapBasicToStableGasLimit(adjustmentValueBasic);
+		let gasLimitEth = this._ethContracts.arbitrageContract.swapStableToBasicGasLimit(this.adjustmentValueStable);
+		let gasLimitBsc = this._bscContracts.arbitrageContract.swapBasicToStableGasLimit(this.adjustmentValueBasic);
 		let transactionFees = (await this._bscContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitBsc) + 
 							  (await this._ethContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitEth);
 
@@ -153,7 +151,6 @@ class ArbitrageService {
 		console.log("poolPriceBsc: " + this.poolPriceBsc);
     
 		console.log("AdjustmentValue: " + this.adjustmentValueStable);
-		console.log("profitUsd: " + profitUsd);
 	}
 
     
