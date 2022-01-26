@@ -3,6 +3,7 @@ const PoolPrice = require("../models/PoolPrice");
 const OracleContract = require("../contracts/oracleContract");
 const DataBaseService = require("../service/DataBaseService");
 const constants = require("../constants");
+const BigNumber  = require("bignumber.js");
 
 class DataService {
 
@@ -61,7 +62,7 @@ class DataService {
 	}
 
 	async getStandardDeviation(network) {
-		return await this.standardDeviation(this.slippageWindow * 60, 0, network);
+		return new BigNumber(await this.standardDeviation(this.slippageWindow * 60, 0, network));
 	}
 
 	async standardDeviation(from, to, network) {

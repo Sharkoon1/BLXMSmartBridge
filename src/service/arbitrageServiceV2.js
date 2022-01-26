@@ -27,6 +27,9 @@ class ArbitrageService {
 		this.adjustmentValueStable;
 		this.adjustmentValueBasic;
 		this.minimumSwapAmount;
+
+		this.stopCycle = false;
+		this.isRunning = false;
 	}
 
 	async startArbitrage (){
@@ -34,7 +37,7 @@ class ArbitrageService {
 		this.isRunning = true;
 
 		logger.info("Starting the abitrage service ..."); 
-
+ 
 		await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
 
 		while (!this.poolPriceBsc.eq(this.poolPriceEth)) {
@@ -47,10 +50,10 @@ class ArbitrageService {
 
 			if(this.poolPriceEth.gt(this.poolPriceBsc)){
 
-				this.calculateSwapEth(tokenArrayBsc[1], tokenArrayBsc[0], tokenArrayEth[1], tokenArrayEth[0]);
+				await this.calculateSwapEth(tokenArrayBsc[1], tokenArrayBsc[0], tokenArrayEth[1], tokenArrayEth[0]);
 
 				if(this.minimumSwapAmount < this.adjustmentValueStable) {
-					this.swapEth();
+					await this.swapEth();
 				}
 
 				else {
@@ -61,10 +64,10 @@ class ArbitrageService {
 			}
 
 			else {
-				this.calculateSwapBsc(tokenArrayEth[1], tokenArrayEth[0], tokenArrayBsc[1], tokenArrayBsc[0]);  
+				await this.calculateSwapBsc(tokenArrayEth[1], tokenArrayEth[0], tokenArrayBsc[1], tokenArrayBsc[0]);  
 
 				if(this.minimumSwapAmount < this.adjustmentValueStable) {
-					this.swapBsc();
+					await this.swapBsc();
 				}
 				else {
 					logger.info("BSC: Minimum swap amount: " + this.minimumSwapAmount + "is bigger than the calculated adjustment value: " + this.adjustmentValueStable);
@@ -103,12 +106,13 @@ class ArbitrageService {
     
 		let profitUsd = stableExpensive.minus(stableExpensiveNew).minus(this.adjustmentValueStable);
 
-		let gasLimitBsc = this._bscContracts.arbitrageContract.swapStableToBasicGasLimit(this.adjustmentValueStable);
-		let gasLimitEth = this._ethContracts.arbitrageContract.swapBasicToStableGasLimit(this.adjustmentValueBasic);
-		let transactionFees = (await this._bscContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitBsc) + 
-							  (await this._ethContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitEth);
+		let gasLimitBsc = await this._bscContracts.arbitrageContract.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable));
+		let gasLimitEth = await this._ethContracts.arbitrageContract.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic));
+
+		let transactionFees = (await this._bscContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitBsc).add(
+							  (await this._ethContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitEth));
 		
-		this.minimumSwapAmount = this._evaluationService.minimumSwapAmount(this.poolPriceBsc, this.poolPriceEth, transactionFees);
+		this.minimumSwapAmount = await this._evaluationService.minimumSwapAmount(this.poolPriceBsc, this.poolPriceEth, this.fromEthersToBigNumber(transactionFees));
 	}		
 
 	async swapEth(){
@@ -144,13 +148,14 @@ class ArbitrageService {
     
 		let profitUsd = stableExpensive.minus(stableExpensiveNew).minus(this.adjustmentValueStable);
 	
-		let gasLimitEth = this._ethContracts.arbitrageContract.swapStableToBasicGasLimit(this.adjustmentValueStable);
-		let gasLimitBsc = this._bscContracts.arbitrageContract.swapBasicToStableGasLimit(this.adjustmentValueBasic);
-		let transactionFees = (await this._bscContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitBsc) + 
-							  (await this._ethContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitEth);
+		let gasLimitEth = await this._ethContracts.arbitrageContract.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable));
+		let gasLimitBsc = await this._bscContracts.arbitrageContract.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic));
 
-		this.minimumSwapAmount = this._evaluationService.minimumSwapAmount(this.poolPriceBsc, this.poolPriceEth, transactionFees);
+		let transactionFees = (await this._bscContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitBsc).add(
+							  (await this._ethContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitEth));
 
+
+		this.minimumSwapAmount = await this._evaluationService.minimumSwapAmount(this.poolPriceBsc, this.poolPriceEth, this.fromEthersToBigNumber(transactionFees));
 	}
 
 	async swapBsc(){
@@ -198,6 +203,10 @@ class ArbitrageService {
 	toEthersBigNumber(value){
 		let x = new BigNumber(10).pow(18);
 		return ethers.BigNumber.from(value.multipliedBy(x).dp(0).toString());
+	}
+
+	fromEthersToBigNumber(value){
+		return new BigNumber(ethers.utils.formatEther(value));
 	}
 }
 

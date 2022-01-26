@@ -33,7 +33,7 @@ exports.startSingleArbitrage = [
 				return apiResponse.successResponseWithData(res, "stopping the cycle", { "ArbitrageCycleStatus": ArbitrageService.isRunning });
 			}
 
-			else {
+			else { 
 				ArbitrageService.startArbitrage();
 
 				return apiResponse.successResponseWithData(res, "started the arbitrage service", { "ArbitrageCycleStatus": ArbitrageService.isRunning });
