@@ -62,10 +62,7 @@ class DataService {
 	}
 
 	async getStandardDeviation(network) {
-		return new BigNumber(await this.standardDeviation(this.slippageWindow * 60, 0, network));
-	}
-
-	async standardDeviation(from, to, network) {
+		let from = this.slippageWindow * 60;
 		var priceHistory = [];
 		//get data from db
 		let EarlierConstructedObjectId = this.getSeconds(from);
@@ -81,8 +78,8 @@ class DataService {
 			priceQuery.forEach(element => {
 				priceHistory.push(element.PoolPrice);
 			});
-
-			return priceHistory.length > 0 ? this.CalculateStandardDeviation(priceHistory) : 0;
+			let standardDeviation = priceHistory.length > 0 ? this.CalculateStandardDeviation(priceHistory) : 0;
+			return new BigNumber(standardDeviation)
 		} catch (err) {
 			console.log(err);
 			throw err;
