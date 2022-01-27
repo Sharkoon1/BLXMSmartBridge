@@ -18,7 +18,7 @@ export default function SettingsModal() {
                 setSlippage(result.data.SlippageWindow);
             }
         });
-    });
+    }, []);
 
     function apply() {
         console.log(setSlippage);
