@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import "./style/SettingsModal.css"
 import UrlHandler from "./UrlHandler";
+import AlertInfo from "./AlertInfo";
 
 export default function SettingsModal() {
     var url = UrlHandler();
+    const [alert, setAlert] = useState();
     const [slippageWindow, setSlippage] = useState(0);
 
     useEffect(() => {   
@@ -19,12 +21,17 @@ export default function SettingsModal() {
     });
 
     function apply() {
+        console.log(setSlippage);
         fetch(url+"api/slippage/",
         {
             headers: { "Content-Type": "application/json" },
             method: "post",
             body: JSON.stringify({slippageWindow:slippageWindow})
-        }).then(response => response.json())
+        }).then(response => {
+            if(response) {
+                setAlert("Success! New slippage window is " + slippageWindow + " min");
+            }
+            })
         .then(result => {
             
         });
@@ -40,7 +47,9 @@ export default function SettingsModal() {
                         <button className='modalButton' onClick={apply}>Apply</button>
                         <input className='modalInput' placeholder={slippageWindow}></input>
                         <span>Minutes</span>
+                        <AlertInfo message={alert}></AlertInfo>
                     </div>
+                    
                 </div>           
             </div>         
         </div>
