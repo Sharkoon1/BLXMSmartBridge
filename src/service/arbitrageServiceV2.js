@@ -92,6 +92,9 @@ class ArbitrageService {
 		catch(error) {
 			logger.error("Arbitrage service failed. Error: " +  error);
 			logger.error("Service stopped ...");
+
+			app.logEvent.emit("cycleCompleted", true);
+			this.isRunning = false;
 		}
 	}
 

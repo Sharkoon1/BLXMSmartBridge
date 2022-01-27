@@ -26,11 +26,11 @@ export default class Buttons extends Component  {
 				}).then(response => response.json())
 				.then(result => {
 					if(result.data.ArbitrageCycleStatus) {
-						this.setState({connButtonText: 'Job running', startIsDisabled: true});
+						this.setState({connButtonText: 'Job running', toggleIsDisabled: true});
 					}
 	
 					else {
-						this.setState({connButtonText: 'Job not running'});
+						this.setState({connButtonText: 'Job not running', toggleIsDisabled: false});
 					}
 				});
 
@@ -43,13 +43,13 @@ export default class Buttons extends Component  {
 	
 		ioClient.on("cycleCompleted", (msg) => { 
 		  console.log("cycle completed");
-		  this.setState({ toggleIsDisabled:false, startIsDisabled: false}); 
+		  this.setState({ connButtonText: 'Job not running', toggleIsDisabled: false}); 
 		});
 	  
 	}
 
 	startArbitrage() {
-		this.setState({toggleIsDisabled: true, startIsDisabled: true});
+		this.setState({toggleIsDisabled: true});
 	
 		fetch(this.url+"api/arbitrage/single",
 			{
@@ -63,7 +63,7 @@ export default class Buttons extends Component  {
 				method: "post",
 			}).then(response => response.json().then(result => {
 				if(result.data.ArbitrageCycleStatus) {
-					this.setState({connButtonText: 'Job running', startIsDisabled: true});
+					this.setState({connButtonText: 'Job running', toggleIsDisabled: true});
 				}
 
 				else {
