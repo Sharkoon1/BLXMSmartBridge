@@ -27,7 +27,6 @@ if (window.ethereum && window.ethereum.isMetaMask) {
 					headers: new Headers({ "content-type": "application/json" }),
 					body: JSON.stringify({ User: result[0] })
 				}).then(response => response.json()).then(result => {
-					debugger;
 					if (result.status === 1) {
 						//####### NAVBAR #######
 						const navbar = document.getElementById("navbar");
@@ -81,6 +80,14 @@ if (window.ethereum && window.ethereum.isMetaMask) {
 								<Dashboad />
 							</StrictMode>,
 							dashboardGraph
+						);
+					} else {
+						const ErrorMessage = document.getElementById("root1");
+						ReactDOM.render(
+							<StrictMode>
+								<AlertInfo message={"You are not authorized to access this website."}/>
+							</StrictMode>,
+							ErrorMessage
 						);
 					}
 				});
