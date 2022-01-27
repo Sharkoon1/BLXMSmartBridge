@@ -50,6 +50,7 @@ class OracleContract {
 	}
 
 	async getPrice() {
+		// stable/ blxm
 		let tokensToSell = this.blxmTokenContract.DecimalToWei(1);
 		let tokenInStable;
 		try {

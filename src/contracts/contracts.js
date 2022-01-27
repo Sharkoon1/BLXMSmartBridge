@@ -33,7 +33,7 @@ class Contracts  {
 				this.arbitrageWallet = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
 
 				this.blxmTokenContract = new TokenContract(constants.BLXM_TOKEN_ADDRESS_ETH,  this.arbitrageWallet);
-				this.usdTokenContract = new TokenContract(constants.USD_TOKEN_ADRESS_ETH, this.arbitrageWallet);
+				this.usdTokenContract = new TokenContract(constants.USD_TOKEN_ADDRESS_ETH, this.arbitrageWallet);
 				this.arbitrageContract = new ArbitrageContract(constants.ARBITRAGE_CONTRACT_ADDRESS_ETH, this.arbitrageWallet);
 				break;
 		}

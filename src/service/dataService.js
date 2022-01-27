@@ -9,8 +9,8 @@ class DataService {
 
 	constructor(queryIntervalSeconds = 10) {
 		this._databaseService = DataBaseService;
-		this._oracleUniswap = new OracleContract("ETH", constants.BLXM_TOKEN_ADDRESS_ETH, constants.WETH_ADDRESS_TESTNET);
-		this._oraclePancakeSwap = new OracleContract("BSC", constants.BLXM_TOKEN_ADDRESS_BSC, constants.WBNB_ADDRESS_TESTNET);
+		this._oracleUniswap = new OracleContract("ETH", constants.BLXM_TOKEN_ADDRESS_ETH, constants.USD_TOKEN_ADDRESS_ETH);
+		this._oraclePancakeSwap = new OracleContract("BSC", constants.BLXM_TOKEN_ADDRESS_BSC, constants.USD_TOKEN_ADDRESS_BSC);
 		setInterval(this.getPoolData.bind(this), queryIntervalSeconds * 1000);
 		this.cachedUniswapPrice = {};
 		this.cachedPancakePrice = {};
