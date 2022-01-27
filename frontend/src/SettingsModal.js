@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import "./style/SettingsModal.css"
 import UrlHandler from "./UrlHandler";
 import AlertInfo from "./AlertInfo";
+import ErrorMessage from './ErrorMessage';
 
 export default function SettingsModal() {
     var url = UrlHandler();
     const [alert, setAlert] = useState();
+    const [error, setError] = useState();
     const [slippageWindow, setSlippage] = useState(0);
 
     useEffect(() => {   
@@ -15,10 +17,10 @@ export default function SettingsModal() {
         }).then(response => response.json())
         .then(result => {
             if(result.data.SlippageWindow) {
-                setSlippage(result.data.SlippageWindow);
-            }
-        });
-    }, []);
+                 setSlippage(result.data.SlippageWindow);
+             }
+         });
+     }, []);
 
     function apply() {
         console.log(setSlippage);
@@ -28,8 +30,10 @@ export default function SettingsModal() {
             method: "post",
             body: JSON.stringify({slippageWindow:parseInt(slippageWindow)})
         }).then(response => {
-            if(response) {
+            if(response.status === 200) {
                 setAlert("Success! New slippage window is " + slippageWindow + " min");
+            } else {
+                setError("An error occured. Response code: " + response.status)
             }
             })
         .then(result => {
@@ -48,6 +52,8 @@ export default function SettingsModal() {
                         <input className='modalInput' onInput={e => setSlippage(e.target.value)} placeholder={slippageWindow}></input>
                         <span>Minutes</span>
                         <AlertInfo message={alert}></AlertInfo>
+                        <ErrorMessage message={error}></ErrorMessage>
+                        
                     </div>
                     
                 </div>           
