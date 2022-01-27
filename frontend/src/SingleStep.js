@@ -8,6 +8,8 @@ import ProgressOutline from './ProgressOutline';
 export default function SingleStep() {
     var url = UrlHandler();
 
+    const [stopIsDisabled, setStopDisabled] = React.useState(false)
+    const [startIsDisabled, setStartDisabled] = React.useState(false)
     const [status, setStepStatus] = React.useState(1)
     const [showResults, setShowResults] = React.useState(false)
     const onClick = () => setShowResults(!showResults)
@@ -25,6 +27,7 @@ export default function SingleStep() {
     }, []);
 
     function onStop() {
+        setStopDisabled(true);
         setStepStatus(1);
 
         fetch(url+"api/arbitrage/stopStep",
@@ -32,25 +35,27 @@ export default function SingleStep() {
             headers: { "Content-Type": "application/json" },
             method: "post"
         }).then(response => response.json())
-        .then(result => {
-            
+        .then(() => {
+            setStopDisabled(false);
         }); 
     }
 
     function onNextStep() {
+        setStartDisabled(true);
         fetch(url+"api/arbitrage/singleStep", 
         {
             headers: { "Content-Type": "application/json" },
             method: "post",
             body: JSON.stringify({stepStatus:status})
         }).then(response => response.json())
-        .then(result => {         
+        .then(() => {         
             if(status !== 4) {
                 setStepStatus(status+1)
             }
             else {
                 setStepStatus(1)
             }
+            setStartDisabled(false);
         });
     }
  
@@ -66,8 +71,8 @@ export default function SingleStep() {
                 </div> 
                 <Logs/>
                 <div className='SingleStepButtons'>
-                    <button className='button' id='nextStep' onClick={onNextStep}>Next Step</button>
-                    <button className='button Stop' id='stop' onClick={onStop}>Stop</button>
+                    <button disabled={startIsDisabled} className='button' id='nextStep' onClick={onNextStep}>Next Step</button>
+                    <button disabled={stopIsDisabled} className='button Stop' id='stop' onClick={onStop}>Stop</button>
                 </div>
             </div> 
 
