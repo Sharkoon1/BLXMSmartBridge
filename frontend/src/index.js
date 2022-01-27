@@ -10,6 +10,7 @@ import Logs from "./Logs";
 import Buttons from "./Buttons";
 import SingleStep from "./SingleStep"
 import FullAutonomous from "./FullAutonomous";
+import ProgressOutline from "./ProgressOutline";
 
 import Dashboad from "./Dashboad";
 
