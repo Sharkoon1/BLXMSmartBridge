@@ -36,45 +36,51 @@ class SingleStepArbitrageService{
     async startSingleStepArbitrage(status) {
         this.stepStatus = status;
 
-        await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
+        try {
+            await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
 
-        if(!this.poolPriceBsc.eq(this.poolPriceEth)) {
+            if(!this.poolPriceBsc.eq(this.poolPriceEth)) {
 
-            switch(status){
-                case 1:                     
-                    logger.info("Starting AbitrageService");
-                    logger.info("Next step: collecting prices...");
+                switch(status){
+                    case 1:                     
+                        logger.info("Starting AbitrageService");
+                        logger.info("Next step: collecting prices...");
 
-                    break;
-                case 2: 
-                    await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
-                    await this.getReserves(); //overwrites this.tokenArrayBsc and this.tokenArrayEth with the current reserves from the LPs
-                    
-                    logger.info("Price difference found");
-                    logger.info("ETH network: Current price = " + this.poolPriceEth + " USD/BLXM");
-                    logger.info("BSC network: Current price = " + this.poolPriceBsc + " USD/BLXM");
-                    
-                    logger.info("Next step: calculating aribtrage ...");
-                    break;
-                case 3: 
-                    logger.info("Calculating arbitrage ...");
-                    await this.calculateArbitrage();
-                    logger.info("Adjustment Value stable: " + ArbitrageService.adjustmentValueStable); 
-                    logger.info("Adjustment Value basic: " + ArbitrageService.adjustmentValueBasic);    
-                    
-                    logger.info("Next step: Executing swaps ...");
-                    break;
-                case 4: 
-                    logger.info("Executing swaps");    
-                    await this.executeSwap();        
-                    
-                    break;
-                }			
-            }   
+                        break;
+                    case 2: 
+                        await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
+                        await this.getReserves(); //overwrites this.tokenArrayBsc and this.tokenArrayEth with the current reserves from the LPs
+                        
+                        logger.info("Price difference found");
+                        logger.info("ETH network: Current price = " + this.poolPriceEth + " USD/BLXM");
+                        logger.info("BSC network: Current price = " + this.poolPriceBsc + " USD/BLXM");
+                        
+                        logger.info("Next step: calculating aribtrage ...");
+                        break;
+                    case 3: 
+                        logger.info("Calculating arbitrage ...");
+                        await this.calculateArbitrage();
+                        logger.info("Adjustment Value stable: " + ArbitrageService.adjustmentValueStable); 
+                        logger.info("Adjustment Value basic: " + ArbitrageService.adjustmentValueBasic);    
+                        
+                        logger.info("Next step: Executing swaps ...");
+                        break;
+                    case 4: 
+                        logger.info("Executing swaps");    
+                        await this.executeSwap();        
+                        
+                        break;
+                    }			
+                }   
 
-        else {
-            logger.info("No arbitrage opportunity found.");
+            else {
+                logger.info("No arbitrage opportunity found.");
+            }
         }
+        catch(error) {
+			logger.error("Single step arbitrage service failed. Error: " +  error);
+			logger.error("Service stopped ...");
+		}
     }
 
     async getPoolPrices(){
