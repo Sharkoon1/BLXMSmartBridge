@@ -36,57 +36,63 @@ class ArbitrageService {
 		this.stopCycle = false;
 		this.isRunning = true;
 
-		logger.info("Starting the abitrage service ..."); 
+		try {
+			logger.info("Starting the abitrage service ..."); 
  
-		await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
+			await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
 
-		while (!this.poolPriceBsc.eq(this.poolPriceEth)) {
-			let tokenArrayBsc = await this.PancakeOracle.getReserves(); //tokenArrayBsc[0] = stableBsc, tokenArrayBsc[1] = basicBsc
-			let tokenArrayEth = await this.UniswapOracle.getReserves(); //tokenArrayEth[0] = stableEth, tokenArrayEth[1] = basicEth
-
-			logger.info("Price difference found");
-			logger.info("ETH network: Current price = " + this.poolPriceEth + " USD/BLXM");
-			logger.info("BSC network: Current price = " + this.poolPriceBsc + " USD/BLXM");
-
-			if(this.poolPriceEth.gt(this.poolPriceBsc)){
-
-				await this.calculateSwapEth(tokenArrayBsc[1], tokenArrayBsc[0], tokenArrayEth[1], tokenArrayEth[0]);
-
-				if(this.minimumSwapAmount < this.adjustmentValueStable) {
-					await this.swapEth();
-				}
-
-				else {
-					logger.info("ETH: Minimum swap amount: " + this.minimumSwapAmount + "is bigger than the calculated adjustment value: " + this.adjustmentValueStable);
-					logger.info("Skipping current arbitrage cycle...");
-				}
-				
-			}
-
-			else {
-				await this.calculateSwapBsc(tokenArrayEth[1], tokenArrayEth[0], tokenArrayBsc[1], tokenArrayBsc[0]);  
-
-				if(this.minimumSwapAmount < this.adjustmentValueStable) {
-					await this.swapBsc();
-				}
-				else {
-					logger.info("BSC: Minimum swap amount: " + this.minimumSwapAmount + "is bigger than the calculated adjustment value: " + this.adjustmentValueStable);
-					logger.info("Skipping current arbitrage cycle...");
-				}
-			
-			}
-
-			if(this.stopCycle) {
-				logger.info("The arbitrage service has been stopped and the last cycle has been completed.");
-
-				this.isRunning = false;
-				app.logEvent.emit("cycleCompleted", true);
-				break;
-			}
-		}
-
+			while (!this.poolPriceBsc.eq(this.poolPriceEth)) {
+				let tokenArrayBsc = await this.PancakeOracle.getReserves(); //tokenArrayBsc[0] = stableBsc, tokenArrayBsc[1] = basicBsc
+				let tokenArrayEth = await this.UniswapOracle.getReserves(); //tokenArrayEth[0] = stableEth, tokenArrayEth[1] = basicEth
 	
-		this.isRunning = false;
+				logger.info("Price difference found");
+				logger.info("ETH network: Current price = " + this.poolPriceEth + " USD/BLXM");
+				logger.info("BSC network: Current price = " + this.poolPriceBsc + " USD/BLXM");
+	
+				if(this.poolPriceEth.gt(this.poolPriceBsc)){
+	
+					await this.calculateSwapEth(tokenArrayBsc[1], tokenArrayBsc[0], tokenArrayEth[1], tokenArrayEth[0]);
+	
+					if(this.minimumSwapAmount < this.adjustmentValueStable) {
+						await this.swapEth();
+					}
+	
+					else {
+						logger.info("ETH: Minimum swap amount: " + this.minimumSwapAmount + "is bigger than the calculated adjustment value: " + this.adjustmentValueStable);
+						logger.info("Skipping current arbitrage cycle...");
+					}
+					
+				}
+	
+				else {
+					await this.calculateSwapBsc(tokenArrayEth[1], tokenArrayEth[0], tokenArrayBsc[1], tokenArrayBsc[0]);  
+	
+					if(this.minimumSwapAmount < this.adjustmentValueStable) {
+						await this.swapBsc();
+					}
+					else {
+						logger.info("BSC: Minimum swap amount: " + this.minimumSwapAmount + "is bigger than the calculated adjustment value: " + this.adjustmentValueStable);
+						logger.info("Skipping current arbitrage cycle...");
+					}
+				
+				}
+	
+				if(this.stopCycle) {
+					logger.info("The arbitrage service has been stopped and the last cycle has been completed.");
+	
+					this.isRunning = false;
+					app.logEvent.emit("cycleCompleted", true);
+					break;
+				}
+			}
+	
+		
+			this.isRunning = false;
+		}	
+		catch(error) {
+			logger.error("Arbitrage service failed. Error: " +  error);
+			logger.error("Service stopped ...");
+		}
 	}
 
 	async calculateSwapEth(basicCheap, stableCheap, basicExpensive, stableExpensive){ // When ETH is more expensive
