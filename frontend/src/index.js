@@ -15,10 +15,16 @@ import ProgressOutline from "./ProgressOutline";
 
 import Dashboad from "./Dashboad";
 import UrlHandler from "./UrlHandler";
+import LoginPage from "./LoginPage";
+const rootElement1 = document.getElementById("root1");
+ReactDOM.render(
+	<StrictMode>
+		<LoginPage />
+	</StrictMode>,
+rootElement1 );
 
 
 if (window.ethereum && window.ethereum.isMetaMask) {
-
 	window.ethereum.request({ method: "eth_requestAccounts" })
 		.then(result => {
 			fetch(UrlHandler() + "api/authorization",
@@ -66,7 +72,7 @@ if (window.ethereum && window.ethereum.isMetaMask) {
 						);
 
 						//####### Abitrage Console Single Step ####### 
-						const rootElement1 = document.getElementById("root1");
+						
 						ReactDOM.render(
 							<StrictMode>
 								<SingleStep />
