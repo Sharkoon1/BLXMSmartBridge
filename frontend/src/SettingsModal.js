@@ -31,10 +31,7 @@ export default function SettingsModal() {
             if(response) {
                 setAlert("Success! New slippage window is " + slippageWindow + " min");
             }
-            })
-        .then(result => {
-            
-        });
+            });
     }
 
     return (

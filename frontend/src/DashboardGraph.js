@@ -15,7 +15,7 @@ import "./style/DashboardGraph.css";
 
 
 const url = UrlHandler();
-const queryIntervalSeconds = 60;
+const queryIntervalSeconds = 10;
 
 //
 /*
@@ -69,7 +69,7 @@ class DashboardGraph extends Component {
 				console.log(res.data.data.PancakeBLXMPrice.Timestamp);
 				this.setState(prevState => {
 					return {
-						data: [...prevState.data, newData]
+						data: [...prevState.data, ...newData]
 					};
 				});
 			});
