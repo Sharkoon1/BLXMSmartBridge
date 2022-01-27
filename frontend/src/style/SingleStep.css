@@ -35,6 +35,14 @@
     margin-top: 2vh;
 }
 
+#nextStep:disabled {
+    background-color: #333;
+}
+
+#stop:disabled {
+    background-color: #333;
+}
+
 #nextStep, #stop { 
     width: 95%; 
     display: inline;
