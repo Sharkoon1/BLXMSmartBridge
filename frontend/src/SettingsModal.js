@@ -35,10 +35,7 @@ export default function SettingsModal() {
             } else {
                 setError("An error occured. Response code: " + response.status)
             }
-            })
-        .then(result => {
-            
-        });
+            });
     }
 
     return (

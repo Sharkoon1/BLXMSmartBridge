@@ -49,18 +49,35 @@ class DataService {
 		return mongoose.Types.ObjectId(hexSeconds + "0000000000000000");
 	}
 
-	getETHPrice() {
-		return this.cachedUniswapPrice;
-	}
+	async getPrice(network) {
+		let from = this.slippageWindow * 60;
+		var priceHistory = [];
+		//get data from db
+		let EarlierConstructedObjectId = this.getSeconds(from);
+		let LaterConstructedObjectId = this.getSeconds(0);
 
-	getBSCPrice() {
-		return this.cachedPancakePrice;
+		let query = {
+			"_id": { $gt: EarlierConstructedObjectId, $lt: LaterConstructedObjectId },
+			"Network": network
+		};
+		try {
+			let priceQuery = await this._databaseService.QueryData(query, PoolPrice);
+			priceQuery.forEach(element => {
+				let dateTimeArray = element.createdAt.toJSON().split("T");
+				let date = dateTimeArray[0].split("-").reverse().join(".");
+				let time = dateTimeArray[1].split(".")[0].split(":").slice(0, 2).join(":");
+				priceHistory.push({ "Price": element.PoolPrice, "Timestamp": date + ", " + time });
+			});
+			return priceHistory.length > 0 ?  priceHistory : 0;
+		} catch (err) {
+			console.log(err);
+			throw err;
+		}
 	}
 
 	async getStandardDeviation(network) {
 		let from = this.slippageWindow * 60;
 		var priceHistory = [];
-		
 		//get data from db
 		let EarlierConstructedObjectId = this.getSeconds(from);
 		let LaterConstructedObjectId = this.getSeconds(0);
