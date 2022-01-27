@@ -23,7 +23,7 @@ export default function SettingsModal() {
         {
             headers: { "Content-Type": "application/json" },
             method: "post",
-            body: JSON.stringify({slippageWindow:slippageWindow})
+            body: JSON.stringify({slippageWindow:parseInt(slippageWindow)})
         }).then(response => response.json())
         .then(result => {
             
@@ -36,9 +36,9 @@ export default function SettingsModal() {
                 <h1 className='modalHeading'>Settings</h1>
                 <div className='modalSettings'>
                     <h1>Set Slippage Window </h1>
-                    <div>
+                    <div>   
                         <button className='modalButton' onClick={apply}>Apply</button>
-                        <input className='modalInput' placeholder={slippageWindow}></input>
+                        <input className='modalInput' onInput={e => setSlippage(e.target.value)} placeholder={slippageWindow}></input>
                         <span>Minutes</span>
                     </div>
                 </div>           
