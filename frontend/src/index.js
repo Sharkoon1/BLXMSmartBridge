@@ -11,6 +11,7 @@ import Buttons from "./Buttons";
 import SingleStep from "./SingleStep"
 import FullAutonomous from "./FullAutonomous";
 import AlertInfo from "./AlertInfo";
+import ProgressOutline from "./ProgressOutline";
 
 import Dashboad from "./Dashboad";
 import UrlHandler from "./UrlHandler";
