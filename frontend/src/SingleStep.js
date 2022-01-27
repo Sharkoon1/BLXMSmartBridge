@@ -3,7 +3,7 @@ import Logs from './Logs';
 import "./style/SingleStep.css"
 import SettingsModal from './SettingsModal';
 import UrlHandler from "./UrlHandler";
-
+import ProgressOutline from './ProgressOutline';
 
 export default function SingleStep() {
     var url = UrlHandler();
@@ -56,6 +56,7 @@ export default function SingleStep() {
  
     return (
         <Fragment>
+        <ProgressOutline state={status}/>
         { showResults ? <SettingsModal/> : null }
             <div className='logsBox'>
                 <div className='settings'>
