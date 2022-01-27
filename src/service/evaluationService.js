@@ -16,7 +16,7 @@ class EvaluationService {
 			priceExpensiveBLXM = poolPriceBsc;
 			priceCheapBLXM = poolPriceEth;
 		} else {
-			priceExpensiveBLXM = poolPriceEth;
+			priceExpensiveBLXM = poolPriceEth; 
 			priceCheapBLXM = poolPriceBsc;
 		}
         

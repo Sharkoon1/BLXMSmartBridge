@@ -19,8 +19,6 @@ class DataService {
 
 	getPoolData() {
 		this._oracleUniswap.getPrice().then((res) => {
-			//console.log("Price Uniswap");
-			//console.log(+res);
 			const price = res.toNumber();
 			let dateTimeArray = new Date().toJSON().split("T");
 			let date = dateTimeArray[0].split("-").reverse().join(".");
@@ -32,8 +30,6 @@ class DataService {
 			}, PoolPrice);
 		});
 		this._oraclePancakeSwap.getPrice().then((res) => {
-			//console.log("Price Pancakeswap");
-			//console.log(+res);
 			const price = res.toNumber();
 			let dateTimeArray = new Date().toJSON().split("T");
 			let date = dateTimeArray[0].split("-").reverse().join(".");
@@ -64,11 +60,11 @@ class DataService {
 	async getStandardDeviation(network) {
 		let from = this.slippageWindow * 60;
 		var priceHistory = [];
+		
 		//get data from db
 		let EarlierConstructedObjectId = this.getSeconds(from);
-		//console.log(EarlierConstructedObjectId);
-		let LaterConstructedObjectId = this.getSeconds(to);
-		//console.log(LaterConstructedObjectId);
+		let LaterConstructedObjectId = this.getSeconds(0);
+
 		let query = {
 			"_id": { $gt: EarlierConstructedObjectId, $lt: LaterConstructedObjectId },
 			"Network": network
@@ -79,7 +75,7 @@ class DataService {
 				priceHistory.push(element.PoolPrice);
 			});
 			let standardDeviation = priceHistory.length > 0 ? this.CalculateStandardDeviation(priceHistory) : 0;
-			return new BigNumber(standardDeviation)
+			return new BigNumber(standardDeviation);
 		} catch (err) {
 			console.log(err);
 			throw err;

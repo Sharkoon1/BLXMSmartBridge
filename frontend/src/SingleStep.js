@@ -2,12 +2,18 @@ import React, { Component, Fragment, useEffect} from 'react';
 import Logs from './Logs';
 import "./style/SingleStep.css"
 import SettingsModal from './SettingsModal';
+import UrlHandler from "./UrlHandler";
 
 
 export default function SingleStep() {
+    var url = UrlHandler();
+
+    const [status, setStepStatus] = React.useState(1)
+    const [showResults, setShowResults] = React.useState(false)
+    const onClick = () => setShowResults(!showResults)
 
     useEffect(() => {
-        fetch(url +"api/arbitrage/singleStep",
+        fetch(url +"api/arbitrage/stepStatus",
         {
             method: "get",
         }).then(response => response.json())
@@ -16,44 +22,37 @@ export default function SingleStep() {
                 setStepStatus(result.data.stepStatus);
             }
         });
-    });
+    }, []);
 
     function onStop() {
         setStepStatus(1);
 
-        fetch(url+"api/arbitrage/setStep",
+        fetch(url+"api/arbitrage/stopStep",
         {
             headers: { "Content-Type": "application/json" },
-            method: "post",
-            body: JSON.stringify({stepStatus:status})
+            method: "post"
         }).then(response => response.json())
         .then(result => {
             
-        });
+        }); 
     }
 
     function onNextStep() {
-        if(status !== 4) {
-            setStepStatus(status + 1)
-        }
-        else {
-            setStepStatus(1);
-        }
-
-        fetch(url+"api/arbitrage/step",
+        fetch(url+"api/arbitrage/singleStep", 
         {
             headers: { "Content-Type": "application/json" },
             method: "post",
             body: JSON.stringify({stepStatus:status})
         }).then(response => response.json())
-        .then(result => {
-            
+        .then(result => {         
+            if(status !== 4) {
+                setStepStatus(status+1)
+            }
+            else {
+                setStepStatus(1)
+            }
         });
     }
-    
-    const [status, setStepStatus] = React.useState(1)
-    const [showResults, setShowResults] = React.useState(false)
-    const onClick = () => setShowResults(!showResults)
  
     return (
         <Fragment>

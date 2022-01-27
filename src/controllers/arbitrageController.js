@@ -64,7 +64,7 @@ exports.startSingleArbitrage = [
 /**
  * Single step arbitrage mode.
  *  
- * @returns {Object}
+ * @returns {Object} 
  */
  exports.singleStep = [
 	function (req, res) {
@@ -92,20 +92,12 @@ exports.startSingleArbitrage = [
  *  
  * @returns {Object}
  */
- exports.setStepStatus = [
+ exports.stopStep = [
 	function (req, res) {
         try {
-			let stepStatus = req.body.stepStatus;
-
-            if(stepStatus) {
-				SingleStepArbitrageService.stepStatus = 1;
-
-                return apiResponse.successResponse(res, "Arbitrage step status: " + stepStatus + " has been successful.");
-            }
-            else {
-                return apiResponse.validationError(res, "Arbitrage step status was missing.", {"stepStatus": stepStatus});
-            }
-			
+				SingleStepArbitrageService.resetSingleStepArbitrage();
+                return apiResponse.successResponse(res, "Arbitrage step status has been stopped.");
+	
 		} catch (err) {
 			//throw error in json response with status 500. 
 			return apiResponse.ErrorResponse(res, err);

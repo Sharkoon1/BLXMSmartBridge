@@ -26,6 +26,13 @@ class SingleStepArbitrageService{
         this.stepStatus = 1;
     }
 
+    resetSingleStepArbitrage() {
+        logger.info("Stopping single step arbitrage ...");
+        logger.info("Resetting to step 1 ...");
+
+        this.stepStatus = 1;
+    }
+
     async startSingleStepArbitrage(status) {
         this.stepStatus = status;
 
@@ -34,29 +41,32 @@ class SingleStepArbitrageService{
         if(!this.poolPriceBsc.eq(this.poolPriceEth)) {
 
             switch(status){
-                case "1": 
+                case 1:                     
+                    logger.info("Starting AbitrageService");
+                    logger.info("Next step: collecting prices...");
+
+                    break;
+                case 2: 
                     await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
                     await this.getReserves(); //overwrites this.tokenArrayBsc and this.tokenArrayEth with the current reserves from the LPs
                     
-                    logger.info("Starting AbitrageService");
-                    
-                    break;
-                case "2": 
                     logger.info("Price difference found");
                     logger.info("ETH network: Current price = " + this.poolPriceEth + " USD/BLXM");
                     logger.info("BSC network: Current price = " + this.poolPriceBsc + " USD/BLXM");
                     
+                    logger.info("Next step: calculating aribtrage ...");
                     break;
-                case "3": 
-                    logger.info("Calculating arbitrage");
-                    this.calculateArbitrage();
+                case 3: 
+                    logger.info("Calculating arbitrage ...");
+                    await this.calculateArbitrage();
                     logger.info("Adjustment Value stable: " + ArbitrageService.adjustmentValueStable); 
                     logger.info("Adjustment Value basic: " + ArbitrageService.adjustmentValueBasic);    
                     
+                    logger.info("Next step: Executing swaps ...");
                     break;
-                case "4": 
-                    logger.info("Executing swap");    
-                    this.executeSwap();        
+                case 4: 
+                    logger.info("Executing swaps");    
+                    await this.executeSwap();        
                     
                     break;
                 }			
@@ -70,6 +80,9 @@ class SingleStepArbitrageService{
     async getPoolPrices(){
 		this.poolPriceBsc = await this.PancakeOracle.getPrice();
 		this.poolPriceEth = await this.UniswapOracle.getPrice();
+
+        ArbitrageService.poolPriceBsc = this.poolPriceBsc;
+        ArbitrageService.poolPriceEth = this.poolPriceEth;
 	}
 
     async getReserves(){
@@ -79,19 +92,19 @@ class SingleStepArbitrageService{
 
     async calculateArbitrage(){
         if(this.poolPriceEth.gt(this.poolPriceBsc)){
-            ArbitrageService.calculateSwapEth(this.tokenArrayBsc[1], this.tokenArrayBsc[0], this.tokenArrayEth[1], this.tokenArrayEth[0]);
+            await ArbitrageService.calculateSwapEth(this.tokenArrayBsc[1], this.tokenArrayBsc[0], this.tokenArrayEth[1], this.tokenArrayEth[0]);
         }
         else {
-            ArbitrageService.calculateSwapBsc(this.tokenArrayEth[1], this.tokenArrayEth[0], this.tokenArrayBsc[1], this.tokenArrayBsc[0]);  
+            await ArbitrageService.calculateSwapBsc(this.tokenArrayEth[1], this.tokenArrayEth[0], this.tokenArrayBsc[1], this.tokenArrayBsc[0]);  
         }
     }
 
     async executeSwap(){
         if(this.poolPriceEth.gt(this.poolPriceBsc)){
-            ArbitrageService.swapEth();
+            await ArbitrageService.swapEth();
         }
         else {
-            ArbitrageService.swapBsc();
+            await ArbitrageService.swapBsc();
         }
     }
 }
