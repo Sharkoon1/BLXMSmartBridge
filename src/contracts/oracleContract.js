@@ -4,7 +4,7 @@ const factoryAbi = require("../abi/factory_abi.json");
 const constants = require("../constants");
 const TokenContract = require("./TokenContract");
 const { ethers } = require("ethers");
-const BigNumber  = require("bignumber.js");
+const BigNumber = require("bignumber.js");
 
 
 class OracleContract {
@@ -50,16 +50,16 @@ class OracleContract {
 	}
 
 	async getPrice() {
-		// stable/ blxm
-		let tokensToSell = this.blxmTokenContract.DecimalToWei(1);
-		let tokenInStable;
+		let poolReserves;
 		try {
-			tokenInStable = await this.router.callStatic.getAmountsOut(tokensToSell, [this.BLXMTokenAddress, this.stableTokenAddress]);
+			poolReserves = await this.getReserves();
 		} catch (error) {
 			console.log("An error occured");
 			console.log(error);
 		}
-		return new BigNumber(ethers.utils.formatEther(tokenInStable[1]));
+		let stableToken = poolReserves[0];
+		let blxmToken = poolReserves[1];
+		return stableToken.div(blxmToken);
 	}
 
 	async getReserves() {
