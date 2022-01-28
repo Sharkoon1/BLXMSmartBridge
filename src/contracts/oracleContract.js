@@ -5,6 +5,7 @@ const constants = require("../constants");
 const TokenContract = require("./TokenContract");
 const { ethers } = require("ethers");
 const BigNumber = require("bignumber.js");
+const logger = require("../logger/logger");
 
 
 class OracleContract {
@@ -54,8 +55,8 @@ class OracleContract {
 		try {
 			poolReserves = await this.getReserves();
 		} catch (error) {
-			console.log("An error occured");
-			console.log(error);
+			logger.error("An error occured retrieving the network prices.");
+			logger.error("Error: " + error);
 		}
 		let stableToken = poolReserves[0];
 		let blxmToken = poolReserves[1];
@@ -72,8 +73,8 @@ class OracleContract {
 			let reservesBasic = new BigNumber(ethers.utils.formatEther(reserves[1]));
 			return [reservesStable, reservesBasic];
 		} catch (error) {
-			console.log("An error occured");
-			console.log(error);
+			logger.error("An error occured retrieving pool reserves.");
+			logger.error("Error: " + error);
 		}
 	}
 }
