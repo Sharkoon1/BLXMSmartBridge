@@ -6,8 +6,7 @@ import {
 	YAxis,
 	CartesianGrid,
 	Tooltip,
-	Legend,
-	ResponsiveContainer
+	Legend
 } from "recharts";
 import UrlHandler from "./UrlHandler";
 import axios from 'axios';
@@ -15,7 +14,6 @@ import "./style/DashboardGraph.css";
 
 
 const url = UrlHandler();
-const queryIntervalSeconds = 60;
 
 //
 /*
@@ -32,20 +30,6 @@ const queryIntervalSeconds = 60;
 
 */
 
-async function getData() {
-	//console.log("function called!");
-	axios.get(url + "api/oracle/price").then((res) => {
-		//console.log(res.data);
-		//data.push()
-		setData([data, { timestamp: res.data.data.UniBLXMPrice.Timestamp, Pancakeswap: res.data.data.PancakeBLXMPrice.Price, Uniswap: res.data.data.UniBLXMPrice.Price }]);
-		console.log(data)
-		console.log(res.data.data.UniBLXMPrice.Price);
-		console.log(res.data.data.UniBLXMPrice.Timestamp);
-		console.log(res.data.data.PancakeBLXMPrice.Price);
-		console.log(res.data.data.PancakeBLXMPrice.Timestamp);
-	});
-}
-
 class DashboardGraph extends Component {
 
 	constructor(props) {
@@ -56,24 +40,32 @@ class DashboardGraph extends Component {
 	}
 
 	componentDidMount() {
-		const intervalId = setInterval(() => {
-			let newData;
-			axios.get(url + "api/oracle/price").then((res) => {
-				//console.log(res.data);
-				//data.push()
-				newData = { timestamp: res.data.data.UniBLXMPrice.Timestamp, Pancakeswap: res.data.data.PancakeBLXMPrice.Price, Uniswap: res.data.data.UniBLXMPrice.Price };
-				console.log(this.state.data);
-				console.log(res.data.data.UniBLXMPrice.Price);
-				console.log(res.data.data.UniBLXMPrice.Timestamp);
-				console.log(res.data.data.PancakeBLXMPrice.Price);
-				console.log(res.data.data.PancakeBLXMPrice.Timestamp);
-				this.setState(prevState => {
-					return {
-						data: [...prevState.data, newData]
-					};
-				});
+		axios.get(url + "api/oracle/price").then((res) => {
+			let uni = res.data.data.UniBLXMPrice;
+			let pancake = res.data.data.PancakeBLXMPrice;
+
+			let dataArray = [];
+
+			Object.keys(uni).forEach((key) => {
+				var existsPancake = pancake.find(({Timestamp}) => uni[key].Timestamp === Timestamp);
+				if(existsPancake) {
+					dataArray.push({timestamp: existsPancake.Timestamp, Pancakeswap: uni[key].Price, Uniswap: existsPancake.Price });
+				}
+			})
+
+			let distinctTimeStampData = dataArray.filter((v,i,a)=>a.findIndex(t=>(t.timestamp===v.timestamp))===i);
+
+			console.log(this.state.data);
+			console.log(res.data.data.UniBLXMPrice.Price);
+			console.log(res.data.data.UniBLXMPrice.Timestamp);
+			console.log(res.data.data.PancakeBLXMPrice.Price);
+			console.log(res.data.data.PancakeBLXMPrice.Timestamp);
+			this.setState(prevState => {
+				return {
+					data: [...prevState.data, ...distinctTimeStampData]
+				};
 			});
-		}, queryIntervalSeconds * 1000);
+		});
 	}
 
 

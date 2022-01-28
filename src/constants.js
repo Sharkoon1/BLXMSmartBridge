@@ -23,4 +23,6 @@ module.exports = Object.freeze({
 	JOB_ENABLED_STATE:"enabled",
 	UNISWAP_FEES: "0.997",
 	PANCAKESWAP_FEES: "0.998"
+	AUTHORIZED_WALLETS: ["0xc591113a44fcf67aa205b074011fdeb862a9c755"],
+	JOB_ENABLED_STATE:"enabled"
 });

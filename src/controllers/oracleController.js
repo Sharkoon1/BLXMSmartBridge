@@ -7,11 +7,11 @@ const dataService = require("../service/dataService");
  * @returns {Object}
  */
 exports.price = [
-	function (req, res) {
+	async function (req, res) {
 		try {
-			let UniData = dataService.getETHPrice();
-			let PancakeData = dataService.getBSCPrice();
-			return apiResponse.successResponseWithData(res, "Operation success", { UniBLXMPrice: UniData, PancakeBLXMPrice: PancakeData });
+			let UniData = await dataService.getPrice("ETH");
+			let PancakeData = await dataService.getPrice("BSC");
+			return await apiResponse.successResponseWithData(res, "Operation success", { UniBLXMPrice: UniData, PancakeBLXMPrice: PancakeData });
 		} catch (err) {
 			//throw error in json response with status 500. 
 			return apiResponse.ErrorResponse(res, err);
