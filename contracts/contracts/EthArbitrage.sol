@@ -72,7 +72,7 @@ contract EthArbitrage is Ownable {
             1000000,
             getPathStableToBasic(),
             address(this),
-            block.timestamp + 15
+            block.timestamp + 1200
         );
     }
 
@@ -84,7 +84,7 @@ contract EthArbitrage is Ownable {
             1000000,
             getPathBasicToStable(),
             address(this),
-            block.timestamp + 15
+            block.timestamp + 1200
         );
     }
 
