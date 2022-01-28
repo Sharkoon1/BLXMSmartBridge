@@ -9,6 +9,11 @@
     z-index: 100;
 }
 
+.settingsImage:hover
+{
+    opacity: .5;
+}
+
 .modalContent{
     padding: 1rem;
     color: black;
