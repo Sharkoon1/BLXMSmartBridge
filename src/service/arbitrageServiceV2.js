@@ -30,6 +30,9 @@ class ArbitrageService {
 
 		this.stopCycle = false;
 		this.isRunning = false;
+
+		UniswapFees = new BigNumber(constants.UNISWAP_FEES)
+		pancakeswapFees = new BigNumber(constants.PANCAKESWAP_FEES)
 	}
 
 	async startArbitrage (){
@@ -103,7 +106,7 @@ class ArbitrageService {
 		let constantCheap = stableCheap.multipliedBy(basicCheap);
 		let constantExpensive = stableExpensive.multipliedBy(basicExpensive);   
 
-		this.adjustmentValueStable = this.getAdjustmentValueUsd(basicCheap, stableCheap, basicExpensive, constantCheap, constantExpensive);
+		this.adjustmentValueStable = this.getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, constantCheap, constantExpensive);
     
 		let stableCheapNew = stableCheap.plus(this.adjustmentValueStable);
 		let basicCheapNew = constantCheap.div(stableCheapNew);
@@ -147,7 +150,7 @@ class ArbitrageService {
 		let constantCheap = stableCheap.multipliedBy(basicCheap);
 		let constantExpensive = stableExpensive.multipliedBy(basicExpensive); 
           
-		this.adjustmentValueStable = this.getAdjustmentValueUsd(basicCheap, stableCheap, basicExpensive, constantCheap, constantExpensive);
+		this.adjustmentValueStable = this.getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, constantCheap, constantExpensive);
 
 		let stableCheapNew = stableCheap.plus(this.adjustmentValueStable);
 		let basicCheapNew = constantCheap.div(stableCheapNew);
@@ -188,25 +191,28 @@ class ArbitrageService {
 	}
 
     
-	getAdjustmentValueUsd(basicCheap, stableCheap, basicExpensive, constantCheap, constantExpensive){ //With BigNumber.js Operators and data types
+	getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, constantCheap, constantExpensive, UniswapFees, pancakeswapFees) {
 
-		let term1 = basicCheap.exponentiatedBy(2).multipliedBy(constantCheap).multipliedBy(constantExpensive);
-		let term2 = basicCheap.multipliedBy(2).multipliedBy(basicExpensive).multipliedBy(constantCheap).multipliedBy(constantExpensive);
-		let term3 = basicExpensive.exponentiatedBy(2).multipliedBy(constantCheap).multipliedBy(constantExpensive);
-		let term4 = basicCheap.exponentiatedBy(2).multipliedBy(stableCheap.multipliedBy(-1));
-		let term5 = basicCheap.multipliedBy(2).multipliedBy(basicExpensive).multipliedBy(stableCheap);
-		let term6 = basicCheap.multipliedBy(constantCheap);
-		let term7 = basicExpensive.exponentiatedBy(2).multipliedBy(stableCheap);
-		let term8 = basicExpensive.multipliedBy(constantCheap);
-	
-		let term9 = basicCheap.exponentiatedBy(2);
-		let term10 = basicCheap.multipliedBy(2).multipliedBy(basicExpensive);
-		let term11 = basicExpensive.exponentiatedBy(2);    
+		let term1 = basicCheap.exponentiatedBy(2).multipliedBy(constantCheap).multipliedBy(constantExpensive).multipliedBy(pancakeswapFees.exponentiatedBy(2)).multipliedBy(UniswapFees.exponentiatedBy(2))
+		let term2 = (new BigNumber("2")).multipliedBy(basicCheap).multipliedBy(basicExpensive).multipliedBy(constantCheap).multipliedBy(constantExpensive).multipliedBy(pancakeswapFees.exponentiatedBy(2)).multipliedBy(UniswapFees)
+		let term3 = basicExpensive.exponentiatedBy(2).multipliedBy(constantCheap).multipliedBy(constantExpensive).multipliedBy(pancakeswapFees.exponentiatedBy(2)) 
+		let term4 = basicCheap.exponentiatedBy(2).multipliedBy(pancakeswapFees).multipliedBy(UniswapFees.exponentiatedBy(2)).multipliedBy(stableCheap) 
+		let term5 = (new BigNumber("2")).multipliedBy(basicCheap).multipliedBy(basicExpensive).multipliedBy(pancakeswapFees).multipliedBy(UniswapFees).multipliedBy(stableCheap)
+		let term6 = basicCheap.multipliedBy(constantCheap).multipliedBy(pancakeswapFees).multipliedBy(UniswapFees.exponentiatedBy(2))
+		let term7 = basicExpensive.exponentiatedBy(2).multipliedBy(pancakeswapFees).multipliedBy(stableCheap)
+		let term8 = basicExpensive.multipliedBy(constantCheap).multipliedBy(pancakeswapFees).multipliedBy(UniswapFees)
+		let term9 = basicCheap.exponentiatedBy(2).multipliedBy(pancakeswapFees.exponentiatedBy(2)).multipliedBy(UniswapFees.exponentiatedBy(2))
+		let term10 = (new BigNumber("2")).multipliedBy(basicCheap).multipliedBy(basicExpensive).multipliedBy(pancakeswapFees.exponentiatedBy(2)).multipliedBy(UniswapFees)
+		let term11 = basicExpensive.exponentiatedBy(2).multipliedBy(pancakeswapFees.exponentiatedBy(2))
 		
-		let adjustmentValue = ((term1.plus(term2).plus(term3).squareRoot()).plus(term4).minus(term5).plus(term6).minus(term7).plus(term8)).dividedBy((term9.plus(term10.plus(term11))));
-
+		let term1_8 = ((term1.plus(term2).plus(term3)).squareRoot()).minus(term4).minus(term5).plus(term6).minus(term7).plus(term8)
+		let term9_11 = term9.plus(term10).plus(term11)
+		
+		let adjustmentValue = term1_8.dividedBy(term9_11)
+		
 		return adjustmentValue;
-	}
+		
+		}
 
 	async getPoolPrices(){
 		this.poolPriceBsc = await this.PancakeOracle.getPrice();

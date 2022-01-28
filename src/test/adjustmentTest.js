@@ -1,11 +1,15 @@
 const { ethers } = require("ethers");
 const BigNumber  = require('bignumber.js');
+const constants = require("../constants");
 
-basicCheapA = new BigNumber("200")
-stableCheapA = new BigNumber("250")
-basicExpensiveA = new BigNumber("150")
-constantCheapA = new BigNumber("50000")
-constantExpensiveA = new BigNumber("30000")
+basicCheapA = new BigNumber("29.99731818")
+stableCheapA = new BigNumber("67.08781438")
+basicExpensiveA = new BigNumber("21.19342441")
+constantCheapA = new BigNumber("2012.454514")
+constantExpensiveA = new BigNumber("1005.62634")
+
+UniswapFees = new BigNumber(constants.UNISWAP_FEES)
+pancakeswapFees = new BigNumber(constants.PANCAKESWAP_FEES)
 
 basicCheapB = 200
 stableCheapB = 250
@@ -14,6 +18,9 @@ constantCheapB = 50000
 constantExpensiveB = 30000
 
 function getAdjustmentValueUsdWithBigNumOperators(basicCheap, stableCheap, basicExpensive, constantCheap, constantExpensive){
+  let AdjustmentValue = (sqrt(basicCheap^2 * constantCheap * constantExpensive * constants.PANCAKESWAP_FEES^2 * constants.UNISWAP_FEES^2 + 2 * basicCheap * basicExpensive * constantCheap * constantExpensive * constants.PANCAKESWAP_FEES^2 * constants.UNISWAP_FEES + basicExpensive^2 * constantCheap * constantExpensive * constants.PANCAKESWAP_FEES^2) - 
+  basicCheap^2 * constants.PANCAKESWAP_FEES * constants.UNISWAP_FEES^2 * stableCheap - 2 * basicCheap * basicExpensive * constants.PANCAKESWAP_FEES * constants.UNISWAP_FEES * stableCheap + basicCheap * constantCheap * constants.PANCAKESWAP_FEES * constants.UNISWAP_FEES^2 - basicExpensive^2 * constants.PANCAKESWAP_FEES * stableCheap + basicExpensive * constantCheap * constants.PANCAKESWAP_FEES * constants.UNISWAP_FEES)/
+  (basicCheap^2 * constants.PANCAKESWAP_FEES^2 * constants.UNISWAP_FEES^2 + 2 * basicCheap * basicExpensive * constants.PANCAKESWAP_FEES^2 * constants.UNISWAP_FEES + basicExpensive^2 * constants.PANCAKESWAP_FEES ^2)
 
     let term1 = basicCheap.exponentiatedBy(2).multipliedBy(constantCheap).multipliedBy(constantExpensive);
     let term2 = basicCheap.multipliedBy(2).multipliedBy(basicExpensive).multipliedBy(constantCheap).multipliedBy(constantExpensive);
@@ -45,6 +52,32 @@ function getAdjustmentValueUsd(basicCheap, stableCheap, basicExpensive, constant
     console.log(adjustmentValue)  
 }
 
-getAdjustmentValueUsdWithBigNumOperators(basicCheapA, stableCheapA, basicExpensiveA, constantCheapA, constantExpensiveA);
+function getAdjustmentValueWithFees(basicCheap, stableCheap, basicExpensive, constantCheap, constantExpensive, UniswapFees, pancakeswapFees) {
 
-getAdjustmentValueUsd(basicCheapB, stableCheapB, basicExpensiveB, constantCheapB, constantExpensiveB)
+let term1 = basicCheap.exponentiatedBy(2).multipliedBy(constantCheap).multipliedBy(constantExpensive).multipliedBy(pancakeswapFees.exponentiatedBy(2)).multipliedBy(UniswapFees.exponentiatedBy(2))
+let term2 = (new BigNumber("2")).multipliedBy(basicCheap).multipliedBy(basicExpensive).multipliedBy(constantCheap).multipliedBy(constantExpensive).multipliedBy(pancakeswapFees.exponentiatedBy(2)).multipliedBy(UniswapFees)
+let term3 = basicExpensive.exponentiatedBy(2).multipliedBy(constantCheap).multipliedBy(constantExpensive).multipliedBy(pancakeswapFees.exponentiatedBy(2)) 
+let term4 = basicCheap.exponentiatedBy(2).multipliedBy(pancakeswapFees).multipliedBy(UniswapFees.exponentiatedBy(2)).multipliedBy(stableCheap) 
+let term5 = (new BigNumber("2")).multipliedBy(basicCheap).multipliedBy(basicExpensive).multipliedBy(pancakeswapFees).multipliedBy(UniswapFees).multipliedBy(stableCheap)
+let term6 = basicCheap.multipliedBy(constantCheap).multipliedBy(pancakeswapFees).multipliedBy(UniswapFees.exponentiatedBy(2))
+let term7 = basicExpensive.exponentiatedBy(2).multipliedBy(pancakeswapFees).multipliedBy(stableCheap)
+let term8 = basicExpensive.multipliedBy(constantCheap).multipliedBy(pancakeswapFees).multipliedBy(UniswapFees)
+let term9 = basicCheap.exponentiatedBy(2).multipliedBy(pancakeswapFees.exponentiatedBy(2)).multipliedBy(UniswapFees.exponentiatedBy(2))
+let term10 = (new BigNumber("2")).multipliedBy(basicCheap).multipliedBy(basicExpensive).multipliedBy(pancakeswapFees.exponentiatedBy(2)).multipliedBy(UniswapFees)
+let term11 = basicExpensive.exponentiatedBy(2).multipliedBy(pancakeswapFees.exponentiatedBy(2))
+
+let term1_8 = ((term1.plus(term2).plus(term3)).squareRoot()).minus(term4).minus(term5).plus(term6).minus(term7).plus(term8)
+let term9_11 = term9.plus(term10).plus(term11)
+
+let adjustmentValue = term1_8.dividedBy(term9_11)
+
+return adjustmentValue;
+
+}
+
+
+//etAdjustmentValueUsdWithBigNumOperators(basicCheapA, stableCheapA, basicExpensiveA, constantCheapA, constantExpensiveA);
+
+//getAdjustmentValueUsd(basicCheapB, stableCheapB, basicExpensiveB, constantCheapB, constantExpensiveB)
+
+getAdjustmentValueWithFees(basicCheapA, stableCheapA, basicExpensiveA, constantCheapA, constantExpensiveA, UniswapFees, pancakeswapFees)
