@@ -22,15 +22,12 @@ class EvaluationService {
         
 		let standardDeviation = await this._dataService.getStandardDeviation(currentNetwork);
     
-		if (priceCheapBLXM.plus(standardDeviation).lt(priceExpensiveBLXM)) {
-			var minimumSwapAmount = (( sumFees ).dividedBy((priceCheapBLXM.plus(standardDeviation).minus(priceExpensiveBLXM)))).multipliedBy(-1); 
+		var minimumSwapAmount = (( sumFees ).dividedBy((priceCheapBLXM.plus(standardDeviation).minus(priceExpensiveBLXM))));
 
-			logger.info("Evaluation service calculated minimum swap amount: " + minimumSwapAmount);
+		logger.info("Maximum sum of transaction fees: " + sumFees);
+		logger.info("Evaluation service calculated minimum swap amount: " + minimumSwapAmount);
 
-			return minimumSwapAmount;  
-		} else {
-			return -1;
-		}
+		return minimumSwapAmount;  
 	}
 }
 
