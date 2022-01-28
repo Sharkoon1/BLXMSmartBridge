@@ -117,14 +117,19 @@ class ArbitrageService {
 		let stableExpensiveNew = constantExpensive.div(basicExpensiveNew);
     
 		let profitUsd = stableExpensive.minus(stableExpensiveNew).minus(this.adjustmentValueStable);
-
+		
+		// getGasPrice for BSC legacy transactions
+		// getFeeData()).maxFeePerGas for ETH EIP-1559
 		let gasLimitBsc = await this._bscContracts.arbitrageContract.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable));
 		let gasLimitEth = await this._ethContracts.arbitrageContract.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic));
 
-		// getGasPrice for BSC legacy transactions
-		// getFeeData()).maxFeePerGas for ETH EIP-1559
-		let transactionFees = (await this._bscContracts.provider.getGasPrice()).mul(gasLimitBsc)
-							  .add((await this._ethContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitEth));
+		let gasPriceBsc = await this._bscContracts.provider.getGasPrice();
+		let gasPriceEth = (await this._ethContracts.provider.getFeeData()).maxFeePerGas;
+		
+		let totalGasPriceBsc = gasPriceBsc.mul(gasLimitBsc);
+		let totalGasPriceEth = gasPriceEth.mul(gasLimitEth);
+		
+		let transactionFees = totalGasPriceBsc.add(totalGasPriceEth);
 		 
 		this.minimumSwapAmount = await this._evaluationService.minimumSwapAmount(this.poolPriceBsc, this.poolPriceEth, this.fromEthersToBigNumber(transactionFees), "BSC");
 	}		
@@ -161,15 +166,19 @@ class ArbitrageService {
 		let stableExpensiveNew = constantExpensive.div(basicExpensiveNew);
     
 		let profitUsd = stableExpensive.minus(stableExpensiveNew).minus(this.adjustmentValueStable);
-	
-		let gasLimitEth = await this._ethContracts.arbitrageContract.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable));
-		let gasLimitBsc = await this._bscContracts.arbitrageContract.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic));
 
 		// getGasPrice for BSC legacy transactions
 		// getFeeData()).maxFeePerGas for ETH EIP-1559
-		let transactionFees = (await this._bscContracts.provider.getGasPrice()).mul(gasLimitBsc)
-							  .add((await this._ethContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitEth));
-
+		let gasLimitEth = await this._ethContracts.arbitrageContract.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable));
+		let gasLimitBsc = await this._bscContracts.arbitrageContract.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic));
+		
+		let gasPriceBsc = await this._bscContracts.provider.getGasPrice();
+		let gasPriceEth = (await this._ethContracts.provider.getFeeData()).maxFeePerGas;
+		
+		let totalGasPriceBsc = gasPriceBsc.mul(gasLimitBsc);
+		let totalGasPriceEth = gasPriceEth.mul(gasLimitEth);
+		
+		let transactionFees = totalGasPriceBsc.add(totalGasPriceEth);
 
 		this.minimumSwapAmount = await this._evaluationService.minimumSwapAmount(this.poolPriceBsc, this.poolPriceEth, this.fromEthersToBigNumber(transactionFees), "ETH");
 	}
@@ -225,6 +234,31 @@ class ArbitrageService {
 
 	fromEthersToBigNumber(value){
 		return new BigNumber(ethers.utils.formatEther(value));
+	}
+
+	async logTx(){
+
+	let adjustmentValueStable = new BigNumber("1");
+	let adjustmentValueBasic = new BigNumber("1");
+
+	let gasLimitBsc = await this._bscContracts.arbitrageContract.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable));
+	let gasLimitEth = await this._ethContracts.arbitrageContract.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic));
+	
+	let gasPriceBsc = await this._bscContracts.provider.getGasPrice();
+	let gasPriceEth = (await this._ethContracts.provider.getFeeData()).maxFeePerGas;
+	
+	let totalGasPriceBsc = gasPriceBsc.mul(gasLimitBsc);
+	let totalGasPriceEth = gasPriceEth.mul(gasLimitEth);
+	
+	let transactionFees = totalGasPriceBsc.add(totalGasPriceEth);
+	
+	console.log(gasLimitBsc.toString());
+	console.log(gasLimitEth.toString());
+	console.log(gasPriceBsc.toString());
+	console.log(gasPriceEth.toString());
+	console.log(totalGasPriceBsc.toString());
+	console.log(totalGasPriceEth.toString());
+	console.log((this.fromEthersToBigNumber(transactionFees)).toString());
 	}
 }
 
