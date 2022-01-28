@@ -8,6 +8,14 @@ class ArbitrageContract extends BaseContract {
 		super(contractAddress, abi, signer);
 	}
 
+	async getBasicAddress() {
+		return await this._contract.callStatic.basicAddress();
+	}
+
+	async geStableAddress() {
+		return await this._contract.callStatic.stableAddress();
+	}
+
 	async swapBasicToStableGasLimit(amount) {
 		let gasLimit = await this._contract.estimateGas.swapBasicToStable(amount);
 

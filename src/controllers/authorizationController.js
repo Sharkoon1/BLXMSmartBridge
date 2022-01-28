@@ -1,5 +1,5 @@
 const apiResponse = require("../helpers/apiResponse");
-const constants = require("../constants")
+const constants = require("../constants");
 
 /**
  * Authorize user wallets.

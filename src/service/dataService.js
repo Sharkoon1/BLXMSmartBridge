@@ -1,29 +1,29 @@
 const mongoose = require("mongoose");
 const PoolPrice = require("../models/PoolPrice");
-const OracleContract = require("../contracts/oracleContract");
 const DataBaseService = require("../service/DataBaseService");
-const constants = require("../constants");
 const BigNumber  = require("bignumber.js");
+const Contracts = require("../contracts/contracts");
 
 class DataService {
 
 	constructor(queryIntervalSeconds = 10) {
 		this._databaseService = DataBaseService;
-		this._oracleUniswap = new OracleContract("ETH", constants.BLXM_TOKEN_ADDRESS_ETH, constants.USD_TOKEN_ADDRESS_ETH);
-		this._oraclePancakeSwap = new OracleContract("BSC", constants.BLXM_TOKEN_ADDRESS_BSC, constants.USD_TOKEN_ADDRESS_BSC);
+		this._ethContracts = new Contracts("ETH");
+		this._bscContracts = new Contracts("BSC");
+
 		setInterval(this.getPoolData.bind(this), queryIntervalSeconds * 1000);
 		this.slippageWindow = 60;
 	}
 
 	getPoolData() {
-		this._oracleUniswap.getPrice().then((res) => {
+		this._ethContracts.oracleContract.getPrice().then((res) => {
 			const price = res.toNumber();
 			this._databaseService.AddData({
 				PoolPrice: price,
 				Network: "ETH",
 			}, PoolPrice);
 		});
-		this._oraclePancakeSwap.getPrice().then((res) => {
+		this._bscContracts.oracleContract.getPrice().then((res) => {
 			const price = res.toNumber();
 			this._databaseService.AddData({
 				PoolPrice: price,
