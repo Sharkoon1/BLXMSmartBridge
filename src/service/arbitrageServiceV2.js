@@ -4,35 +4,30 @@ const DataBaseService = require("./DataBaseService");
 const EvaluationService = require("./EvaluationService");
 const logger = require("../logger/logger");
 const constants = require("../constants");
-const Contracts = require("../contracts/Contracts");
-const OracleContract = require("../contracts/OracleContract");
 const BigNumber  = require("bignumber.js");
 const app = require("../app");
-
+const Contracts = require("../contracts/contracts");
 
 class ArbitrageService {
 	constructor(){
-		this._databaseService = DataBaseService;
-		this._evaluationService = EvaluationService;
-
-		this._ethContracts = new Contracts("ETH");
-		this._bscContracts = new Contracts("BSC");
-
-		this.UniswapOracle = new OracleContract("ETH", constants.BLXM_TOKEN_ADDRESS_ETH, constants.USD_TOKEN_ADDRESS_ETH);
-		this.PancakeOracle = new OracleContract("BSC", constants.BLXM_TOKEN_ADDRESS_BSC, constants.USD_TOKEN_ADDRESS_BSC);
+			this._databaseService = DataBaseService;
+			this._evaluationService = EvaluationService;
 	
-		this.poolPriceEth;
-		this.poolPriceBsc;
-
-		this.adjustmentValueStable;
-		this.adjustmentValueBasic;
-		this.minimumSwapAmount;
-
-		this.stopCycle = false;
-		this.isRunning = false;
-
-		this.uniswapFees = new BigNumber(constants.UNISWAP_FEES);
-		this.pancakeswapFees = new BigNumber(constants.PANCAKESWAP_FEES);
+			this._ethContracts = new Contracts("ETH");
+			this._bscContracts = new Contracts("BSC");
+		
+			this.poolPriceEth;
+			this.poolPriceBsc;
+	
+			this.adjustmentValueStable;
+			this.adjustmentValueBasic;
+			this.minimumSwapAmount;
+	
+			this.stopCycle = false;
+			this.isRunning = false;
+	
+			this.uniswapFees = new BigNumber(constants.UNISWAP_FEES);
+			this.pancakeswapFees = new BigNumber(constants.PANCAKESWAP_FEES);
 	}
 
 	async startArbitrage (){
@@ -45,8 +40,8 @@ class ArbitrageService {
 			await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
 
 			while (!this.poolPriceBsc.eq(this.poolPriceEth)) {
-				let tokenArrayBsc = await this.PancakeOracle.getReserves(); //tokenArrayBsc[0] = stableBsc, tokenArrayBsc[1] = basicBsc
-				let tokenArrayEth = await this.UniswapOracle.getReserves(); //tokenArrayEth[0] = stableEth, tokenArrayEth[1] = basicEth
+				let tokenArrayBsc = await this._bscContracts.oracleContract.getReserves(); //tokenArrayBsc[0] = stableBsc, tokenArrayBsc[1] = basicBsc
+				let tokenArrayEth = await this._ethContracts.oracleContract.getReserves(); //tokenArrayEth[0] = stableEth, tokenArrayEth[1] = basicEth
 	
 				logger.info("Price difference found");
 				logger.info("ETH network: Current price = " + this.poolPriceEth + " USD/BLXM");
@@ -79,7 +74,7 @@ class ArbitrageService {
 					}
 				
 				}
-	
+	 
 				if(this.stopCycle) {
 					logger.info("The arbitrage service has been stopped and the last cycle has been completed.");
 	
@@ -139,10 +134,8 @@ class ArbitrageService {
 
 		await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
 
-		logger.info("poolPriceEth: " + this.poolPriceEth);
-		logger.info("poolPriceBsc: " + this.poolPriceBsc);
-     
-		logger.info("AdjustmentValue: " + this.adjustmentValueStable);
+		logger.info("ETH network: price after swap = " + this.poolPriceEth);
+		logger.info("BSC network: price after swap = " + this.poolPriceBsc);
 	}
 
 	async calculateSwapBsc(basicCheap, stableCheap, basicExpensive, stableExpensive){ // When BSC is more expensive
@@ -184,11 +177,9 @@ class ArbitrageService {
 
 		await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
 
-		logger.info("poolPriceEth: " + this.poolPriceEth);
-		logger.info("poolPriceBsc: " + this.poolPriceBsc);
-    
-		logger.info("AdjustmentValue: " + this.adjustmentValueStable);
-	}
+		logger.info("ETH network: price after swap = " + this.poolPriceEth);
+		logger.info("BSC network: price after swap = " + this.poolPriceBsc);
+    }
 
     
 	getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, constantCheap, constantExpensive) {
@@ -214,8 +205,8 @@ class ArbitrageService {
 	}
 
 	async getPoolPrices(){
-		this.poolPriceBsc = await this.PancakeOracle.getPrice();
-		this.poolPriceEth = await this.UniswapOracle.getPrice();
+		this.poolPriceBsc = await this._bscContracts.oracleContract.getPrice();
+		this.poolPriceEth = await this._ethContracts.oracleContract.getPrice();
 	}
 
 	toEthersBigNumber(value){

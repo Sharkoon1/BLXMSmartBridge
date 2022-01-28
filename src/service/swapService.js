@@ -11,6 +11,7 @@ class SwapService {
 	constructor() {
 		this._ethContracts = new Contracts("ETH");
 		this._bscContracts = new Contracts("BSC");
+		
 		this.BridgeServiceInstance = new BridgeService();
 		this._evaluationService = new EvaluationService(this._databaseService);
 		this.ArbitrageServiceInstance = new ArbitrageService(this.BridgeServiceInstance);

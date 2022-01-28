@@ -2,52 +2,44 @@ const routerAbi = require("../abi/router_abi.json");
 const liquidityPoolAbi = require("../abi/liquidityPool_abi.json");
 const factoryAbi = require("../abi/factory_abi.json");
 const constants = require("../constants");
-const TokenContract = require("./TokenContract");
 const { ethers } = require("ethers");
 const BigNumber = require("bignumber.js");
 const logger = require("../logger/logger");
+const TokenContract = require("./TokenContract");
 
 
 class OracleContract {
-	constructor(network, BLXMAddress, stableTokenAddress) {
-		switch (network) {
-			case "BSC":
-				if (process.env.NODE_ENV === "production") {
-					this.provider = new ethers.providers.JsonRpcProvider(constants.PROVIDER_BSC);
-					this.arbitrageWallet = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
-					this.router = new ethers.Contract(constants.ROUTER_BSC, routerAbi, this.arbitrageWallet);
-				}
-				else {
-					this.provider = new ethers.providers.JsonRpcProvider(constants.PROVIDER_BSC_TEST);
-					this.arbitrageWallet = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
-					this.router = new ethers.Contract(constants.ROUTER_BSC_TESTNET, routerAbi, this.arbitrageWallet);
-				}
-				break;
-			case "ETH":
-				if (process.env.NODE_ENV === "production") {
-					this.provider = new ethers.providers.JsonRpcProvider(constants.PROVIDER_ETH);
-					this.arbitrageWallet = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
-					this.router = new ethers.Contract(constants.ROUTER_ETH, routerAbi, this.arbitrageWallet);
-				}
-				else {
-					this.provider = new ethers.providers.JsonRpcProvider(constants.PROVIDER_ETH_TEST);
-					this.arbitrageWallet = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
-					this.router = new ethers.Contract(constants.ROUTER_ETH_TESTNET, routerAbi, this.arbitrageWallet);
-				}
+	constructor(network, arbitrageContract, signer) {
+		this.signer = signer;
+		this.arbitrageContract = arbitrageContract;
+
+		if (process.env.NODE_ENV === "production") {
+			this.router = new ethers.Contract(constants["ROUTER_" + network], routerAbi, this.signer);
 		}
-		this.blxmTokenContract = new TokenContract(BLXMAddress, this.arbitrageWallet);
-		this.stableTokenContract = new TokenContract(stableTokenAddress, this.arbitrageWallet);
-		this.BLXMTokenAddress = BLXMAddress;
-		this.stableTokenAddress = stableTokenAddress;
+		else {
+			this.router = new ethers.Contract(constants["ROUTER_" + network + "_TESTNET"], routerAbi, this.signer);
+		}
+
+		this.basicTokenAddress = null;
+		this.stableTokenAddress = null;
 		this.factory = null;
 		this.liquidityPool = null;
+
+		this.basicTokenContract = null;
+		this.stableTokenContract = null;
 	}
 
-	async init_liquidityPool() {
+	async init() {
+		this.basicTokenAddress = await this.arbitrageContract.getBasicAddress();
+		this.stableTokenAddress = await this.arbitrageContract.geStableAddress();
+
 		let factoryAddress = await this.router.factory();
-		this.factory = new ethers.Contract(factoryAddress, factoryAbi, this.arbitrageWallet);
-		let liquidityPoolAddress = await this.factory.getPair(this.BLXMTokenAddress, this.stableTokenAddress);
-		this.liquidityPool = new ethers.Contract(liquidityPoolAddress, liquidityPoolAbi, this.arbitrageWallet);
+		this.factory = new ethers.Contract(factoryAddress, factoryAbi, this.signer);
+		let liquidityPoolAddress = await this.factory.getPair(this.basicTokenAddress, this.stableTokenAddress);
+		this.liquidityPool = new ethers.Contract(liquidityPoolAddress, liquidityPoolAbi, this.signer);
+
+		this.basicTokenContract = new TokenContract(this.basicTokenAddress,  this.arbitrageWallet);
+		this.stableTokenContract = new TokenContract(this.stableTokenAddress, this.arbitrageWallet);
 	}
 
 	async getPrice() {
@@ -64,8 +56,8 @@ class OracleContract {
 	}
 
 	async getReserves() {
-		if (this.liquidityPool === null && this.factory === null) {
-			await this.init_liquidityPool();
+		if (this.liquidityPool === null && this.factory === null && this.basicTokenContract === null && this.stableTokenContract === null) {
+			await this.init();
 		}
 		try {
 			let reserves = await this.liquidityPool.getReserves();

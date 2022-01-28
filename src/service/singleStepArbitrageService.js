@@ -1,23 +1,17 @@
 const logger = require("../logger/logger");
-const constants = require("../constants");
-const Contracts = require("../contracts/Contracts");
-const OracleContract = require("../contracts/OracleContract");
 const ArbitrageService = require("../service/arbitrageServiceV2");
+const Contracts = require("../contracts/contracts");
 
 class SingleStepArbitrageService{
 
     constructor(){
+        this._ethContracts = new Contracts("ETH");
+        this._bscContracts = new Contracts("BSC");
+    
+        this.poolPriceEth;
+        this.poolPriceBsc;
 
-		this._ethContracts = new Contracts("ETH");
-		this._bscContracts = new Contracts("BSC");
-
-		this.UniswapOracle = new OracleContract("ETH", constants.BLXM_TOKEN_ADDRESS_ETH, constants.USD_TOKEN_ADDRESS_ETH);
-		this.PancakeOracle = new OracleContract("BSC", constants.BLXM_TOKEN_ADDRESS_BSC, constants.USD_TOKEN_ADDRESS_BSC);
-	
-		this.poolPriceEth;
-		this.poolPriceBsc;
-
-		this.adjustmentValueStable;
+        this.adjustmentValueStable;
         this.adjustmentValueBasic;
 
         this.tokenArrayBsc;
@@ -84,16 +78,16 @@ class SingleStepArbitrageService{
     }
 
     async getPoolPrices(){
-		this.poolPriceBsc = await this.PancakeOracle.getPrice();
-		this.poolPriceEth = await this.UniswapOracle.getPrice();
+		this.poolPriceBsc = await this._bscContracts.oracleContract.getPrice();
+		this.poolPriceEth = await this._ethContracts.oracleContract.getPrice();
 
         ArbitrageService.poolPriceBsc = this.poolPriceBsc;
         ArbitrageService.poolPriceEth = this.poolPriceEth;
 	}
 
     async getReserves(){
-        this.tokenArrayBsc = await this.PancakeOracle.getReserves(); //tokenArrayBsc[0] = stableBsc, tokenArrayBsc[1] = basicBsc
-        this.tokenArrayEth = await this.UniswapOracle.getReserves(); //tokenArrayEth[0] = stableEth, tokenArrayEth[1] = basicEth
+        this.tokenArrayBsc = await this._bscContracts.oracleContract.getReserves(); //tokenArrayBsc[0] = stableBsc, tokenArrayBsc[1] = basicBsc
+        this.tokenArrayEth = await this._ethContracts.oracleContract.getReserves(); //tokenArrayEth[0] = stableEth, tokenArrayEth[1] = basicEth
     }
 
     async calculateArbitrage(){

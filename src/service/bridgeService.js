@@ -6,11 +6,11 @@ const { ethers } = require("ethers");
 class BridgeService {
  
 	constructor() {
-		this._ethContracts = new Contracts("ETH");
-		this._bscContracts = new Contracts("BSC");
+		this._ethContracts = Contracts.EthContracts;
+		this._bscContracts = Contracts.BscContracts;
 
-		this._bridgeEthContracts = new Contracts("ETH");
-		this._bridgeBscContracts = new Contracts("BSC");
+		this._bridgeEthContracts = Contracts.EthContracts;
+		this._bridgeBscContracts = Contracts.BscContracts;
 	}	
 
 	async bridgeBLXMTokenEthToBsc(amount) {
