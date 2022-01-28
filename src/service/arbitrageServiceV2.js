@@ -118,7 +118,9 @@ class ArbitrageService {
 		let gasLimitBsc = await this._bscContracts.arbitrageContract.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable));
 		let gasLimitEth = await this._ethContracts.arbitrageContract.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic));
 
-		let transactionFees = (await this._bscContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitBsc)
+		// getGasPrice for BSC legacy transactions
+		// getFeeData()).maxFeePerGas for ETH EIP-1559
+		let transactionFees = (await this._bscContracts.provider.getGasPrice()).mul(gasLimitBsc)
 							  .add((await this._ethContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitEth));
 		 
 		this.minimumSwapAmount = await this._evaluationService.minimumSwapAmount(this.poolPriceBsc, this.poolPriceEth, this.fromEthersToBigNumber(transactionFees), "BSC");
@@ -160,7 +162,9 @@ class ArbitrageService {
 		let gasLimitEth = await this._ethContracts.arbitrageContract.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable));
 		let gasLimitBsc = await this._bscContracts.arbitrageContract.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic));
 
-		let transactionFees = (await this._bscContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitBsc)
+		// getGasPrice for BSC legacy transactions
+		// getFeeData()).maxFeePerGas for ETH EIP-1559
+		let transactionFees = (await this._bscContracts.provider.getGasPrice()).mul(gasLimitBsc)
 							  .add((await this._ethContracts.provider.getFeeData()).maxFeePerGas.mul(gasLimitEth));
 
 
