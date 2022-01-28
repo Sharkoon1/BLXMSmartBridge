@@ -139,10 +139,10 @@ class ArbitrageService {
 
 		await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
 
-		console.log("poolPriceEth: " + this.poolPriceEth);
-		console.log("poolPriceBsc: " + this.poolPriceBsc);
+		logger.info("poolPriceEth: " + this.poolPriceEth);
+		logger.info("poolPriceBsc: " + this.poolPriceBsc);
      
-		console.log("AdjustmentValue: " + this.adjustmentValueStable);
+		logger.info("AdjustmentValue: " + this.adjustmentValueStable);
 	}
 
 	async calculateSwapBsc(basicCheap, stableCheap, basicExpensive, stableExpensive){ // When BSC is more expensive
@@ -155,9 +155,9 @@ class ArbitrageService {
 		let stableCheapNew = stableCheap.plus(this.adjustmentValueStable);
 		let basicCheapNew = constantCheap.div(stableCheapNew);
 
-		let adjustmentValueBasic = basicCheap.minus(basicCheapNew);
+		this.adjustmentValueBasic = basicCheap.minus(basicCheapNew);
     
-		let basicExpensiveNew = basicExpensive.plus(adjustmentValueBasic);
+		let basicExpensiveNew = basicExpensive.plus(this.adjustmentValueBasic);
 		let stableExpensiveNew = constantExpensive.div(basicExpensiveNew);
     
 		let profitUsd = stableExpensive.minus(stableExpensiveNew).minus(this.adjustmentValueStable);
@@ -184,10 +184,10 @@ class ArbitrageService {
 
 		await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
 
-		console.log("poolPriceEth: " + this.poolPriceEth);
-		console.log("poolPriceBsc: " + this.poolPriceBsc);
+		logger.info("poolPriceEth: " + this.poolPriceEth);
+		logger.info("poolPriceBsc: " + this.poolPriceBsc);
     
-		console.log("AdjustmentValue: " + this.adjustmentValueStable);
+		logger.info("AdjustmentValue: " + this.adjustmentValueStable);
 	}
 
     
@@ -210,9 +210,8 @@ class ArbitrageService {
 		
 		let adjustmentValue = term1_8.dividedBy(term9_11);
 		
-		return adjustmentValue;
-		
-		}
+		return adjustmentValue;		
+	}
 
 	async getPoolPrices(){
 		this.poolPriceBsc = await this.PancakeOracle.getPrice();
