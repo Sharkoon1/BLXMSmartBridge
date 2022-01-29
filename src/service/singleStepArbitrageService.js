@@ -105,7 +105,7 @@ class SingleStepArbitrageService{
                 await ArbitrageService.swapEth();
             }
             else {
-                logger.info("ETH: Profit after slippage: " + ArbitrageService.profitAfterSlippage + "is less than zero.");
+                logger.info("ETH: Calculated profit after slippage: " + ArbitrageService.profitAfterSlippage + " is negative.");
                 logger.info("Skipping current arbitrage cycle...");
             }
         }
@@ -114,7 +114,7 @@ class SingleStepArbitrageService{
                 await ArbitrageService.swapBsc();
             }
             else {
-                logger.info("BSC: Profit after slippage: " + ArbitrageService.profitAfterSlippage + " is less than zero.");
+                logger.info("BSC: Calculated profit after slippage: " + ArbitrageService.profitAfterSlippage + " is negative.");
                 logger.info("Skipping current arbitrage cycle...");
             }
         }
