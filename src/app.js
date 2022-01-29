@@ -153,5 +153,17 @@ function onListening() {
 	debug("Listening on " + bind);
 }
 
+var DataService = require("./service/dataService");
+
+(async () => {
+	const queryIntervalSeconds = 10;
+
+	setInterval(async () => { 
+		await DataService.getPoolData();
+	}, queryIntervalSeconds * 1000);
+})();
+
+
 module.exports = app;
+
 

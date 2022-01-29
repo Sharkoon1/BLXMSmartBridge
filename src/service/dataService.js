@@ -2,28 +2,46 @@ const mongoose = require("mongoose");
 const PoolPrice = require("../models/PoolPrice");
 const DataBaseService = require("../service/DataBaseService");
 const BigNumber  = require("bignumber.js");
-const Contracts = require("../contracts/contracts");
+const OracleContract = require("../contracts/OracleContract");
+const ArbitrageContract = require("../contracts/ArbitrageContract");
 
 class DataService {
 
-	constructor(queryIntervalSeconds = 10) {
+	constructor() {
 		this._databaseService = DataBaseService;
-		this._ethContracts = new Contracts("ETH");
-		this._bscContracts = new Contracts("BSC");
 
-		setInterval(this.getPoolData.bind(this), queryIntervalSeconds * 1000);
+		this._oracleContractBsc = null;
+		this._oracleContractEth = null;
+
 		this.slippageWindow = 60;
 	}
 
-	getPoolData() {
-		this._ethContracts.oracleContract.getPrice().then((res) => {
+	async init() {
+		let arbitrageContractEth = new ArbitrageContract("ETH");
+		let arbitrageContractBsc = new ArbitrageContract("BSC");
+
+		let basicTokenAddressEth = await arbitrageContractEth.getBasicAddress();
+		let stableTokenAddressEth = await arbitrageContractEth.getStableAddress();
+		this._oracleContractEth = new OracleContract("ETH", basicTokenAddressEth, stableTokenAddressEth);
+
+		let basicTokenAddressBsc = await arbitrageContractBsc.getBasicAddress();
+		let stableTokenAddressBsc = await arbitrageContractBsc.getStableAddress();
+		this._oracleContractBsc = new OracleContract("BSC", basicTokenAddressBsc, stableTokenAddressBsc);
+	}
+
+	async getPoolData() {
+		if(this._oracleContractBsc === null || this._oracleContractEth === null) {
+			await this.init();
+		}
+
+		this._oracleContractEth.getPrice().then((res) => {
 			const price = res.toString();
 			this._databaseService.AddData({
 				PoolPrice: price,
 				Network: "ETH",
 			}, PoolPrice);
 		});
-		this._bscContracts.oracleContract.getPrice().then((res) => {
+		this._oracleContractBsc.getPrice().then((res) => {
 			const price = res.toString();
 			this._databaseService.AddData({
 				PoolPrice: price,

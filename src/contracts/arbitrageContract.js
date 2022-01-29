@@ -1,11 +1,30 @@
 const BaseContract = require("./BaseContract");
 const TokenContract = require("./TokenContract");
 const __path = require("path");
+const { ethers } = require("ethers");
+const constants = require("../constants");
 
 class ArbitrageContract extends BaseContract {
-	constructor(contractAddress, signer) {
+	constructor(network) {
 		const abi = require(__path.join(__dirname, "../abi/arbitrage_abi.json"));		
-		super(contractAddress, abi, signer);
+		let provider;
+		let signer;
+		
+
+		if (process.env.NODE_ENV === "production") {  
+			provider = new ethers.providers.JsonRpcProvider(constants["PROVIDER_" + network]);
+			signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+
+			super(constants["ARBITRAGE_CONTRACT_ADDRESS_" + network], abi, signer);
+		}
+		else {
+			provider = new ethers.providers.JsonRpcProvider(constants["PROVIDER_" + network + "_TEST"]);
+			signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+
+			super(constants["ARBITRAGE_CONTRACT_ADDRESS_" + network + "_TESTNET"], abi, signer);
+		}
+
+		this.provider = provider;
 	}
 
 	async getStableBalance() {
@@ -20,7 +39,7 @@ class ArbitrageContract extends BaseContract {
 		return await this._contract.callStatic.basicAddress();
 	}
 
-	async geStableAddress() {
+	async getStableAddress() {
 		return await this._contract.callStatic.stableAddress();
 	}
 

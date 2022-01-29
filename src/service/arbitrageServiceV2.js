@@ -1,25 +1,29 @@
-require("dotenv").config();
 const { ethers } = require("ethers");
 const DataBaseService = require("./DataBaseService");
-const EvaluationService = require("./EvaluationService");
 const logger = require("../logger/logger");
 const constants = require("../constants");
 const BigNumber  = require("bignumber.js");
 const app = require("../app");
-const Contracts = require("../contracts/contracts");
+const ArbitrageContract = require("../contracts/ArbitrageContract");
+const OracleContract = require("../contracts/OracleContract");
 const DataService = require("./DataService");
 
 class ArbitrageService {
 	constructor(){
 			this._databaseService = DataBaseService;
-			this._evaluationService = EvaluationService;
 			this._dataService = DataService;
 
-			this._ethContracts = new Contracts("ETH");
-			this._bscContracts = new Contracts("BSC");
+			this._arbitrageContractEth = new ArbitrageContract("ETH");
+			this._arbitrageContractBsc = new ArbitrageContract("BSC");
 		
+			this._oracleContractBsc = null;
+			this._oracleContractEth = null;
+
 			this.poolPriceEth;
 			this.poolPriceBsc;
+
+			this.tokenArrayBsc;
+			this.tokenArrayEth;
 	
 			this.adjustmentValueStable;
 			this.adjustmentValueBasic;
@@ -32,7 +36,21 @@ class ArbitrageService {
 			this.pancakeswapFees = new BigNumber(constants.PANCAKESWAP_FEES);
 	}
 
+	async init() {
+		if(this._oracleContractBsc === null || this._oracleContractEth === null) {
+			let basicTokenAddressEth = await this._arbitrageContractEth.getBasicAddress();
+			let stableTokenAddressEth = await this._arbitrageContractEth.getStableAddress();
+			this._oracleContractEth = new OracleContract("ETH", basicTokenAddressEth, stableTokenAddressEth);
+
+			let basicTokenAddressBsc = await this._arbitrageContractBsc.getBasicAddress();
+			let stableTokenAddressBsc = await this._arbitrageContractBsc.getStableAddress();
+			this._oracleContractBsc = new OracleContract("BSC", basicTokenAddressBsc, stableTokenAddressBsc);
+		}
+	}
+
 	async startArbitrage (){
+		await this.init();
+
 		this.stopCycle = false;
 		this.isRunning = true;
 
@@ -42,8 +60,7 @@ class ArbitrageService {
 			await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
 
 			while (!this.poolPriceBsc.eq(this.poolPriceEth)) {
-				let tokenArrayBsc = await this._bscContracts.oracleContract.getReserves(); //tokenArrayBsc[0] = stableBsc, tokenArrayBsc[1] = basicBsc
-				let tokenArrayEth = await this._ethContracts.oracleContract.getReserves(); //tokenArrayEth[0] = stableEth, tokenArrayEth[1] = basicEth
+				await this.getReserves();
 	
 				logger.info("Price difference found");
 				logger.info("ETH network: Current price = " + this.poolPriceEth + " USD/BLXM");
@@ -51,7 +68,7 @@ class ArbitrageService {
 	
 				if(this.poolPriceEth.gt(this.poolPriceBsc)){
 	
-					await this.calculateSwapEth(tokenArrayBsc[1], tokenArrayBsc[0], tokenArrayEth[1], tokenArrayEth[0]);
+					await this.calculateSwapEth(this.tokenArrayBsc[1], this.tokenArrayBsc[0], this.tokenArrayEth[1], this.tokenArrayEth[0]);
 	
 					if(this.profitAfterSlippage.gt(0)) {
 						await this.swapEth();
@@ -65,7 +82,7 @@ class ArbitrageService {
 				}
 	
 				else {
-					await this.calculateSwapBsc(tokenArrayEth[1], tokenArrayEth[0], tokenArrayBsc[1], tokenArrayBsc[0]);  
+					await this.calculateSwapBsc(this.tokenArrayEth[1], this.tokenArrayEth[0], this.tokenArrayBsc[1], this.tokenArrayBsc[0]);  
 	
 					if(this.profitAfterSlippage.gt(0)) {
 						await this.swapBsc();
@@ -112,11 +129,11 @@ class ArbitrageService {
         		
 		// getGasPrice for BSC legacy transactions
 		// getFeeData()).maxFeePerGas for ETH EIP-1559
-		let gasLimitBsc = await this._bscContracts.arbitrageContract.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable));
-		let gasLimitEth = await this._ethContracts.arbitrageContract.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic));
+		let gasLimitBsc = await this._arbitrageContractBsc.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable));
+		let gasLimitEth = await this._arbitrageContractEth.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic));
 
-		let gasPriceBsc = await this._bscContracts.provider.getGasPrice();
-		let gasPriceEth = (await this._ethContracts.provider.getFeeData()).maxFeePerGas;
+		let gasPriceBsc = await this._arbitrageContractBsc.provider.getGasPrice();
+		let gasPriceEth = (await this._arbitrageContractEth.provider.getFeeData()).maxFeePerGas;
 		
 		let totalGasPriceBsc = gasPriceBsc.mul(gasLimitBsc);
 		let totalGasPriceEth = gasPriceEth.mul(gasLimitEth);
@@ -127,10 +144,10 @@ class ArbitrageService {
 	}		
 
 	async swapEth(){
-		let preStableBalance = await this._ethContracts.arbitrageContract.getStableBalance();
+		let preStableBalance = await this._arbitrageContractEth.getStableBalance();
 
-		let swapStableToBasicTx = await this._bscContracts.arbitrageContract.swapStableToBasic(this.toEthersBigNumber(this.adjustmentValueStable));
-		let swapBasicToStableTx = await this._ethContracts.arbitrageContract.swapBasicToStable(this.toEthersBigNumber(this.adjustmentValueBasic));
+		let swapStableToBasicTx = await this._arbitrageContractBsc.swapStableToBasic(this.toEthersBigNumber(this.adjustmentValueStable));
+		let swapBasicToStableTx = await this._arbitrageContractEth.swapBasicToStable(this.toEthersBigNumber(this.adjustmentValueBasic));
 		
 		await swapStableToBasicTx.wait(); //waits for the promise of swapStableToBasic to be resolved
 		await swapBasicToStableTx.wait(); //waits for the promise of swapBasicToStable to be resolved
@@ -140,7 +157,7 @@ class ArbitrageService {
 		logger.info("ETH network: price after swap = " + this.poolPriceEth);
 		logger.info("BSC network: price after swap = " + this.poolPriceBsc);
 
-		let postStableBalance = await this._ethContracts.arbitrageContract.getStableBalance();
+		let postStableBalance = await this._arbitrageContractEth.getStableBalance();
 		let realProfit = postStableBalance.sub(preStableBalance);
 		
 		logger.info("Absolute profit after arbitrage: " + ethers.utils.formatEther(realProfit));
@@ -160,11 +177,11 @@ class ArbitrageService {
         
 		// getGasPrice for BSC legacy transactions
 		// getFeeData()).maxFeePerGas for ETH EIP-1559
-		let gasLimitEth = await this._ethContracts.arbitrageContract.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable));
-		let gasLimitBsc = await this._bscContracts.arbitrageContract.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic));
+		let gasLimitEth = await this._arbitrageContractEth.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable));
+		let gasLimitBsc = await this._arbitrageContractBsc.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic));
 		
-		let gasPriceBsc = await this._bscContracts.provider.getGasPrice();
-		let gasPriceEth = (await this._ethContracts.provider.getFeeData()).maxFeePerGas;
+		let gasPriceBsc = await this._arbitrageContractBsc.provider.getGasPrice();
+		let gasPriceEth = (await this._arbitrageContractEth.provider.getFeeData()).maxFeePerGas;
 		
 		let totalGasPriceBsc = gasPriceBsc.mul(gasLimitBsc);
 		let totalGasPriceEth = gasPriceEth.mul(gasLimitEth);
@@ -176,10 +193,10 @@ class ArbitrageService {
 
 	async swapBsc(){
 
-		let preStableBalance = await this._bscContracts.arbitrageContract.getStableBalance();
+		let preStableBalance = await this._arbitrageContractBsc.getStableBalance();
 
-		let swapStableToBasicTx = await this._ethContracts.arbitrageContract.swapStableToBasic(this.toEthersBigNumber(this.adjustmentValueStable));
-		let swapBasicToStableTx = await this._bscContracts.arbitrageContract.swapBasicToStable(this.toEthersBigNumber(this.adjustmentValueBasic));
+		let swapStableToBasicTx = await this._arbitrageContractEth.swapStableToBasic(this.toEthersBigNumber(this.adjustmentValueStable));
+		let swapBasicToStableTx = await this._arbitrageContractBsc.swapBasicToStable(this.toEthersBigNumber(this.adjustmentValueBasic));
 
 		await swapStableToBasicTx.wait(); //waits for the promise of swapStableToBasic to be resolved
 		await swapBasicToStableTx.wait(); //waits for the promise of swapBasicToStable to be resolved
@@ -189,7 +206,7 @@ class ArbitrageService {
 		logger.info("ETH network: price after swap = " + this.poolPriceEth);
 		logger.info("BSC network: price after swap = " + this.poolPriceBsc);
 
-		let postStableBalance = await this._bscContracts.arbitrageContract.getStableBalance();
+		let postStableBalance = await this._arbitrageContractBsc.getStableBalance();
 		let realProfit = postStableBalance.sub(preStableBalance);
 		
 		logger.info("Absolute profit after arbitrage: " + ethers.utils.formatEther(realProfit));
@@ -283,9 +300,14 @@ class ArbitrageService {
 	}
 
 	async getPoolPrices(){
-		this.poolPriceBsc = await this._bscContracts.oracleContract.getPrice();
-		this.poolPriceEth = await this._ethContracts.oracleContract.getPrice();
+		this.poolPriceBsc = await this._oracleContractBsc.getPrice();
+		this.poolPriceEth = await this._oracleContractEth.getPrice();
 	}
+
+	async getReserves(){
+        this.tokenArrayBsc = await this._oracleContractBsc.getReserves(); //tokenArrayBsc[0] = stableBsc, tokenArrayBsc[1] = basicBsc
+        this.tokenArrayEth = await this._oracleContractEth.getReserves(); //tokenArrayEth[0] = stableEth, tokenArrayEth[1] = basicEth
+    }
 
 	toEthersBigNumber(value){
 		let x = new BigNumber(10).pow(18);
