@@ -17,14 +17,14 @@ class DataService {
 
 	getPoolData() {
 		this._ethContracts.oracleContract.getPrice().then((res) => {
-			const price = res.toNumber();
+			const price = res.toString();
 			this._databaseService.AddData({
 				PoolPrice: price,
 				Network: "ETH",
 			}, PoolPrice);
 		});
 		this._bscContracts.oracleContract.getPrice().then((res) => {
-			const price = res.toNumber();
+			const price = res.toString();
 			this._databaseService.AddData({
 				PoolPrice: price,
 				Network: "BSC",
@@ -79,10 +79,10 @@ class DataService {
 		try {
 			let priceQuery = await this._databaseService.QueryData(query, PoolPrice);
 			priceQuery.forEach(element => {
-				priceHistory.push(element.PoolPrice);
+				priceHistory.push(new BigNumber(element.PoolPrice));
 			});
 			let standardDeviation = priceHistory.length > 0 ? this.CalculateStandardDeviation(priceHistory) : 0;
-			return new BigNumber(standardDeviation);
+			return standardDeviation;
 		} catch (err) {
 			console.log(err);
 			throw err;
@@ -92,8 +92,8 @@ class DataService {
 
 	CalculateStandardDeviation(array) {
 		const n = array.length;
-		const mean = array.reduce((a, b) => a + b) / n;
-		return Math.sqrt(array.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
+		const mean = array.reduce((a, b) => a.plus(b)).div(n);
+		return array.map(x => x.minus(mean).pow(2)).reduce((a, b) => a.plus(b)).div(n).sqrt();
 	}
 }
 
