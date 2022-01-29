@@ -127,11 +127,11 @@ class ArbitrageService {
 
 		this.adjustmentValueBasic = basicCheap.minus(basicCheapNew); 
         		
-		// getGasPrice for BSC legacy transactions
-		// getFeeData()).maxFeePerGas for ETH EIP-1559
 		let gasLimitBsc = await this._arbitrageContractBsc.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable));
 		let gasLimitEth = await this._arbitrageContractEth.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic));
 
+		// getGasPrice for BSC legacy transactions
+		// getFeeData()).maxFeePerGas for ETH EIP-1559
 		let gasPriceBsc = await this._arbitrageContractBsc.provider.getGasPrice();
 		let gasPriceEth = (await this._arbitrageContractEth.provider.getFeeData()).maxFeePerGas;
 		
@@ -175,11 +175,11 @@ class ArbitrageService {
 
 		this.adjustmentValueBasic = basicCheap.minus(basicCheapNew);
         
-		// getGasPrice for BSC legacy transactions
-		// getFeeData()).maxFeePerGas for ETH EIP-1559
 		let gasLimitEth = await this._arbitrageContractEth.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable));
 		let gasLimitBsc = await this._arbitrageContractBsc.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic));
 		
+		// getGasPrice for BSC legacy transactions
+		// getFeeData()).maxFeePerGas for ETH EIP-1559
 		let gasPriceBsc = await this._arbitrageContractBsc.provider.getGasPrice();
 		let gasPriceEth = (await this._arbitrageContractEth.provider.getFeeData()).maxFeePerGas;
 		
@@ -217,24 +217,17 @@ class ArbitrageService {
 		let standardDeviationEth = await this._dataService.getStandardDeviation("ETH");
 		let standardDeviationBsc = await this._dataService.getStandardDeviation("BSC");
 
-		console.log(standardDeviationBsc.toString());
-		console.log(standardDeviationEth.toString());
+		let slippagePriceBsc = this.poolPriceBsc.plus(standardDeviationBsc);
+		let slippagePriceEth = this.poolPriceEth.minus(standardDeviationEth);
 
-		let slippagePriceEth;
-		let slippagePriceBsc;
-		let basicSlippageGain;
-
-		slippagePriceBsc = this.poolPriceBsc.plus(standardDeviationBsc);
-		slippagePriceEth = this.poolPriceEth.minus(standardDeviationEth);
-
-		basicSlippageGain = this.poolPriceBsc.dividedBy(slippagePriceBsc).multipliedBy(this.adjustmentValueBasic);
+		let basicSlippageGain = this.poolPriceBsc.dividedBy(slippagePriceBsc).multipliedBy(this.adjustmentValueBasic);
 		
 		let basicExpensiveNew = basicExpensive.plus(basicSlippageGain);
 		let stableExpensiveNew = constantExpensive.div(basicExpensiveNew);
     
-		let stableGain = stableExpensive.minus(stableExpensiveNew).minus(this.adjustmentValueStable);
+		let stableSlippageGain = stableExpensive.minus(stableExpensiveNew).minus(this.adjustmentValueStable);
 
-		let profitAfterSlippage = slippagePriceEth.dividedBy(this.poolPriceEth).multipliedBy(stableGain);
+		let profitAfterSlippage = slippagePriceEth.dividedBy(this.poolPriceEth).multipliedBy(stableSlippageGain);
 
 		let swapProfit = profitAfterSlippage.minus(sumFees);
 
@@ -249,24 +242,17 @@ class ArbitrageService {
 		let standardDeviationEth = await this._dataService.getStandardDeviation("ETH");
 		let standardDeviationBsc = await this._dataService.getStandardDeviation("BSC");
 
-		console.log(standardDeviationBsc.toString());
-		console.log(standardDeviationEth.toString());
-		
-		let slippagePriceEth;
-		let slippagePriceBsc;
-		let basicSlippageGain;
+		let slippagePriceEth = this.poolPriceEth.plus(standardDeviationEth);
+		let slippagePriceBsc = this.poolPriceBsc.minus(standardDeviationBsc);
 
-		slippagePriceEth = this.poolPriceEth.plus(standardDeviationEth);
-		slippagePriceBsc = this.poolPriceBsc.minus(standardDeviationBsc);
-
-		basicSlippageGain = this.poolPriceEth.dividedBy(slippagePriceEth).multipliedBy(this.adjustmentValueStable);
+		let basicSlippageGain = this.poolPriceEth.dividedBy(slippagePriceEth).multipliedBy(this.adjustmentValueBasic);
 		
 		let basicExpensiveNew = basicExpensive.plus(basicSlippageGain);
 		let stableExpensiveNew = constantExpensive.dividedBy(basicExpensiveNew);
     
-		let stableGain = stableExpensive.minus(stableExpensiveNew).minus(this.adjustmentValueStable);
+		let stableSlippageGain = stableExpensive.minus(stableExpensiveNew).minus(this.adjustmentValueStable);
 
-		let profitAfterSlippage = slippagePriceBsc.dividedBy(this.poolPriceBsc).multipliedBy(stableGain);
+		let profitAfterSlippage = slippagePriceBsc.dividedBy(this.poolPriceBsc).multipliedBy(stableSlippageGain);
 
 		let swapProfit = profitAfterSlippage.minus(sumFees);
 
