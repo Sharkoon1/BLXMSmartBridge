@@ -58,7 +58,7 @@ class ArbitrageService {
 					}
 	
 					else {
-						logger.info("ETH: Profit after slippage: " + this.profitAfterSlippage + "is less than zero.");
+						logger.info("ETH: Calculated profit after slippage: " + this.profitAfterSlippage + " is negative.");
 						logger.info("Skipping current arbitrage cycle...");
 					}
 					
@@ -71,7 +71,7 @@ class ArbitrageService {
 						await this.swapBsc();
 					}
 					else {
-						logger.info("BSC: Profit after slippage: " + this.profitAfterSlippage + " is less than zero.");
+						logger.info("BSC: Calculated profit after slippage: " + this.profitAfterSlippage + " is negative.");
 						logger.info("Skipping current arbitrage cycle...");
 					}
 				
@@ -127,6 +127,7 @@ class ArbitrageService {
 	}		
 
 	async swapEth(){
+		let preStableBalance = await this._ethContracts.arbitrageContract.getStableBalance();
 
 		let swapStableToBasicTx = await this._bscContracts.arbitrageContract.swapStableToBasic(this.toEthersBigNumber(this.adjustmentValueStable));
 		let swapBasicToStableTx = await this._ethContracts.arbitrageContract.swapBasicToStable(this.toEthersBigNumber(this.adjustmentValueBasic));
@@ -138,6 +139,11 @@ class ArbitrageService {
 
 		logger.info("ETH network: price after swap = " + this.poolPriceEth);
 		logger.info("BSC network: price after swap = " + this.poolPriceBsc);
+
+		let postStableBalance = await this._ethContracts.arbitrageContract.getStableBalance();
+		let realProfit = postStableBalance.sub(preStableBalance);
+		
+		logger.info("Absolute profit after arbitrage: " + ethers.utils.formatEther(realProfit));
 	}
 
 	async calculateSwapBsc(basicCheap, stableCheap, basicExpensive, stableExpensive){ // When BSC is more expensive
@@ -170,6 +176,8 @@ class ArbitrageService {
 
 	async swapBsc(){
 
+		let preStableBalance = await this._bscContracts.arbitrageContract.getStableBalance();
+
 		let swapStableToBasicTx = await this._ethContracts.arbitrageContract.swapStableToBasic(this.toEthersBigNumber(this.adjustmentValueStable));
 		let swapBasicToStableTx = await this._bscContracts.arbitrageContract.swapBasicToStable(this.toEthersBigNumber(this.adjustmentValueBasic));
 
@@ -180,6 +188,11 @@ class ArbitrageService {
 
 		logger.info("ETH network: price after swap = " + this.poolPriceEth);
 		logger.info("BSC network: price after swap = " + this.poolPriceBsc);
+
+		let postStableBalance = await this._bscContracts.arbitrageContract.getStableBalance();
+		let realProfit = postStableBalance.sub(preStableBalance);
+		
+		logger.info("Absolute profit after arbitrage: " + ethers.utils.formatEther(realProfit));
     }
 
 	async swapSlippageProfitEth(sumFees, basicExpensive, stableExpensive, constantExpensive){
@@ -209,7 +222,7 @@ class ArbitrageService {
 		let swapProfit = profitAfterSlippage.minus(sumFees);
 
 		logger.info("Maximum sum of transaction fees: " + sumFees);
-		logger.info("Profit after slippage: " + swapProfit);
+		logger.info("Worst case profit after slippage: " + swapProfit);
 
 		return swapProfit;  
 	}
@@ -241,7 +254,7 @@ class ArbitrageService {
 		let swapProfit = profitAfterSlippage.minus(sumFees);
 
 		logger.info("Maximum sum of transaction fees: " + sumFees);
-		logger.info("Profit after slippage: " + swapProfit);
+		logger.info("Worst case profit after slippage: " + swapProfit);
 
 		return swapProfit;  
 	}

@@ -1,5 +1,4 @@
-import React, { Component, Fragment, useEffect } from 'react';
-import { Button, Spinner } from 'react-bootstrap'
+import React, { Fragment, useEffect } from 'react';
 import Logs from './Logs';
 import "./style/SingleStep.css"
 import SettingsModal from './SettingsModal';

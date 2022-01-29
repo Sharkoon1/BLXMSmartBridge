@@ -10,11 +10,11 @@ export default class Buttons extends Component  {
 		this.state = {
 			connButtonText: 'Job not running',
 			startIsDisabled: false,
-			toggleIsDisabled: false
+			toggleIsDisabled: false,
+			isRunning: false
 		  };
 
 		this.toggleJob = this.toggleJob.bind(this);  
-		this.startArbitrage = this.startArbitrage.bind(this);
 		this.url= UrlHandler();
 	}
 
@@ -26,11 +26,11 @@ export default class Buttons extends Component  {
 				}).then(response => response.json())
 				.then(result => {
 					if(result.data.ArbitrageCycleStatus) {
-						this.setState({connButtonText: 'Job running', toggleIsDisabled: true});
+						this.setState({connButtonText: 'Job running', isRunning: true});
 					}
 	
 					else {
-						this.setState({connButtonText: 'Job not running', toggleIsDisabled: false});
+						this.setState({connButtonText: 'Job not running', isRunning: false});
 					}
 				});
 
@@ -43,44 +43,32 @@ export default class Buttons extends Component  {
 	
 		ioClient.on("cycleCompleted", (msg) => { 
 		  console.log("cycle completed");
-		  this.setState({ connButtonText: 'Job not running', toggleIsDisabled: false}); 
+		  this.setState({ connButtonText: 'Job not running', toggleIsDisabled: false, isRunning: false}); 
 		});
 	  
-	}
-
-	startArbitrage() {
-		this.setState({toggleIsDisabled: true});
-	
-		fetch(this.url+"api/arbitrage/single",
-			{
-				method: "post",
-			});
 	};
 
 	toggleJob()  {
+		if(this.state.isRunning) {
+			this.setState({connButtonText: 'Stopping - waiting for cycle to complete', toggleIsDisabled: true, isRunning: false});
+		}
+
+		else {
+			this.setState({connButtonText: 'Job running', isRunning: true});
+		}
+
 		fetch(this.url+"api/arbitrage/toggle",
 			{
 				method: "post",
-			}).then(response => response.json().then(result => {
-				if(result.data.ArbitrageCycleStatus) {
-					this.setState({connButtonText: 'Job running', toggleIsDisabled: true});
-				}
-
-				else {
-					this.setState({connButtonText: 'Job not running'});
-				}
-			}));
+			});
 	};
 
 
 	render() {
 		return (
 			<div className="adminPanel">
-		
 				<button disabled={this.state.toggleIsDisabled} onClick={this.toggleJob} className="button arbiToggle" id="toggleStatus" title={this.state.toggleIsDisabled ? "Once the job running in the background is finished you can again start a new job run." : "Click here to start a new Job run."}>{this.state.connButtonText}</button>
 			</div>
 		);
 	  }
 }
-//Single Abitrage button 
-//<button disabled={this.state.startIsDisabled} onClick={this.startArbitrage} className="button arbiToggle" id="runSingle" title={this.state.toggleIsDisabled ? "You have to end the currently running job to start a single arbitrage cycle.." : "Click here to start a single arbitrage cycle."}>Run Single Arbitrage Cycle</button>
