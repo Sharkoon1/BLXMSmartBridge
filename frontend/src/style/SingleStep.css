@@ -36,7 +36,7 @@
 }
 
 #nextStep:disabled {
-    background-color: #333;
+    background-color: #203a4b;
 }
 
 #loading:disabled {
@@ -45,7 +45,7 @@
 }
 
 #stop:disabled {
-    background-color: #333;
+    background-color: #203a4b;
 }
 
 #nextStep, #stop { 

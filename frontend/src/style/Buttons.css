@@ -10,7 +10,7 @@
 }
 
 .arbiToggle:disabled {
-    background-color: #333;
+    background-color: #203a4b;
 }
 
 #runSingle, #toggleStatus { 

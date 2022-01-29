@@ -74,7 +74,7 @@ class DashboardGraph extends Component {
 	render() {
 		return (
 			<Fragment>
-				<h1 className='headingDashboardGraph'>Smartbridge Overview</h1>
+				<h1 className='headingDashboardGraph'>Price Overview</h1>
 				<div className='dashboardGraph'>
 					<LineChart className='lineChart' data={this.state.data} width={1000} height={300}
 						margin={{ top: 50, right: 30, left: 20, bottom: 20 }}>
