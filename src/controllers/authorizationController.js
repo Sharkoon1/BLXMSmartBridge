@@ -9,7 +9,9 @@ const constants = require("../constants");
 exports.authorize = [
 	function (req, res) {
 		try {
-			let authorizedUsers = constants.AUTHORIZED_WALLETS;
+			const authorizedUsers = constants.AUTHORIZED_WALLETS.map(element => {
+				return element.toLowerCase();
+			});
 			let user = req.body.User.toLowerCase();
 			if (authorizedUsers.indexOf(user) !== -1) {
                 return apiResponse.successResponse(res, "Authorized successfuly");
