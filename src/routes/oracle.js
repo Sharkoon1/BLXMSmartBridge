@@ -4,5 +4,6 @@ const oracle = require("../controllers/oracleController");
 var router = express.Router();
 
 router.get("/price", oracle.price);
+router.get("/poolsize", oracle.poolsize);
 
 module.exports = router;    

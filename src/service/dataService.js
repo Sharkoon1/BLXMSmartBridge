@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const PoolPrice = require("../models/PoolPrice");
 const DataBaseService = require("../service/DataBaseService");
-const BigNumber  = require("bignumber.js");
+const BigNumber = require("bignumber.js");
 const Contracts = require("../contracts/contracts");
 
 class DataService {
@@ -15,6 +15,36 @@ class DataService {
 		this.slippageWindow = 60;
 	}
 
+	async getLiquidity() {
+		let UniswapReserves = await this._ethContracts.oracleContract.getReserves();
+		let UniswapStableBalance = UniswapReserves[0].toString();
+		let UniswapBLXMBalance = UniswapReserves[1].toString();
+		let PancakeswapReserves = await this._bscContracts.oracleContract.getReserves();
+		let PancakeswapStableBalance = PancakeswapReserves[0].toString();
+		let PancakeswapBLXMBalance = PancakeswapReserves[1].toString();
+		return {
+			UniswapStables: UniswapStableBalance, 
+			UniswapBLXM: UniswapBLXMBalance,
+			PancakeswapStable: PancakeswapStableBalance, 
+			PancakeswapBLXM: PancakeswapBLXMBalance
+		}
+	}
+
+
+	async getTokenBalance(network){
+		switch (network) {
+			case "BSC":
+				let stableTokenSupply = this._bscContracts.oracleContract.stableTokenContract.totalSupply();
+				let basicTokenSupply = this._bscContracts.oracleContract.basicTokenContract.totalSupply();
+				return [stableTokenSupply, basicTokenSupply]
+			case "ETH":
+				let stableTokenSupply = this._ethContracts.oracleContract.stableTokenContract.totalSupply();
+				let basicTokenSupply = this._ethContracts.oracleContract.basicTokenContract.totalSupply();
+				return [stableTokenSupply, basicTokenSupply]
+			default:
+				break;
+		}
+	}
 	getPoolData() {
 		this._ethContracts.oracleContract.getPrice().then((res) => {
 			const price = res.toString();
@@ -33,7 +63,7 @@ class DataService {
 	}
 
 	getSeconds(seconds) {
-		var timestamp = new Date(Date.now() - seconds  * 1000);
+		var timestamp = new Date(Date.now() - seconds * 1000);
 		var hexSeconds = Math.floor(timestamp / 1000).toString(16);
 		// Create an ObjectId with that hex timestamp
 		return mongoose.Types.ObjectId(hexSeconds + "0000000000000000");
@@ -58,7 +88,7 @@ class DataService {
 				let time = dateTimeArray[1].split(".")[0].split(":").slice(0, 2).join(":");
 				priceHistory.push({ "Price": element.PoolPrice, "Timestamp": date + ", " + time });
 			});
-			return priceHistory.length > 0 ?  priceHistory : 0;
+			return priceHistory.length > 0 ? priceHistory : 0;
 		} catch (err) {
 			console.log(err);
 			throw err;

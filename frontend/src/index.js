@@ -20,7 +20,6 @@ import UrlHandler from "./UrlHandler";
 //import LoginPage from "./LoginPage";
 
 const connectWalletHandler = (setError, setOtherError) => {
-	debugger;
 	if (window.ethereum && window.ethereum.isMetaMask) {
 		window.ethereum.request({ method: "eth_requestAccounts" })
 			.then(result => {
@@ -30,7 +29,6 @@ const connectWalletHandler = (setError, setOtherError) => {
 						headers: new Headers({ "content-type": "application/json" }),
 						body: JSON.stringify({ User: result[0] })
 					}).then(response => response.json()).then(result => {
-						debugger;
 						if (result.status === 1) {
 							//####### NAVBAR #######
 							const navbar = document.getElementById("navbar");
