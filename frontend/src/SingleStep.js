@@ -73,7 +73,16 @@ export default function SingleStep() {
 				<Logs />
 				<div className='SingleStepButtons'>
 					{startIsDisabled &&
-						"Loading ..."
+						<Button variant="primary">
+							<Spinner
+								as="span"
+								animation="grow"
+								size="sm"
+								role="status"
+								aria-hidden="true"
+							/>
+							Loading...
+						</Button>
 					}
 					<button disabled={startIsDisabled} className='button' id='nextStep' onClick={onNextStep}>
 						Next Step
