@@ -39,6 +39,11 @@
     background-color: #333;
 }
 
+#loading:disabled {
+    background-color: #4CAF50;
+	color: white;
+}
+
 #stop:disabled {
     background-color: #333;
 }
