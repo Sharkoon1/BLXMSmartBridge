@@ -28,7 +28,7 @@ exports.startSingleArbitrage = [
 	function (req, res) {
         try {
 			if(ArbitrageService.isRunning) {
-				this.stopCycle = true;
+				ArbitrageService.stopCycle = true;
 
 				return apiResponse.successResponseWithData(res, "stopping the cycle", { "ArbitrageCycleStatus": ArbitrageService.isRunning });
 			}
