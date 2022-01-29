@@ -74,6 +74,9 @@ class SingleStepArbitrageService{
         catch(error) {
 			logger.error("Single step arbitrage service failed. Error: " +  error);
 			logger.error("Service stopped ...");
+            logger.info("Resetting to step 1 ...");
+
+            this.stepStatus = 1;
 		}
     }
 

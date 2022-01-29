@@ -94,7 +94,7 @@ exports.startSingleArbitrage = [
  */
  exports.stopStep = [
 	function (req, res) {
-        try {
+        try {	
 				SingleStepArbitrageService.resetSingleStepArbitrage().then(() => {
 					return apiResponse.successResponse(res, "Arbitrage step status has been stopped.");
 				});
