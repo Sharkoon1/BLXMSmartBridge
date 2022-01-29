@@ -1,4 +1,4 @@
-import React, { StrictMode, Component, Fragment } from "react";
+import React, { StrictMode, Component, Fragment, useState } from "react";
 import "./style/LoginPage.css"
 
 import ReactDOM from "react-dom";
@@ -19,7 +19,8 @@ import Dashboad from "./Dashboad";
 import UrlHandler from "./UrlHandler";
 //import LoginPage from "./LoginPage";
 
-const connectWalletHandler = () => {
+const connectWalletHandler = (setError, setOtherError) => {
+	debugger;
 	if (window.ethereum && window.ethereum.isMetaMask) {
 		window.ethereum.request({ method: "eth_requestAccounts" })
 			.then(result => {
@@ -67,24 +68,12 @@ const connectWalletHandler = () => {
 								dashboardGraph
 							);
 						} else {
-							const ErrorMessage = document.getElementById("root");
-							ReactDOM.render(
-								<StrictMode>
-									<AlertInfo message={"You are not authorized to access this website."} />
-								</StrictMode>,
-								ErrorMessage
-							);
+							setError(true);
 						}
 					});
 			})
 			.catch(error => {
-				const ErrorMessage = document.getElementById("root");
-				ReactDOM.render(
-					<StrictMode>
-						<AlertInfo message={error.message} />
-					</StrictMode>,
-					ErrorMessage
-				);
+				setOtherError(error.message);
 			});
 
 	} else {
@@ -95,6 +84,8 @@ const connectWalletHandler = () => {
 
 
 function LoginPage() {
+	const [error, setError] = useState(false);
+	const [othererror, setOtherError] = useState("");
 	return (
 		<Fragment>
 			<div className="empty"></div>
@@ -102,7 +93,11 @@ function LoginPage() {
 				<img className="logoBLXM" src="../BLXMToken.png"></img>
 				<h1 className="textLogin">Welcome to BLXM Smartbridge!!!</h1>
 				<h1 className="textLogin">Login to enter admin view</h1>
-				<button className="button" id="loginButton" onClick={connectWalletHandler}>Login with MetaMask</button>
+				<button className="button" id="loginButton" onClick={() => connectWalletHandler(setError, setOtherError)}>Login with MetaMask</button>
+			</div>
+			<div style={{ width: "40%" , marginLeft: "auto", marginRight: "auto"}}>
+				{error ? <AlertInfo message={"You are not authorized to access this website."} /> : null}
+				{othererror !== "" ? <AlertInfo message={othererror} /> : null}
 			</div>
 		</Fragment>
 	);
