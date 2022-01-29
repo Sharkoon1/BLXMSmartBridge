@@ -1,13 +1,9 @@
 const logger = require("../logger/logger");
 const ArbitrageService = require("../service/arbitrageServiceV2");
-const Contracts = require("../contracts/contracts");
 
 class SingleStepArbitrageService{
 
-    constructor(){
-        this._ethContracts = new Contracts("ETH");
-        this._bscContracts = new Contracts("BSC");
-    
+    constructor(){ 
         this.poolPriceEth;
         this.poolPriceBsc;
 
@@ -30,10 +26,12 @@ class SingleStepArbitrageService{
     async startSingleStepArbitrage(status) {
         this.stepStatus = status;
 
-        try {
-            await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
+        await ArbitrageService.init();
 
-            if(!this.poolPriceBsc.eq(this.poolPriceEth)) {
+        try {
+            await ArbitrageService.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
+
+            if(!ArbitrageService.poolPriceBsc.eq(ArbitrageService.poolPriceEth)) {
 
                 switch(status){
                     case 1:                     
@@ -42,12 +40,12 @@ class SingleStepArbitrageService{
 
                         break;
                     case 2: 
-                        await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
-                        await this.getReserves(); //overwrites this.tokenArrayBsc and this.tokenArrayEth with the current reserves from the LPs
+                        await ArbitrageService.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
+                        await ArbitrageService.getReserves(); //overwrites this.tokenArrayBsc and this.tokenArrayEth with the current reserves from the LPs
                         
                         logger.info("Price difference found");
-                        logger.info("ETH network: Current price = " + this.poolPriceEth + " USD/BLXM");
-                        logger.info("BSC network: Current price = " + this.poolPriceBsc + " USD/BLXM");
+                        logger.info("ETH network: Current price = " + ArbitrageService.poolPriceEth + " USD/BLXM");
+                        logger.info("BSC network: Current price = " + ArbitrageService.poolPriceBsc + " USD/BLXM");
                         
                         logger.info("Next step: calculating aribtrage ...");
                         break;
@@ -80,30 +78,17 @@ class SingleStepArbitrageService{
 		}
     }
 
-    async getPoolPrices(){
-		this.poolPriceBsc = await this._bscContracts.oracleContract.getPrice();
-		this.poolPriceEth = await this._ethContracts.oracleContract.getPrice();
-
-        ArbitrageService.poolPriceBsc = this.poolPriceBsc;
-        ArbitrageService.poolPriceEth = this.poolPriceEth;
-	}
-
-    async getReserves(){
-        this.tokenArrayBsc = await this._bscContracts.oracleContract.getReserves(); //tokenArrayBsc[0] = stableBsc, tokenArrayBsc[1] = basicBsc
-        this.tokenArrayEth = await this._ethContracts.oracleContract.getReserves(); //tokenArrayEth[0] = stableEth, tokenArrayEth[1] = basicEth
-    }
-
     async calculateArbitrage(){
-        if(this.poolPriceEth.gt(this.poolPriceBsc)){
-            await ArbitrageService.calculateSwapEth(this.tokenArrayBsc[1], this.tokenArrayBsc[0], this.tokenArrayEth[1], this.tokenArrayEth[0]);
+        if(ArbitrageService.poolPriceEth.gt(ArbitrageService.poolPriceBsc)){
+            await ArbitrageService.calculateSwapEth(ArbitrageService.tokenArrayBsc[1], ArbitrageService.tokenArrayBsc[0], ArbitrageService.tokenArrayEth[1], ArbitrageService.tokenArrayEth[0]);
         }
         else {
-            await ArbitrageService.calculateSwapBsc(this.tokenArrayEth[1], this.tokenArrayEth[0], this.tokenArrayBsc[1], this.tokenArrayBsc[0]);  
+            await ArbitrageService.calculateSwapBsc(ArbitrageService.tokenArrayEth[1], ArbitrageService.tokenArrayEth[0], ArbitrageService.tokenArrayBsc[1], ArbitrageService.tokenArrayBsc[0]);  
         }
     }
 
     async executeSwap(){
-        if(this.poolPriceEth.gt(this.poolPriceBsc)){
+        if(ArbitrageService.poolPriceEth.gt(ArbitrageService.poolPriceBsc)){
             if(ArbitrageService.profitAfterSlippage.gt(0)) {
                 await ArbitrageService.swapEth();
             }

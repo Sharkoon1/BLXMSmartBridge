@@ -5,8 +5,11 @@ import "./style/Log.css";
 import UrlHandler from "./UrlHandler";
 
 export default class Logs extends Component {
+  
+  messagesEndRef = React.createRef()
+
   state = {
-    logs: [],
+    logs: []
   };
  
 
@@ -19,6 +22,7 @@ export default class Logs extends Component {
 
     ioClient.on("log", (msg) => { 
       this.setState({ logs: [...this.state.logs, msg] }); //simple value
+      this.scrollToBottom();
     });
   }
 
@@ -35,6 +39,10 @@ export default class Logs extends Component {
     });
   }
 
+  scrollToBottom = () => {
+    this.messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
+  }
+
   render() {
     return (
      
@@ -45,7 +53,7 @@ export default class Logs extends Component {
             {this.state.logs.map((subItems, sIndex) => {
               return <p className="log"><span key={sIndex}> {subItems}</span></p>;
             })}
-          
+          <div ref={this.messagesEndRef} />
         </div>
       </div>
   
