@@ -56,7 +56,7 @@ class OracleContract {
 	}
 
 	async getReserves() {
-		if (this.liquidityPool === null && this.factory === null && this.basicTokenContract === null && this.stableTokenContract === null) {
+		if (this.liquidityPool === null && this.factory === null) {
 			await this.init();
 		}
 		try {

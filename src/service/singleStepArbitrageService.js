@@ -101,20 +101,20 @@ class SingleStepArbitrageService{
 
     async executeSwap(){
         if(this.poolPriceEth.gt(this.poolPriceBsc)){
-            if(ArbitrageService.minimumSwapAmount < ArbitrageService.adjustmentValueStable) {
+            if(ArbitrageService.profitAfterSlippage.gt(0)) {
                 await ArbitrageService.swapEth();
             }
             else {
-                logger.info("ETH: Minimum swap amount: " + ArbitrageService.minimumSwapAmount + "is bigger than the calculated adjustment value: " + ArbitrageService.adjustmentValueStable);
+                logger.info("ETH: Profit after slippage: " + ArbitrageService.profitAfterSlippage + "is less than zero.");
                 logger.info("Skipping current arbitrage cycle...");
             }
         }
         else {
-            if(ArbitrageService.minimumSwapAmount < ArbitrageService.adjustmentValueStable) {
+            if(ArbitrageService.profitAfterSlippage.gt(0)) {
                 await ArbitrageService.swapBsc();
             }
             else {
-                logger.info("BSC: Minimum swap amount: " + ArbitrageService.minimumSwapAmount + "is bigger than the calculated adjustment value: " + ArbitrageService.adjustmentValueStable);
+                logger.info("BSC: Profit after slippage: " + ArbitrageService.profitAfterSlippage + " is less than zero.");
                 logger.info("Skipping current arbitrage cycle...");
             }
         }

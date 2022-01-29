@@ -1,6 +1,6 @@
 module.exports = Object.freeze({
-	PROVIDER_BSC_TEST: "https://bsc.getblock.io/testnet/?api_key=fc5b6275-8764-4648-89ba-e2cb2b49e150" , //Testnet
-	PROVIDER_ETH_TEST: "https://eth.getblock.io/rinkeby/?api_key=fc5b6275-8764-4648-89ba-e2cb2b49e150", //Testnet
+	PROVIDER_BSC_TEST: "https://bsc.getblock.io/testnet/?api_key=2cea88c6-0bf3-41a7-9fe7-1368697f3806" , //Testnet
+	PROVIDER_ETH_TEST: "https://eth.getblock.io/rinkeby/?api_key=2cea88c6-0bf3-41a7-9fe7-1368697f3806", //Testnet
 	PROVIDER_BSC: "https://bsc-dataseed1.binance.org/" , //Mainnet
 	PROVIDER_ETH: "https://mainnet.infura.io/v3/f18fcafb7053463d9183260a2bdbf968", //Mainnet
 	ARBITRAGE_CONTRACT_ADDRESS_ETH: "0xC50c71F6B2C454def7d7c7DB94952ae6d5Fae844",

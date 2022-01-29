@@ -64,24 +64,24 @@ contract EthArbitrage is Ownable {
         return path;
     }
 
-    function swapStableToBasic(uint256 amount) public onlyOwner {
+    function swapStableToBasic(uint256 amount, uint256 minAmountOut) public onlyOwner {
         stables.approve(uniswapRouterAddress, amount);
 
         uniswapRouter.swapExactTokensForTokens(
             amount,
-            1000000,
+            minAmountOut,
             getPathStableToBasic(),
             address(this),
             block.timestamp + 1200
         );
     }
 
-    function swapBasicToStable(uint256 amount) public onlyOwner {
+    function swapBasicToStable(uint256 amount, uint256 minAmountOut) public onlyOwner {
         basics.approve(uniswapRouterAddress, amount);
 
         uniswapRouter.swapExactTokensForTokens(
             amount,
-            1000000,
+            minAmountOut,
             getPathBasicToStable(),
             address(this),
             block.timestamp + 1200

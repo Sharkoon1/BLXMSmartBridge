@@ -7,12 +7,14 @@ const constants = require("../constants");
 const BigNumber  = require("bignumber.js");
 const app = require("../app");
 const Contracts = require("../contracts/contracts");
+const DataService = require("./DataService");
 
 class ArbitrageService {
 	constructor(){
 			this._databaseService = DataBaseService;
 			this._evaluationService = EvaluationService;
-	
+			this._dataService = DataService;
+
 			this._ethContracts = new Contracts("ETH");
 			this._bscContracts = new Contracts("BSC");
 		
@@ -21,7 +23,7 @@ class ArbitrageService {
 	
 			this.adjustmentValueStable;
 			this.adjustmentValueBasic;
-			this.minimumSwapAmount;
+			this.profitAfterSlippage;
 	
 			this.stopCycle = false;
 			this.isRunning = false;
@@ -51,12 +53,12 @@ class ArbitrageService {
 	
 					await this.calculateSwapEth(tokenArrayBsc[1], tokenArrayBsc[0], tokenArrayEth[1], tokenArrayEth[0]);
 	
-					if(this.minimumSwapAmount < this.adjustmentValueStable) {
+					if(this.profitAfterSlippage.gt(0)) {
 						await this.swapEth();
 					}
 	
 					else {
-						logger.info("ETH: Minimum swap amount: " + this.minimumSwapAmount + "is bigger than the calculated adjustment value: " + this.adjustmentValueStable);
+						logger.info("ETH: Profit after slippage: " + this.profitAfterSlippage + "is less than zero.");
 						logger.info("Skipping current arbitrage cycle...");
 					}
 					
@@ -65,11 +67,11 @@ class ArbitrageService {
 				else {
 					await this.calculateSwapBsc(tokenArrayEth[1], tokenArrayEth[0], tokenArrayBsc[1], tokenArrayBsc[0]);  
 	
-					if(this.minimumSwapAmount < this.adjustmentValueStable) {
+					if(this.profitAfterSlippage.gt(0)) {
 						await this.swapBsc();
 					}
 					else {
-						logger.info("BSC: Minimum swap amount: " + this.minimumSwapAmount + "is bigger than the calculated adjustment value: " + this.adjustmentValueStable);
+						logger.info("BSC: Profit after slippage: " + this.profitAfterSlippage + " is less than zero.");
 						logger.info("Skipping current arbitrage cycle...");
 					}
 				
@@ -107,12 +109,7 @@ class ArbitrageService {
 		let basicCheapNew = constantCheap.div(stableCheapNew);
 
 		this.adjustmentValueBasic = basicCheap.minus(basicCheapNew); 
-    
-		let basicExpensiveNew = basicExpensive.plus(basicCheap).minus(basicCheapNew);
-		let stableExpensiveNew = constantExpensive.div(basicExpensiveNew);
-    
-		let profitUsd = stableExpensive.minus(stableExpensiveNew).minus(this.adjustmentValueStable);
-		
+        		
 		// getGasPrice for BSC legacy transactions
 		// getFeeData()).maxFeePerGas for ETH EIP-1559
 		let gasLimitBsc = await this._bscContracts.arbitrageContract.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable));
@@ -126,7 +123,7 @@ class ArbitrageService {
 		
 		let transactionFees = totalGasPriceBsc.add(totalGasPriceEth);
 		 
-		this.minimumSwapAmount = await this._evaluationService.minimumSwapAmount(this.poolPriceBsc, this.poolPriceEth, this.fromEthersToBigNumber(transactionFees), "BSC");
+		this.profitAfterSlippage = await this.swapSlippageProfitEth(this.fromEthersToBigNumber(transactionFees), basicExpensive, stableExpensive, constantExpensive);
 	}		
 
 	async swapEth(){
@@ -154,12 +151,7 @@ class ArbitrageService {
 		let basicCheapNew = constantCheap.div(stableCheapNew);
 
 		this.adjustmentValueBasic = basicCheap.minus(basicCheapNew);
-    
-		let basicExpensiveNew = basicExpensive.plus(this.adjustmentValueBasic);
-		let stableExpensiveNew = constantExpensive.div(basicExpensiveNew);
-    
-		let profitUsd = stableExpensive.minus(stableExpensiveNew).minus(this.adjustmentValueStable);
-
+        
 		// getGasPrice for BSC legacy transactions
 		// getFeeData()).maxFeePerGas for ETH EIP-1559
 		let gasLimitEth = await this._ethContracts.arbitrageContract.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable));
@@ -173,7 +165,7 @@ class ArbitrageService {
 		
 		let transactionFees = totalGasPriceBsc.add(totalGasPriceEth);
 
-		this.minimumSwapAmount = await this._evaluationService.minimumSwapAmount(this.poolPriceBsc, this.poolPriceEth, this.fromEthersToBigNumber(transactionFees), "ETH");
+		this.profitAfterSlippage = await this.swapSlippageProfitBsc(this.fromEthersToBigNumber(transactionFees), basicExpensive, stableExpensive, constantExpensive);
 	}
 
 	async swapBsc(){
@@ -189,6 +181,70 @@ class ArbitrageService {
 		logger.info("ETH network: price after swap = " + this.poolPriceEth);
 		logger.info("BSC network: price after swap = " + this.poolPriceBsc);
     }
+
+	async swapSlippageProfitEth(sumFees, basicExpensive, stableExpensive, constantExpensive){
+
+		let standardDeviationEth = await this._dataService.getStandardDeviation("ETH");
+		let standardDeviationBsc = await this._dataService.getStandardDeviation("BSC");
+
+		console.log(standardDeviationBsc.toString());
+		console.log(standardDeviationEth.toString());
+
+		let slippagePriceEth;
+		let slippagePriceBsc;
+		let basicSlippageGain;
+
+		slippagePriceBsc = this.poolPriceBsc.plus(standardDeviationBsc);
+		slippagePriceEth = this.poolPriceEth.minus(standardDeviationEth);
+
+		basicSlippageGain = this.poolPriceBsc.dividedBy(slippagePriceBsc).multipliedBy(this.adjustmentValueBasic);
+		
+		let basicExpensiveNew = basicExpensive.plus(basicSlippageGain);
+		let stableExpensiveNew = constantExpensive.div(basicExpensiveNew);
+    
+		let stableGain = stableExpensive.minus(stableExpensiveNew).minus(this.adjustmentValueStable);
+
+		let profitAfterSlippage = slippagePriceEth.dividedBy(this.poolPriceEth).multipliedBy(stableGain);
+
+		let swapProfit = profitAfterSlippage.minus(sumFees);
+
+		logger.info("Maximum sum of transaction fees: " + sumFees);
+		logger.info("Profit after slippage: " + swapProfit);
+
+		return swapProfit;  
+	}
+
+	async swapSlippageProfitBsc(sumFees, basicExpensive, stableExpensive, constantExpensive){
+
+		let standardDeviationEth = await this._dataService.getStandardDeviation("ETH");
+		let standardDeviationBsc = await this._dataService.getStandardDeviation("BSC");
+
+		console.log(standardDeviationBsc.toString());
+		console.log(standardDeviationEth.toString());
+		
+		let slippagePriceEth;
+		let slippagePriceBsc;
+		let basicSlippageGain;
+
+		slippagePriceEth = this.poolPriceEth.plus(standardDeviationEth);
+		slippagePriceBsc = this.poolPriceBsc.minus(standardDeviationBsc);
+
+		basicSlippageGain = this.poolPriceEth.dividedBy(slippagePriceEth).multipliedBy(this.adjustmentValueStable);
+		
+		let basicExpensiveNew = basicExpensive.plus(basicSlippageGain);
+		let stableExpensiveNew = constantExpensive.dividedBy(basicExpensiveNew);
+    
+		let stableGain = stableExpensive.minus(stableExpensiveNew).minus(this.adjustmentValueStable);
+
+		let profitAfterSlippage = slippagePriceBsc.dividedBy(this.poolPriceBsc).multipliedBy(stableGain);
+
+		let swapProfit = profitAfterSlippage.minus(sumFees);
+
+		logger.info("Maximum sum of transaction fees: " + sumFees);
+		logger.info("Profit after slippage: " + swapProfit);
+
+		return swapProfit;  
+	}
 
     
 	getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, constantCheap, constantExpensive) {
@@ -225,31 +281,6 @@ class ArbitrageService {
 
 	fromEthersToBigNumber(value){
 		return new BigNumber(ethers.utils.formatEther(value));
-	}
-
-	async logTx(){
-
-	let adjustmentValueStable = new BigNumber("1");
-	let adjustmentValueBasic = new BigNumber("1");
-
-	let gasLimitBsc = await this._bscContracts.arbitrageContract.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable));
-	let gasLimitEth = await this._ethContracts.arbitrageContract.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic));
-	
-	let gasPriceBsc = await this._bscContracts.provider.getGasPrice();
-	let gasPriceEth = (await this._ethContracts.provider.getFeeData()).maxFeePerGas;
-	
-	let totalGasPriceBsc = gasPriceBsc.mul(gasLimitBsc);
-	let totalGasPriceEth = gasPriceEth.mul(gasLimitEth);
-	
-	let transactionFees = totalGasPriceBsc.add(totalGasPriceEth);
-	
-	console.log(gasLimitBsc.toString());
-	console.log(gasLimitEth.toString());
-	console.log(gasPriceBsc.toString());
-	console.log(gasPriceEth.toString());
-	console.log(totalGasPriceBsc.toString());
-	console.log(totalGasPriceEth.toString());
-	console.log((this.fromEthersToBigNumber(transactionFees)).toString());
 	}
 }
 

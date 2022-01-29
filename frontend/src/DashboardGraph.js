@@ -49,7 +49,7 @@ class DashboardGraph extends Component {
 			Object.keys(uni).forEach((key) => {
 				var existsPancake = pancake.find(({Timestamp}) => uni[key].Timestamp === Timestamp);
 				if(existsPancake) {
-					dataArray.push({timestamp: existsPancake.Timestamp, Pancakeswap: uni[key].Price, Uniswap: existsPancake.Price });
+					dataArray.push({timestamp: existsPancake.Timestamp, Pancakeswap: existsPancake.Price, Uniswap: uni[key].Price });
 				}
 			})
 
