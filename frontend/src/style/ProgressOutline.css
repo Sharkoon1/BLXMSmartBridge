@@ -73,6 +73,7 @@ hr {
 }
 .progressbar li.active {
     color: #49956a;
+    font-weight: 1000;
 }
 .progressbar li.active:before {
     border-color: #49956a !important;
