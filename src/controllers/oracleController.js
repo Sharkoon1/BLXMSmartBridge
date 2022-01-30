@@ -25,9 +25,15 @@ exports.liquidity = [
 			let BSCBalance = await dataService.getTokenBalance("BSC");
 			let BSCStableBalance = BSCBalance[0];
 			let BSCBasicBalance = BSCBalance[1];
+			let BSCTokenNames = await dataService.getTokenNames("BSC");
+			let BSCStableName = BSCTokenNames[0];
+			let BSCBasicName = BSCTokenNames[1];
 			let ETHBalance = await dataService.getTokenBalance("ETH");
 			let ETHStableBalance = ETHBalance[0];
 			let ETHBasicBalance = ETHBalance[1];
+			let ETHTokenNames = await dataService.getTokenNames("ETH");
+			let ETHStableName = ETHTokenNames[0];
+			let ETHBasicName = ETHTokenNames[1];
 			let BSCWalletBalance = await dataService.getWalletBalance("BSC");
 			let ETHWalletBalance = await dataService.getWalletBalance("ETH");
 			return await apiResponse.successResponseWithData(res, "Operation success", {
@@ -36,7 +42,12 @@ exports.liquidity = [
 				ETHStable: ETHStableBalance,
 				ETHBasic: ETHBasicBalance,
 				ETHBalance: ETHWalletBalance,
-				BSCBalance: BSCWalletBalance
+				BSCBalance: BSCWalletBalance,
+				NameBSCStable: BSCStableName,
+				NameBSCBasic: BSCBasicName,
+				NameETHStable: ETHStableName,
+				NameETHBasic: ETHBasicName,
+
 			});
 		} catch (err) {
 			//throw error in json response with status 500. 
