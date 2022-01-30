@@ -17,12 +17,17 @@ export default class WalletOverview extends Component {
 			BinanceBNB: "Loading...",
 			BinanceBLXM: "Loading...",
 			EthereumETH: "Loading...",
-			EthereumBLXM: "Loading..."
+			EthereumBLXM: "Loading...",
+			NameBSCStable: "Loading...",
+			NameBSCBasic: "Loading...",
+			NameETHStable: "Loading...",
+			NameETHBasic: "Loading..."
 		}
 	}
 	
 	componentDidMount() {
 		axios.get(url + "api/oracle/liquidity ").then((res) => {
+			console.log(res);
 			this.setState(prevState => {
 				return {
 					AbitrageETH: res.data.data.ETHBalance,
@@ -30,7 +35,11 @@ export default class WalletOverview extends Component {
 					BinanceBNB: res.data.data.BSCStable,
 					BinanceBLXM: res.data.data.BSCBasic,
 					EthereumETH: res.data.data.ETHStable,
-					EthereumBLXM: res.data.data.ETHBasic
+					EthereumBLXM: res.data.data.ETHBasic,
+					NameBSCStable: res.data.data.NameBSCStable,
+					NameBSCBasic: res.data.data.NameBSCBasic,
+					NameETHStable: res.data.data.NameETHStable,
+					NameETHBasic: res.data.data.NameETHBasic
 				};
 			});
 		});
@@ -55,9 +64,9 @@ export default class WalletOverview extends Component {
 					<div className="contentPoolsize">
 						<h1 className="poolsizeSubHeading">Binance Smart Chain</h1>
 						<div>
-							<span>{this.state.BinanceBNB} Stable</span>
+							<span>{this.state.BinanceBNB} {this.state.NameBSCStable}</span>
 							<span className="and"> | </span>
-							<span>{this.state.BinanceBLXM} Basic</span>
+							<span>{this.state.BinanceBLXM} {this.state.NameBSCBasic}</span>
 						</div>
 					</div>
 
@@ -67,9 +76,9 @@ export default class WalletOverview extends Component {
 					<div className="contentPoolsize">
 						<h1 className="poolsizeSubHeading">Ethereum</h1>
 						<div>
-							<span>{this.state.EthereumETH} Stable</span>
+							<span>{this.state.EthereumETH} {this.state.NameETHStable}</span>
 							<span className="and"> | </span>
-							<span>{this.state.EthereumBLXM} Basic</span>
+							<span>{this.state.EthereumBLXM} {this.state.NameETHBasic}</span>
 						</div>
 					</div>
 				</div>

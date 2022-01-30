@@ -48,6 +48,13 @@ class DataService {
 		return [stableTokenSupply, basicTokenSupply]
 	}
 
+	async getTokenNames(network) {
+		let arbitrageContract = new ArbitrageContract(network);
+		let stableTokenName = await arbitrageContract.getStableName()
+		let basicTokenName = await arbitrageContract.getBasicName()
+		return [stableTokenName, basicTokenName]
+	}
+
 	async init() {
 		let arbitrageContractEth = new ArbitrageContract("ETH");
 		let arbitrageContractBsc = new ArbitrageContract("BSC");

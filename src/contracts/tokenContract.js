@@ -19,6 +19,10 @@ class TokenContract extends BaseContract {
 		
 		return tx; 
 	}
+
+	async getName(){
+		return await this._contract.symbol();
+	}
 }
 
 module.exports = TokenContract;

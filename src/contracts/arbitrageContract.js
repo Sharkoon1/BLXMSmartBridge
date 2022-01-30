@@ -42,6 +42,22 @@ class ArbitrageContract extends BaseContract {
 
 		return await basicContract.getTokenBalance(this._contractAddress); 
 	}
+
+	async getBasicName(){
+		let basicAddress = await this.getBasicAddress();
+
+		let basicContract = new TokenContract(basicAddress, this._signer);
+
+		return await basicContract.getName(); 
+	}
+
+	async getStableName() {
+		let stableAddress = await this.getStableAddress();
+
+		let stableContract = new TokenContract(stableAddress, this._signer);
+
+		return await stableContract.getName(); 
+	}
 	
 	async getWalletBalance() {
 		return await this._signer.getBalance();
