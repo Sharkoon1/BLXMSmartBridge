@@ -76,7 +76,7 @@ export default function App() {
             </div>
             
             {/* Left-aligned Image */}
-            <img className="imageBig" src="../Bloxmove-Logo.png"></img>
+            <img className="imageBig" src="../BloXmove_SmartBridge_Token_Logo_v2.png"></img>
             <img className="imageSmall" src="../BLXMToken.png"></img>
         </div>
 
