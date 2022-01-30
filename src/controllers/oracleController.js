@@ -25,13 +25,13 @@ exports.liquidity = [
 			let BSCBalance = await dataService.getTokenBalance("BSC");
 			let BSCStableBalance = BSCBalance[0];
 			let BSCBasicBalance = BSCBalance[1];
-			let BSCTokenNames = await dataService.getTokenNames("BSC");
+			let BSCTokenNames = await dataService.getTokenNamesArbitrage("BSC");
 			let BSCStableName = BSCTokenNames[0];
 			let BSCBasicName = BSCTokenNames[1];
 			let ETHBalance = await dataService.getTokenBalance("ETH");
 			let ETHStableBalance = ETHBalance[0];
 			let ETHBasicBalance = ETHBalance[1];
-			let ETHTokenNames = await dataService.getTokenNames("ETH");
+			let ETHTokenNames = await dataService.getTokenNamesArbitrage("ETH");
 			let ETHStableName = ETHTokenNames[0];
 			let ETHBasicName = ETHTokenNames[1];
 			let BSCWalletBalance = await dataService.getWalletBalance("BSC");
@@ -46,8 +46,7 @@ exports.liquidity = [
 				NameBSCStable: BSCStableName,
 				NameBSCBasic: BSCBasicName,
 				NameETHStable: ETHStableName,
-				NameETHBasic: ETHBasicName,
-
+				NameETHBasic: ETHBasicName
 			});
 		} catch (err) {
 			//throw error in json response with status 500. 
@@ -60,6 +59,16 @@ exports.poolsize = [
 	async function (req, res) {
 		try {
 			let liquidities = await dataService.getLiquidity();
+			let BSCTokenNames = await dataService.getTokenNamesLiquidity("BSC");
+			let BSCStableName = BSCTokenNames[0];
+			let BSCBasicName = BSCTokenNames[1];
+			let ETHTokenNames = await dataService.getTokenNamesLiquidity("ETH");
+			let ETHStableName = ETHTokenNames[0];
+			let ETHBasicName = ETHTokenNames[1];
+			liquidities.NameBSCStable = BSCStableName;
+			liquidities.NameBSCBasic = BSCBasicName;
+			liquidities.NameETHStable = ETHStableName;
+			liquidities.NameETHBasic = ETHBasicName;
 			return await apiResponse.successResponseWithData(res, "Operation success", liquidities);
 		} catch (err) {
 			//throw error in json response with status 500. 

@@ -4,6 +4,7 @@ const DataBaseService = require("../service/DataBaseService");
 const BigNumber = require("bignumber.js");
 const OracleContract = require("../contracts/OracleContract");
 const ArbitrageContract = require("../contracts/ArbitrageContract");
+const TokenContract = require("../contracts/tokenContract");
 const ethers = require("ethers");
 
 class DataService {
@@ -48,11 +49,21 @@ class DataService {
 		return [stableTokenSupply, basicTokenSupply]
 	}
 
-	async getTokenNames(network) {
+	async getTokenNamesArbitrage(network) {
 		let arbitrageContract = new ArbitrageContract(network);
 		let stableTokenName = await arbitrageContract.getStableName()
 		let basicTokenName = await arbitrageContract.getBasicName()
 		return [stableTokenName, basicTokenName]
+	}
+
+	async getTokenNamesLiquidity(network) {
+		let arbitrageContract = new ArbitrageContract(network);
+		let oracle = network === "BSC" ? this._oracleContractBsc : (network === "ETH" ? this._oracleContractEth : null) 
+		let basicToken = new TokenContract(oracle.basicTokenAddress, arbitrageContract.signer);
+		let stableToken = new TokenContract(oracle.stableTokenAddress, arbitrageContract.signer);
+		let stableTokenName = await stableToken.getName();
+		let basicTokenName = await basicToken.getName();
+		return [stableTokenName, basicTokenName];
 	}
 
 	async init() {

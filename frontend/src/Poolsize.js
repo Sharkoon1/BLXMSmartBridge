@@ -12,7 +12,11 @@ export default class Poolsize extends Component {
 			PancakeswapBNB: "Loading...",
 			PancakeswapBLXM: "Loading...",
 			UniswapETH: "Loading...",
-			UniswapBLXM: "Loading..."
+			UniswapBLXM: "Loading...",
+			BSCStableName: "Loading...",
+			BSCBasicName: "Loading...",
+			ETHStableName: "Loading...",
+			ETHBasicName: "Loading..."
 		}
 	}
 	componentDidMount() {
@@ -22,7 +26,11 @@ export default class Poolsize extends Component {
 					PancakeswapBNB: res.data.data.PancakeswapStable,
 					PancakeswapBLXM: res.data.data.PancakeswapBLXM,
 					UniswapETH: res.data.data.UniswapStables,
-					UniswapBLXM: res.data.data.UniswapBLXM
+					UniswapBLXM: res.data.data.UniswapBLXM,
+					BSCStableName: res.data.data.NameBSCStable,
+					BSCBasicName: res.data.data.NameBSCBasic,
+					ETHStableName: res.data.data.NameETHStable,
+					ETHBasicName: res.data.data.NameETHBasic
 				};
 			});
 		});
@@ -36,9 +44,9 @@ export default class Poolsize extends Component {
 					<div className="contentPoolsize">
 						<h1 className="poolsizeSubHeading">Pancakeswap Pool</h1>
 						<div>
-							<span>{this.state.PancakeswapBNB} Stable</span>
+							<span>{this.state.PancakeswapBNB} {this.state.BSCStableName}</span>
 							<span className="and"> | </span>
-							<span>{this.state.PancakeswapBLXM} Basic</span>
+							<span>{this.state.PancakeswapBLXM} {this.state.BSCBasicName}</span>
 						</div>
 					</div>
 
@@ -48,9 +56,9 @@ export default class Poolsize extends Component {
 					<div className="contentPoolsize">
 						<h1 className="poolsizeSubHeading">Uniswap Pool</h1>
 						<div>
-							<span>{this.state.UniswapETH} Stable</span>
+							<span>{this.state.UniswapETH} {this.state.ETHStableName}</span>
 							<span className="and"> | </span>
-							<span>{this.state.UniswapBLXM} Basic</span>
+							<span>{this.state.UniswapBLXM} {this.state.ETHBasicName}</span>
 						</div>
 					</div>
 				</div>
