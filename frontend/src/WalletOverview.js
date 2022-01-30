@@ -12,12 +12,12 @@ export default class WalletOverview extends Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			AbitrageETH: 0,
-			AbitrageBNB: 0,
-			BinanceBNB: 0,
-			BinanceBLXM: 0,
-			EthereumETH: 0,
-			EthereumBLXM: 0
+			AbitrageETH: "Loading...",
+			AbitrageBNB: "Loading...",
+			BinanceBNB: "Loading...",
+			BinanceBLXM: "Loading...",
+			EthereumETH: "Loading...",
+			EthereumBLXM: "Loading..."
 		}
 	}
 	
@@ -46,7 +46,7 @@ export default class WalletOverview extends Component {
 						<div>
 							<span>{this.state.AbitrageETH} ETH </span>
 							<span className="and"> | </span>
-							<span>{this.state.AbitrageBNB} Basic</span>
+							<span>{this.state.AbitrageBNB} BNB</span>
 						</div>
 					</div>
 				</div>

@@ -9,10 +9,10 @@ export default class Poolsize extends Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			PancakeswapBNB: 0,
-			PancakeswapBLXM: 0,
-			UniswapETH: 0,
-			UniswapBLXM: 0
+			PancakeswapBNB: "Loading...",
+			PancakeswapBLXM: "Loading...",
+			UniswapETH: "Loading...",
+			UniswapBLXM: "Loading..."
 		}
 	}
 	componentDidMount() {
