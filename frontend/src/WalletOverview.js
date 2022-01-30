@@ -20,18 +20,21 @@ export default class WalletOverview extends Component {
 			EthereumBLXM: 0
 		}
 	}
-	/*
+	
 	componentDidMount() {
 		axios.get(url + "api/oracle/liquidity ").then((res) => {
-			let uni = res.data.data.UniBLXMPrice;
-			let pancake = res.data.data.PancakeBLXMPrice;
 			this.setState(prevState => {
 				return {
-					data: [...prevState.data, ...distinctTimeStampData]
+					AbitrageETH: res.data.data.ETHBalance,
+					AbitrageBNB: res.data.data.BSCBalance,
+					BinanceBNB: res.data.data.BSCStable,
+					BinanceBLXM: res.data.data.BSCBasic,
+					EthereumETH: res.data.data.ETHStable,
+					EthereumBLXM: res.data.data.ETHBasic
 				};
 			});
 		});
-	}*/
+	}
 	
 	render() {
 		return (
@@ -43,7 +46,7 @@ export default class WalletOverview extends Component {
 						<div>
 							<span>{this.state.AbitrageETH} ETH </span>
 							<span className="and"> | </span>
-							<span>{this.state.AbitrageBNB} BNB</span>
+							<span>{this.state.AbitrageBNB} Basic</span>
 						</div>
 					</div>
 				</div>
@@ -52,9 +55,9 @@ export default class WalletOverview extends Component {
 					<div className="contentPoolsize">
 						<h1 className="poolsizeSubHeading">Binance Smart Chain</h1>
 						<div>
-							<span>{this.state.BinanceBNB} BNB </span>
+							<span>{this.state.BinanceBNB} Stable</span>
 							<span className="and"> | </span>
-							<span>{this.state.BinanceBLXM} BXLM</span>
+							<span>{this.state.BinanceBLXM} Basic</span>
 						</div>
 					</div>
 
@@ -64,9 +67,9 @@ export default class WalletOverview extends Component {
 					<div className="contentPoolsize">
 						<h1 className="poolsizeSubHeading">Ethereum</h1>
 						<div>
-							<span>{this.state.EthereumETH} WETH</span>
+							<span>{this.state.EthereumETH} Stable</span>
 							<span className="and"> | </span>
-							<span>{this.state.EthereumBLXM} BXLM </span>
+							<span>{this.state.EthereumBLXM} Basic</span>
 						</div>
 					</div>
 				</div>

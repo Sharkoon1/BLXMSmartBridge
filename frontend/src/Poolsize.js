@@ -18,7 +18,6 @@ export default class Poolsize extends Component {
 	componentDidMount() {
 		axios.get(url + "api/oracle/poolsize ").then((res) => {
 			this.setState(prevState => {
-				debugger;
 				return {
 					PancakeswapBNB: res.data.data.PancakeswapStable,
 					PancakeswapBLXM: res.data.data.PancakeswapBLXM,
@@ -37,9 +36,9 @@ export default class Poolsize extends Component {
 					<div className="contentPoolsize">
 						<h1 className="poolsizeSubHeading">Pancakeswap Pool</h1>
 						<div>
-							<span>{this.state.PancakeswapBNB} BNB</span>
+							<span>{this.state.PancakeswapBNB} Stable</span>
 							<span className="and"> | </span>
-							<span>{this.state.PancakeswapBLXM} BXLM</span>
+							<span>{this.state.PancakeswapBLXM} Basic</span>
 						</div>
 					</div>
 
@@ -49,9 +48,9 @@ export default class Poolsize extends Component {
 					<div className="contentPoolsize">
 						<h1 className="poolsizeSubHeading">Uniswap Pool</h1>
 						<div>
-							<span>{this.state.UniswapETH} WETH</span>
+							<span>{this.state.UniswapETH} Stable</span>
 							<span className="and"> | </span>
-							<span>{this.state.UniswapBLXM} BXLM</span>
+							<span>{this.state.UniswapBLXM} Basic</span>
 						</div>
 					</div>
 				</div>

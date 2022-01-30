@@ -1,9 +1,10 @@
 const mongoose = require("mongoose");
 const PoolPrice = require("../models/PoolPrice");
 const DataBaseService = require("../service/DataBaseService");
-const BigNumber  = require("bignumber.js");
+const BigNumber = require("bignumber.js");
 const OracleContract = require("../contracts/OracleContract");
 const ArbitrageContract = require("../contracts/ArbitrageContract");
+const ethers = require("ethers");
 
 class DataService {
 
@@ -17,34 +18,34 @@ class DataService {
 	}
 
 	async getLiquidity() {
-		let UniswapReserves = await this._ethContracts.oracleContract.getReserves();
+		let UniswapReserves = await this._oracleContractEth.getReserves();
 		let UniswapStableBalance = UniswapReserves[0].toString();
 		let UniswapBLXMBalance = UniswapReserves[1].toString();
-		let PancakeswapReserves = await this._bscContracts.oracleContract.getReserves();
+		let PancakeswapReserves = await this._oracleContractBsc.getReserves();
 		let PancakeswapStableBalance = PancakeswapReserves[0].toString();
 		let PancakeswapBLXMBalance = PancakeswapReserves[1].toString();
 		return {
-			UniswapStables: UniswapStableBalance, 
+			UniswapStables: UniswapStableBalance,
 			UniswapBLXM: UniswapBLXMBalance,
-			PancakeswapStable: PancakeswapStableBalance, 
+			PancakeswapStable: PancakeswapStableBalance,
 			PancakeswapBLXM: PancakeswapBLXMBalance
 		}
 	}
 
+	async getWalletBalance(network) {
+		let arbitrageContract = new ArbitrageContract(network);
+		let walletBalance = await arbitrageContract.getWalletBalance();
+		return ethers.utils.formatEther(walletBalance);
+	}
 
-	async getTokenBalance(network){
-		switch (network) {
-			case "BSC":
-				let stableTokenSupply = this._bscContracts.oracleContract.stableTokenContract.totalSupply();
-				let basicTokenSupply = this._bscContracts.oracleContract.basicTokenContract.totalSupply();
-				return [stableTokenSupply, basicTokenSupply]
-			case "ETH":
-				let stableTokenSupply = this._ethContracts.oracleContract.stableTokenContract.totalSupply();
-				let basicTokenSupply = this._ethContracts.oracleContract.basicTokenContract.totalSupply();
-				return [stableTokenSupply, basicTokenSupply]
-			default:
-				break;
-		}
+
+	async getTokenBalance(network) {
+		let arbitrageContract = new ArbitrageContract(network);
+		let stableTokenSupply = await arbitrageContract.getStableBalance()
+		stableTokenSupply = ethers.utils.formatEther(stableTokenSupply);
+		let basicTokenSupply = await arbitrageContract.getBasicBalance()
+		basicTokenSupply = ethers.utils.formatEther(basicTokenSupply);
+		return [stableTokenSupply, basicTokenSupply]
 	}
 
 	async init() {
@@ -61,7 +62,7 @@ class DataService {
 	}
 
 	async getPoolData() {
-		if(this._oracleContractBsc === null || this._oracleContractEth === null) {
+		if (this._oracleContractBsc === null || this._oracleContractEth === null) {
 			await this.init();
 		}
 
