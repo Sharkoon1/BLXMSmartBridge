@@ -53,7 +53,7 @@ export default class WalletOverview extends Component {
 
 				<div className="displayPoolsizeBSC">
 					<div className="contentPoolsize">
-						<h1 className="poolsizeSubHeading">Binance Smart Chain</h1>
+						<h1 className="poolsizeSubHeading">BSC Arbitrage Contract</h1>
 						<div>
 							<span>{this.state.BinanceBNB} Stable</span>
 							<span className="and"> | </span>
@@ -65,7 +65,7 @@ export default class WalletOverview extends Component {
 
 				<div className="displayPoolsizeETH">
 					<div className="contentPoolsize">
-						<h1 className="poolsizeSubHeading">Ethereum</h1>
+						<h1 className="poolsizeSubHeading">ETH Arbitrage Contract</h1>
 						<div>
 							<span>{this.state.EthereumETH} Stable</span>
 							<span className="and"> | </span>
