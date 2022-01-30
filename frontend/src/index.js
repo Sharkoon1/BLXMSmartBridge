@@ -89,7 +89,7 @@ function LoginPage() {
 			<div className="empty"></div>
 			<div className="loginPage">
 				<img className="logoBLXM" src="../BLXMToken.png"></img>
-				<h1 className="textLogin">Welcome to BLXM Smartbridge!!!</h1>
+				<h1 className="textLogin">Welcome to BLXM Smartbridge!</h1>
 				<h1 className="textLogin">Login to enter admin view</h1>
 				<button className="button" id="loginButton" onClick={() => connectWalletHandler(setError, setOtherError)}>Login with MetaMask</button>
 			</div>
