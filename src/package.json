@@ -21,6 +21,7 @@
     "bcrypt": "^3.0.6",
     "bignumber": "^1.1.0",
     "bignumber.js": "^9.0.2",
+    "bnc-sdk": "^4.0.0",
     "codacy-coverage": "^3.4.0",
     "cookie-parser": "~1.4.3",
     "cors": "^2.8.5",
@@ -44,7 +45,8 @@
     "socket.io": "^4.4.0",
     "web3": "^1.6.1",
     "winston": "^3.3.3",
-    "winston-mongodb": "^5.0.7"
+    "winston-mongodb": "^5.0.7",
+    "ws": "^8.4.2"
   },
   "devDependencies": {
     "chai": "^4.2.0",
