@@ -23,7 +23,7 @@ class ArbitrageContract extends BaseContract {
 
 			super(constants["ARBITRAGE_CONTRACT_ADDRESS_" + network + "_TESTNET"], abi, signer);
 		}
-
+		this.signer = signer;
 		this.provider = provider;
 	}
 
