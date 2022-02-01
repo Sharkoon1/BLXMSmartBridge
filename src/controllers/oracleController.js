@@ -55,21 +55,26 @@ exports.liquidity = [
 	}
 ];
 
-exports.poolsize = [
+exports.poolData = [
 	async function (req, res) {
 		try {
 			let liquidities = await dataService.getLiquidity();
-			let BSCTokenNames = await dataService.getTokenNamesLiquidity("BSC");
-			let BSCStableName = BSCTokenNames[0];
-			let BSCBasicName = BSCTokenNames[1];
-			let ETHTokenNames = await dataService.getTokenNamesLiquidity("ETH");
-			let ETHStableName = ETHTokenNames[0];
-			let ETHBasicName = ETHTokenNames[1];
-			liquidities.NameBSCStable = BSCStableName;
-			liquidities.NameBSCBasic = BSCBasicName;
-			liquidities.NameETHStable = ETHStableName;
-			liquidities.NameETHBasic = ETHBasicName;
-			return await apiResponse.successResponseWithData(res, "Operation success", liquidities);
+			let bscTokenNames = await dataService.getTokenNamesLiquidity("BSC");
+			let bscStableName = bscTokenNames[0];
+			let bscBasicName = bscTokenNames[1];
+			let ethTokenNames = await dataService.getTokenNamesLiquidity("ETH");
+			let ethStableName = ethTokenNames[0];
+			let ethBasicName = ethTokenNames[1];
+			let poolAddresses = await dataService.getPoolAddresses();
+			let result = {
+				bscStableName: bscStableName,
+				bscBasicName: bscBasicName,
+				ethStableName: ethStableName,
+				ethBasicName: ethBasicName,
+				liquidities: liquidities,
+				poolAddresses: poolAddresses
+			};
+			return await apiResponse.successResponseWithData(res, "Operation success", result);
 		} catch (err) {
 			//throw error in json response with status 500. 
 			return apiResponse.ErrorResponse(res, err);
