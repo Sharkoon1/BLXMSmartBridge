@@ -44,6 +44,10 @@ class OracleContract {
 		let factoryAddress = await this.router.factory();
 		this.factory = new ethers.Contract(factoryAddress, factoryAbi, this.signer);
 		let liquidityPoolAddress = await this.factory.getPair(this.basicTokenAddress, this.stableTokenAddress);
+		if(liquidityPoolAddress === ethers.constants.AddressZero) {
+			logger.error(this.network +  ": liquidity pool does not exist. For basic token address:" + this.basicTokenAddress 
+									   + "and stable token address: " +  this.stableTokenAddress);
+		}
 		this.liquidityPool = new ethers.Contract(liquidityPoolAddress, liquidityPoolAbi, this.signer);
 	}
 

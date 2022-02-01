@@ -52,15 +52,13 @@ class SingleStepArbitrageService{
                     case 3: 
                         logger.info("Calculating arbitrage ...");
                         await this.calculateArbitrage();
-                        logger.info("Adjustment Value stable: " + ArbitrageService.adjustmentValueStable); 
-                        logger.info("Adjustment Value basic: " + ArbitrageService.adjustmentValueBasic);    
                         
                         logger.info("Next step: Executing swaps ...");
                         break;
                     case 4: 
-                        logger.info("Executing swaps");    
                         await this.executeSwap();        
-                        
+                        logger.info("Arbitrage cycle ended...");    
+
                         break;
                     }			
                 }   

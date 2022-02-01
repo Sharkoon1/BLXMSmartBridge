@@ -3,6 +3,7 @@ const TokenContract = require("./TokenContract");
 const __path = require("path");
 const { ethers } = require("ethers");
 const constants = require("../constants");
+const BigNumber = require("bignumber.js");
 
 class ArbitrageContract extends BaseContract {
 	constructor(network) {
@@ -29,18 +30,20 @@ class ArbitrageContract extends BaseContract {
 
 	async getStableBalance() {
 		let stableAddress = await this.getStableAddress();
+		let stableContract = new TokenContract(stableAddress, this._signer);	
 
-		let stableContract = new TokenContract(stableAddress, this._signer);
+		let balance = await stableContract.getTokenBalance(this._contractAddress); 
 
-		return await stableContract.getTokenBalance(this._contractAddress); 
+		return new BigNumber(ethers.utils.formatEther(balance));
 	}
 
 	async getBasicBalance() {
 		let basicAddress = await this.getBasicAddress();
-
 		let basicContract = new TokenContract(basicAddress, this._signer);
+		
+		let balance =  await basicContract.getTokenBalance(this._contractAddress); 
 
-		return await basicContract.getTokenBalance(this._contractAddress); 
+		return new BigNumber(ethers.utils.formatEther(balance));
 	}
 
 	async getBasicName(){
