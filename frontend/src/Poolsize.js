@@ -47,9 +47,13 @@ export default class Poolsize extends Component {
 				<h1 className='headingPoolsize'>Liquidity Pool Overview</h1>
 				<div className="displayPoolsizeBSC">
 					<div className="contentPoolsize">
-					<h1>
+					<h1 className="textPoolsize">
 						<span className="poolsizeSubHeading">Pancakeswap Pool </span>
-						<span className="displayPoolAddress">{this.state.poolAddressBsc}</span></h1>
+						<span className="displayPoolAddress">{this.state.poolAddressBsc}</span>
+						<button className="poolsizeButton">
+							<img className="poolsizeButtonPicture" src="../copy2.png"></img>
+						</button>
+					</h1>
 							<div>
 								<span>{this.state.PancakeswapBNB} {this.state.bscStableName}</span>
 								<span className="and"> | </span>
@@ -61,11 +65,13 @@ export default class Poolsize extends Component {
 
 				<div className="displayPoolsizeETH">
 					<div className="contentPoolsize">
-						<h1>
+						<h1 className="textPoolsize">
 							<span className="poolsizeSubHeading">Uniswap Pool </span>
 							<span className="displayPoolAddress">{this.state.poolAddressEth}</span>
-							<span><button type="button" class="btn btn-default btn-circle"><i class="fa fa-check"></i></button>
-							</span></h1>
+							<button className="poolsizeButton">
+								<img className="poolsizeButtonPicture" src="../copy2.png"></img>
+							</button>
+						</h1>
 						<div>
 							<span>{this.state.UniswapETH} {this.state.ethStableName}</span>
 							<span className="and"> | </span>
