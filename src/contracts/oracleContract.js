@@ -31,6 +31,8 @@ class OracleContract {
 		this.factory = null;
 		this.liquidityPool = null;
 		this.liquidityPoolWrapped = null;
+
+		this.liquidityPoolAddress;
 	}
 
 	async initWrapped() {
@@ -43,8 +45,8 @@ class OracleContract {
 	async init() {
 		let factoryAddress = await this.router.factory();
 		this.factory = new ethers.Contract(factoryAddress, factoryAbi, this.signer);
-		let liquidityPoolAddress = await this.factory.getPair(this.basicTokenAddress, this.stableTokenAddress);
-		this.liquidityPool = new ethers.Contract(liquidityPoolAddress, liquidityPoolAbi, this.signer);
+		this.liquidityPoolAddress = this.factory.getPair(this.basicTokenAddress, this.stableTokenAddress);
+		this.liquidityPool = new ethers.Contract(this.liquidityPoolAddress, liquidityPoolAbi, this.signer);
 	}
 
 	async getWrappedPrice() {
@@ -75,7 +77,6 @@ class OracleContract {
 		}
 	}
 
-
 	async getPrice() {
 		let poolReserves;
 		try {
@@ -102,6 +103,13 @@ class OracleContract {
 			logger.error("An error occured retrieving pool reserves.");
 			logger.error("Error: " + error);
 		}
+	}
+
+	async getPoolAddress(){
+		if (this.liquidityPool === null) {
+			await this.init();
+		}
+		return this.liquidityPoolAddress;
 	}
 }
 

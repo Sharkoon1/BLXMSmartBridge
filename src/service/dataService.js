@@ -33,12 +33,21 @@ class DataService {
 		}
 	}
 
+	async getPoolAddresses(){
+		let liquidityPoolBsc = await this._oracleContractBsc.getPoolAddress();
+		let liquidityPoolEth = await this._oracleContractEth.getPoolAddress();
+
+		return {
+			liquidityPoolBsc: liquidityPoolBsc, 
+			liquidityPoolEth: liquidityPoolEth
+		};
+	}
+
 	async getWalletBalance(network) {
 		let arbitrageContract = new ArbitrageContract(network);
 		let walletBalance = await arbitrageContract.getWalletBalance();
 		return ethers.utils.formatEther(walletBalance);
 	}
-
 
 	async getTokenBalance(network) {
 		let arbitrageContract = new ArbitrageContract(network);

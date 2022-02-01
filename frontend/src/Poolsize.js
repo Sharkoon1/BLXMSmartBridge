@@ -13,24 +13,29 @@ export default class Poolsize extends Component {
 			PancakeswapBLXM: "Loading...",
 			UniswapETH: "Loading...",
 			UniswapBLXM: "Loading...",
-			BSCStableName: "Loading...",
-			BSCBasicName: "Loading...",
-			ETHStableName: "Loading...",
-			ETHBasicName: "Loading..."
+			bscStableName: "",
+			bscBasicName: "",
+			ethStableName: "",
+			ethBasicName: "",
+			poolAddressEth: "",
+			poolAddressBsc: ""
 		}
 	}
 	componentDidMount() {
-		axios.get(url + "api/oracle/poolsize ").then((res) => {
+		fetch(url + "api/oracle/poolData ").then(res => res.json())
+										   .then(result => {
 			this.setState(prevState => {
 				return {
-					PancakeswapBNB: res.data.data.PancakeswapStable,
-					PancakeswapBLXM: res.data.data.PancakeswapBLXM,
-					UniswapETH: res.data.data.UniswapStables,
-					UniswapBLXM: res.data.data.UniswapBLXM,
-					BSCStableName: res.data.data.NameBSCStable,
-					BSCBasicName: res.data.data.NameBSCBasic,
-					ETHStableName: res.data.data.NameETHStable,
-					ETHBasicName: res.data.data.NameETHBasic
+					PancakeswapBNB: result.data.liquidities.PancakeswapStable,
+					PancakeswapBLXM: result.data.liquidities.PancakeswapBLXM,
+					UniswapETH: result.data.liquidities.UniswapStables,
+					UniswapBLXM: result.data.liquidities.UniswapBLXM,
+					bscStableName: result.data.bscStableName,
+					bscBasicName: result.data.bscBasicName,
+					ethStableName: result.data.ethStableName,
+					ethBasicName: result.data.ethBasicName,
+					poolAddressEth: result.data.poolAddresses.liquidityPoolEth,
+					poolAddressBsc: result.data.poolAddresses.liquidityPoolBsc
 				};
 			});
 		});
@@ -39,26 +44,32 @@ export default class Poolsize extends Component {
 	render() {
 		return (
 			<div className="displayPoolsizes">
-				<h1 className='headingPoolsize'>Poolsize Overview</h1>
+				<h1 className='headingPoolsize'>Liquidity Pool Overview</h1>
 				<div className="displayPoolsizeBSC">
 					<div className="contentPoolsize">
-						<h1 className="poolsizeSubHeading">Pancakeswap Pool</h1>
-						<div>
-							<span>{this.state.PancakeswapBNB} {this.state.BSCStableName}</span>
-							<span className="and"> | </span>
-							<span>{this.state.PancakeswapBLXM} {this.state.BSCBasicName}</span>
-						</div>
+					<h1>
+						<span className="poolsizeSubHeading">Pancakeswap Pool </span>
+						<span className="displayPoolAddress">{this.state.poolAddressBsc}</span></h1>
+							<div>
+								<span>{this.state.PancakeswapBNB} {this.state.bscStableName}</span>
+								<span className="and"> | </span>
+								<span>{this.state.PancakeswapBLXM} {this.state.bscBasicName}</span>
+							</div>
 					</div>
 
 				</div>
 
 				<div className="displayPoolsizeETH">
 					<div className="contentPoolsize">
-						<h1 className="poolsizeSubHeading">Uniswap Pool</h1>
+						<h1>
+							<span className="poolsizeSubHeading">Uniswap Pool </span>
+							<span className="displayPoolAddress">{this.state.poolAddressEth}</span>
+							<span><button type="button" class="btn btn-default btn-circle"><i class="fa fa-check"></i></button>
+							</span></h1>
 						<div>
-							<span>{this.state.UniswapETH} {this.state.ETHStableName}</span>
+							<span>{this.state.UniswapETH} {this.state.ethStableName}</span>
 							<span className="and"> | </span>
-							<span>{this.state.UniswapBLXM} {this.state.ETHBasicName}</span>
+							<span>{this.state.UniswapBLXM} {this.state.ethBasicName}</span>
 						</div>
 					</div>
 				</div>
