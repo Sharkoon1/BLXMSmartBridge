@@ -62,8 +62,8 @@ class ArbitrageService {
 			await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
 
 			while (!this.poolPriceBsc.eq(this.poolPriceEth)) {
-				await this.getArbitrageBalances();
-				await this.getReserves();
+				await this.getArbitrageBalances(); //overwrites this.bscArbitrageBalance and this.ethArbitrageBalance from the arbitrage contract
+				await this.getReserves();  //overwrites this.tokenArrayBsc and this.tokenArrayEth with the current reserves from the LPs
 	
 				logger.info("Price difference found");
 				logger.info("ETH network: Current price = " + this.poolPriceEth + " USD/BLXM");
