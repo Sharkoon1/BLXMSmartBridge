@@ -17,7 +17,10 @@ npm install
 
 ### Running API server locally
 
+Two different processes
+
 **Backend:** 
+
 ```bash
 cd src
 npm run dev
@@ -37,7 +40,8 @@ You can now view frontend in the browser.
 
   Local:            http://localhost:3000        
   On Your Network:  http://172.24.192.1:3000 
-``
+```
+
 License
 -------
 
