@@ -5,7 +5,7 @@ BLXM Smart Bridge
 Installing and Importing
 ------------------------
 
-### Install npm dependencies after installing (Git or manual download)
+### Installing npm dependencies
 
 ```bash
 cd src
@@ -15,7 +15,7 @@ cd frontend
 npm install
 ```
 
-### Running API server locally
+### Running the api and frontend locally
 
 Two different processes
 
