@@ -1,4 +1,22 @@
 /* Style the navigation menu */
+.topnav-right{
+  float: right;
+  background-color: rgb(33, 36, 41);
+  border: 1px solid rgb(33, 36, 41);
+  color: rgb(255, 255, 255);
+  font-weight: 500;
+  padding: 12px;
+  margin-right: 20px;
+  margin-top: 15px;
+  box-shadow: rgb(0 0 0 / 2%) 0px 6px 10px;
+  border-radius: 16px;
+
+}
+
+.topnav-right:hover{
+    background-color: rgb(33, 36, 41);
+    box-shadow: 0 5px 15px rgb(3,  3, 36, 41);;
+}
 
 .imageBig {
   float: left;

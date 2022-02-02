@@ -68,6 +68,12 @@ export default function App() {
      
     return (
         <div className="topnav">
+            {/* Right Nav */}
+            <div className="topnav-right">
+                <h1>Mainnet</h1>
+            </div>
+
+
             {/* Centered Nav */}
             <div className="topnav-centered">
                 <a href="#singlestep" id="singlestep" className="topnav-centered-focus" onClick={onClick}>Single Step</a>
