@@ -29,7 +29,10 @@ class ArbitrageService {
 	
 			this.adjustmentValueStable;
 			this.adjustmentValueBasic;
-			this.profitAfterSlippage;
+			this.stableProfitAfterGas;
+
+			this.slippageBufferEth; //TODO needs to be set in the frontend 
+			this.slippageBufferBsc; //TODO needs to be set in the frontend 
 	
 			this.stopCycle = false;
 			this.isRunning = false;
@@ -73,12 +76,12 @@ class ArbitrageService {
 	
 					await this.calculateSwapEth(this.tokenArrayBsc[1], this.tokenArrayBsc[0], this.tokenArrayEth[1], this.tokenArrayEth[0]);
 	
-					if(this.profitAfterSlippage.gt(0)) {
+					if(this.stableProfitAfterGas.gt(0)) {
 						await this.swapEth();
 					}
 	
 					else {
-						logger.info("ETH: Calculated profit after slippage: " + this.profitAfterSlippage + " is negative.");
+						logger.info("ETH: Calculated profit after gas fees: " + this.stableProfitAfterGas + " is negative.");
 						logger.info("Skipping current arbitrage cycle...");
 					}
 					
@@ -87,11 +90,11 @@ class ArbitrageService {
 				else {
 					await this.calculateSwapBsc(this.tokenArrayEth[1], this.tokenArrayEth[0], this.tokenArrayBsc[1], this.tokenArrayBsc[0]);  
 	
-					if(this.profitAfterSlippage.gt(0)) {
+					if(this.stableProfitAfterGas.gt(0)) {
 						await this.swapBsc();
 					}
 					else {
-						logger.info("BSC: Calculated profit after slippage: " + this.profitAfterSlippage + " is negative.");
+						logger.info("BSC: Calculated profit after gas fees: " + this.stableProfitAfterGas + " is negative.");
 						logger.info("Skipping current arbitrage cycle...");
 					}
 				
@@ -124,8 +127,10 @@ class ArbitrageService {
 
 		this.adjustmentValueStable = this.getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, constantCheap, constantExpensive);
 
-		let stableCheapNew = stableCheap.plus(this.adjustmentValueStable);
-		let basicCheapNew = constantCheap.div(stableCheapNew);
+		stableCheapNew = stableCheap.plus(adjustmentValue); 
+		let numeratorCheap = adjustmentValue.multipliedBy(pancakeswapFees).multipliedBy(basicCheap);
+		let denumeratorExpensive = stableCheap.plus(adjustmentValue.multipliedBy(pancakeswapFees));
+		basicCheapNew = basicCheap.minus(numeratorCheap.dividedBy(denumeratorExpensive));
 
 		this.adjustmentValueBasic = basicCheap.minus(basicCheapNew); 
         	
@@ -142,7 +147,7 @@ class ArbitrageService {
 		
 		let transactionFees = totalGasPriceBsc.add(totalGasPriceEth);
 		 
-		this.profitAfterSlippage = await this.swapSlippageProfitEth(this.fromEthersToBigNumber(transactionFees), basicExpensive, stableExpensive, constantExpensive);
+		this.stableProfitAfterGas = await this.swapSlippageProfitEth(this.fromEthersToBigNumber(transactionFees), basicExpensive, stableExpensive, constantExpensive);
 
 		logger.info("Adjustment Value stable: " + this.adjustmentValueStable); 
 		logger.info("Adjustment Value basic: " + this.adjustmentValueBasic);    
@@ -210,7 +215,7 @@ class ArbitrageService {
 		
 		let transactionFees = totalGasPriceBsc.add(totalGasPriceEth);
 
-		this.profitAfterSlippage = await this.swapSlippageProfitBsc(this.fromEthersToBigNumber(transactionFees), basicExpensive, stableExpensive, constantExpensive);
+		this.stableProfitAfterGas = await this.swapSlippageProfitBsc(this.fromEthersToBigNumber(transactionFees), basicExpensive, stableExpensive, constantExpensive);
 
 		logger.info("Adjustment Value stable: " + this.adjustmentValueStable); 
 		logger.info("Adjustment Value basic: " + this.adjustmentValueBasic);    
@@ -268,9 +273,9 @@ class ArbitrageService {
     
 		let stableSlippageGain = stableExpensive.minus(stableExpensiveNew).minus(this.adjustmentValueStable);
 
-		let profitAfterSlippage = slippagePriceEth.dividedBy(this.poolPriceEth).multipliedBy(stableSlippageGain);
+		let stableProfitAfterGas = slippagePriceEth.dividedBy(this.poolPriceEth).multipliedBy(stableSlippageGain);
 
-		let swapProfit = profitAfterSlippage.minus(sumFees);
+		let swapProfit = stableProfitAfterGas.minus(sumFees);
 
 		logger.info("Maximum sum of transaction fees: " + sumFees);
 		logger.info("Worst case profit after slippage: " + swapProfit);
@@ -293,9 +298,9 @@ class ArbitrageService {
     
 		let stableSlippageGain = stableExpensive.minus(stableExpensiveNew).minus(this.adjustmentValueStable);
 
-		let profitAfterSlippage = slippagePriceBsc.dividedBy(this.poolPriceBsc).multipliedBy(stableSlippageGain);
+		let stableProfitAfterGas = slippagePriceBsc.dividedBy(this.poolPriceBsc).multipliedBy(stableSlippageGain);
 
-		let swapProfit = profitAfterSlippage.minus(sumFees);
+		let swapProfit = stableProfitAfterGas.minus(sumFees);
 
 		logger.info("Maximum sum of transaction fees: " + sumFees);
 		logger.info("Worst case profit after slippage: " + swapProfit);

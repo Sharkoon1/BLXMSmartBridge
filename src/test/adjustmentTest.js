@@ -2,11 +2,13 @@ const { ethers } = require("ethers");
 const BigNumber  = require('bignumber.js');
 const constants = require("../constants");
 
-basicCheapA = new BigNumber("29.99731818")
-stableCheapA = new BigNumber("67.08781438")
-basicExpensiveA = new BigNumber("21.19342441")
-constantCheapA = new BigNumber("2012.454514")
-constantExpensiveA = new BigNumber("1005.62634")
+adjustmentValue = new BigNumber("26.1905126125007")
+
+basicCheapA = new BigNumber("300")
+stableCheapA = new BigNumber("250")
+basicExpensiveA = new BigNumber("150")
+constantCheapA = new BigNumber("64500")
+constantExpensiveA = new BigNumber("30000")
 
 UniswapFees = new BigNumber(constants.UNISWAP_FEES)
 pancakeswapFees = new BigNumber(constants.PANCAKESWAP_FEES)
@@ -75,9 +77,21 @@ return adjustmentValue;
 
 }
 
+function checkBignumberOp(basicCheap, stableCheap, basicExpensive, constantCheap, constantExpensive, UniswapFees, pancakeswapFees){
+
+
+  stableCheapNew = stableCheap.plus(adjustmentValue);
+  let numerator = adjustmentValue.multipliedBy(pancakeswapFees).multipliedBy(basicCheap);
+  let denumerator = stableCheap.plus(adjustmentValue.multipliedBy(pancakeswapFees));
+  basicCheapNew = basicCheap.minus(numerator.dividedBy(denumerator));
+
+}
+
 
 //etAdjustmentValueUsdWithBigNumOperators(basicCheapA, stableCheapA, basicExpensiveA, constantCheapA, constantExpensiveA);
 
 //getAdjustmentValueUsd(basicCheapB, stableCheapB, basicExpensiveB, constantCheapB, constantExpensiveB)
 
-getAdjustmentValueWithFees(basicCheapA, stableCheapA, basicExpensiveA, constantCheapA, constantExpensiveA, UniswapFees, pancakeswapFees)
+//getAdjustmentValueWithFees(basicCheapA, stableCheapA, basicExpensiveA, constantCheapA, constantExpensiveA, UniswapFees, pancakeswapFees);
+
+checkBignumberOp(basicCheapA, stableCheapA, basicExpensiveA, constantCheapA, constantExpensiveA, UniswapFees, pancakeswapFees);
