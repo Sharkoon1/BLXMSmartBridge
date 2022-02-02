@@ -10,18 +10,34 @@ Installing and Importing
 ```bash
 cd src
 npm install
+
+cd frontend
+npm install
 ```
 
 ### Running API server locally
-```bash
-npm run dev
-```
 
+**Backend:** 
 ```bash
+cd src
+npm run dev
+
 App is running ...
 Press CTRL + C to stop the process.
 ```
 
+**Frontend:** 
+```bash 
+cd frontend
+npm run dev
+
+Compiled successfully!
+
+You can now view frontend in the browser.        
+
+  Local:            http://localhost:3000        
+  On Your Network:  http://172.24.192.1:3000 
+``
 License
 -------
 
