@@ -13,7 +13,9 @@
     vertical-align: bottom;
     border-radius: 50%;
     margin-right: 14px;
-    margin-left: 7px;
+    margin-left: 5px;
+    margin-top: -10px;
+    margin-bottom: -5px;
 }
 
 .poolsizeButtonPicture{
