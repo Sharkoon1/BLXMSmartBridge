@@ -1,6 +1,6 @@
 import React, { Component } from "react";
+import { ethers } from "ethers";
 import UrlHandler from "./UrlHandler";
-import axios from 'axios';
 const url = UrlHandler();
 import "./style/Poolsize.css";
 
@@ -8,17 +8,19 @@ export default class Poolsize extends Component {
 
 	constructor(props) {
 		super(props)
+		this.visitPageBsc = this.visitPageBsc.bind(this);
+		this.visitPageEth = this.visitPageEth.bind(this);
 		this.state = {
-			PancakeswapBNB: "Loading...",
-			PancakeswapBLXM: "Loading...",
-			UniswapETH: "Loading...",
-			UniswapBLXM: "Loading...",
+			PancakeswapBNB: "Loading",
+			PancakeswapBLXM: "Loading",
+			UniswapETH: "Loading",
+			UniswapBLXM: "Loading",
 			bscStableName: "",
 			bscBasicName: "",
 			ethStableName: "",
 			ethBasicName: "",
-			poolAddressEth: "",
-			poolAddressBsc: ""
+			poolAddressEth: "0x0000000000000000000000000000000000000000",
+			poolAddressBsc: "0x0000000000000000000000000000000000000000"
 		}
 	}
 	componentDidMount() {
@@ -39,7 +41,53 @@ export default class Poolsize extends Component {
 				};
 			});
 		});
+
 	}
+	
+	async getChainId(){
+		const provider = new ethers.providers.Web3Provider(window.ethereum);
+		const networkId = await provider.getNetwork()
+		if (networkId.chainId === 4 || networkId.chainId === 97){
+			return "Testnet";
+		} else if (networkId.chainId === 1 || networkId.chainId === 96) {
+			return "Mainnet";
+		}
+	}
+	
+	
+	visitPageBsc() {
+		this.getChainId().then((network) => {
+
+			let urlBsc;
+
+			if(network === "Testnet"){
+				urlBsc = 'https://testnet.bscscan.com/address/' + this.state.poolAddressBsc;
+			}
+			else if(network === "Mainnet"){
+				urlBsc = 'https://bscscan.com/address/' + this.state.poolAddressBsc;
+				}
+
+				window.open(urlBsc, "_blank")
+			})
+		}
+    
+
+	visitPageEth(){
+		this.getChainId().then((network) => {
+
+			let urlEth;
+
+			if(network === "Testnet"){
+				urlEth = 'https://rinkeby.etherscan.io/address/' + this.state.poolAddressEth;
+			}
+			else if(network === "Mainnet"){
+				urlEth = 'https://etherscan.io/address/' + this.state.poolAddressEth;
+				}
+
+				window.open(urlEth, "_blank")
+			})
+		}
+
 
 	render() {
 		return (
@@ -50,10 +98,9 @@ export default class Poolsize extends Component {
 					<h1 className="textPoolsize">
 						<span className="poolsizeSubHeading">Pancakeswap Pool </span>
 						<span className="displayPoolAddress">{this.state.poolAddressBsc}</span>
-						<button className="poolsizeButton">
-							<img className="poolsizeButtonPicture" src="../copy2.png"></img>
-						</button>
-					</h1>
+						<span><button onClick={this.visitPageBsc} type="button" title="Link to testnet.bscscan.com" className="poolsizeButton"><img className="poolsizeButtonPicture" src="../copy2.png"></img></button>
+						</span>
+							</h1>
 							<div>
 								<span>{this.state.PancakeswapBNB} {this.state.bscStableName}</span>
 								<span className="and"> | </span>
@@ -68,10 +115,8 @@ export default class Poolsize extends Component {
 						<h1 className="textPoolsize">
 							<span className="poolsizeSubHeading">Uniswap Pool </span>
 							<span className="displayPoolAddress">{this.state.poolAddressEth}</span>
-							<button className="poolsizeButton">
-								<img className="poolsizeButtonPicture" src="../copy2.png"></img>
-							</button>
-						</h1>
+							<span><button onClick={this.visitPageEth} type="button" title="Link to rinkeby.etherscan.io" className="poolsizeButton"><img className="poolsizeButtonPicture" src="../copy2.png"></img></button>
+							</span></h1>
 						<div>
 							<span>{this.state.UniswapETH} {this.state.ethStableName}</span>
 							<span className="and"> | </span>
@@ -82,4 +127,5 @@ export default class Poolsize extends Component {
 			</div>
 		);
 	}
+	
 }
