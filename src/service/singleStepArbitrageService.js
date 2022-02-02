@@ -40,6 +40,7 @@ class SingleStepArbitrageService{
 
                         break;
                     case 2: 
+                        await ArbitrageService.getArbitrageBalances(); //overwrites this.bscArbitrageBalance and this.ethArbitrageBalance from the arbitrage contract 
                         await ArbitrageService.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
                         await ArbitrageService.getReserves(); //overwrites this.tokenArrayBsc and this.tokenArrayEth with the current reserves from the LPs
                         
