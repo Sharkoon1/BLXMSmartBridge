@@ -3,7 +3,7 @@ const slippageController = require("../controllers/slippageController");
 
 var router = express.Router();
 
-router.post("/", slippageController.setSlippageWindow);
-router.get("/", slippageController.getSlippageWindow);
+router.post("/", slippageController.setSlippage);
+router.get("/", slippageController.getSlippage);
 
 module.exports = router;    
