@@ -32,7 +32,7 @@ export default function SettingsModal() {
             body: JSON.stringify({slippageEth:parseInt(slippageEth), slippageBsc: parseInt(slippageBsc)},)
         }).then(response => {
             if(response.status === 200) {
-                setAlert("Success! New slippage percentage are set.");
+                setAlert("Success!");
             } else {
                 setError("An error occured. Response code: " + response.status)
             }
@@ -45,16 +45,22 @@ export default function SettingsModal() {
                 <h1 className='modalHeading'>Settings</h1>
                 <div className='modalSettings'>
                     <h1>Set Slippage </h1>
-                    <div>   
-                        <span>ETH</span>
-                        <input className='modalInput' onInput={e => setSlippageEth(e.target.value)} placeholder={slippageEth}></input>
-                        <span>BSC</span>
-                        <input className='modalInput' onInput={e => setSlippageBsc(e.target.value)} placeholder={slippageBsc}></input>
-                        <AlertInfo message={alert}></AlertInfo>
-                        <ErrorMessage message={error}></ErrorMessage>
+                    <div> 
+                        <div>
+                            <span className='modalSubHeading'>ETH</span>
+                            <input className='modalInput' onInput={e => setSlippageEth(e.target.value)} placeholder={slippageEth}></input>
+                        </div> 
+
+                        <div>
+                            <span className='modalSubHeading'>BSC</span>
+                            <input className='modalInput' onInput={e => setSlippageBsc(e.target.value)} placeholder={slippageBsc}></input>
+                        </div> 
                         
+                        <AlertInfo className="alertInfo" message={alert}></AlertInfo>
+                        <ErrorMessage message={error}></ErrorMessage>
+                        <button className='modalButton' onClick={apply}>Apply</button>
                     </div>
-                    <button className='modalButton' onClick={apply}>Apply</button>
+                    
 
                 </div>           
             </div>         

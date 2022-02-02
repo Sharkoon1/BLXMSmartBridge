@@ -16,13 +16,20 @@
 }
 
 .modalContent{
-    padding: 1rem;
+    margin: 25px;
     color: black;
 }
 
 .modalHeading{
     font-weight: 600;
     font-size: 17px;
+}
+
+.modalButton{
+    float: right;
+    padding: 7px !important;
+    width: 73px;
+    margin-bottom: 10px;
 }
 
 .modalButton, .modalInput{
@@ -37,6 +44,14 @@
 
 .modalInput{
     width: 73px;
+}
+
+.modalSubHeading{
+    margin-right: 20px;
+}
+
+.alertInfo{
+    text-align: center;
 }
 
 .modalInput::placeholder {
