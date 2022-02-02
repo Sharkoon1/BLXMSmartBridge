@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import UrlHandler from "./UrlHandler";
-import axios from 'axios';
 const url = UrlHandler();
 import "./style/Poolsize.css";
 
@@ -8,6 +7,8 @@ export default class Poolsize extends Component {
 
 	constructor(props) {
 		super(props)
+		this.visitPageBsc = this.visitPageBsc.bind(this);
+		this.visitPageEth = this.visitPageEth.bind(this);
 		this.state = {
 			PancakeswapBNB: "Loading...",
 			PancakeswapBLXM: "Loading...",
@@ -39,7 +40,23 @@ export default class Poolsize extends Component {
 				};
 			});
 		});
+
 	}
+	
+	
+	
+	
+	visitPageBsc() {
+		let urlBsc = 'https://testnet.bscscan.com/address/' + this.state.poolAddressBsc;
+		window.open(urlBsc, "_blank")
+		}
+    
+
+	visitPageEth(){
+		let urlEth = 'https://rinkeby.etherscan.io/address/' + this.state.poolAddressEth;
+		window.open(urlEth, "_blank")
+    }
+
 
 	render() {
 		return (
@@ -49,7 +66,10 @@ export default class Poolsize extends Component {
 					<div className="contentPoolsize">
 					<h1>
 						<span className="poolsizeSubHeading">Pancakeswap Pool </span>
-						<span className="displayPoolAddress">{this.state.poolAddressBsc}</span></h1>
+						<span className="displayPoolAddress">{this.state.poolAddressBsc}</span>
+						<span><button onClick={this.visitPageBsc} target="_blank" type="button" class="btn btn-default btn-circle"><i class="fa fa-check"></i>test</button>
+						</span>
+							</h1>
 							<div>
 								<span>{this.state.PancakeswapBNB} {this.state.bscStableName}</span>
 								<span className="and"> | </span>
@@ -64,7 +84,7 @@ export default class Poolsize extends Component {
 						<h1>
 							<span className="poolsizeSubHeading">Uniswap Pool </span>
 							<span className="displayPoolAddress">{this.state.poolAddressEth}</span>
-							<span><button type="button" class="btn btn-default btn-circle"><i class="fa fa-check"></i></button>
+							<span><button onClick={this.visitPageEth} type="button" class="btn btn-default btn-circle"><i class="fa fa-check"></i>test</button>
 							</span></h1>
 						<div>
 							<span>{this.state.UniswapETH} {this.state.ethStableName}</span>
@@ -76,4 +96,5 @@ export default class Poolsize extends Component {
 			</div>
 		);
 	}
+	
 }
