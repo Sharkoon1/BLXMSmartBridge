@@ -13,7 +13,6 @@ export default function App() {
 	useEffect(() => {
 		const provider = new ethers.providers.Web3Provider(window.ethereum);
 		provider.getNetwork().then((networkID) => {
-			debugger;
 			if (networkID.chainId === 4 || networkID.chainId === 97){
 				setChainID("Testnet");
 			} else if (networkID.chainId === 1 || networkID.chainId === 96) {
