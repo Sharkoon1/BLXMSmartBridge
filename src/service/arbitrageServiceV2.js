@@ -31,8 +31,8 @@ class ArbitrageService {
 			this.adjustmentValueBasic;
 			this.stableProfitAfterGas;
 
-			this.slippageBufferEth; //TODO needs to be set in the frontend 
-			this.slippageBufferBsc; //TODO needs to be set in the frontend 
+			this.slippageEth = new BigNumber(1);
+			this.slippageBsc = new BigNumber(1);
 	
 			this.stopCycle = false;
 			this.isRunning = false;
@@ -122,32 +122,11 @@ class ArbitrageService {
 	}
 
 	async calculateSwapEth(basicCheap, stableCheap, basicExpensive, stableExpensive){ // When ETH is more expensive
-		let constantCheap = stableCheap.multipliedBy(basicCheap);
-		let constantExpensive = stableExpensive.multipliedBy(basicExpensive);   
+		this.adjustmentValueStable = this.getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, stableExpensive);
 
-		this.adjustmentValueStable = this.getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, constantCheap, constantExpensive);
-
-		stableCheapNew = stableCheap.plus(adjustmentValue); 
-		let numeratorCheap = adjustmentValue.multipliedBy(pancakeswapFees).multipliedBy(basicCheap);
-		let denumeratorExpensive = stableCheap.plus(adjustmentValue.multipliedBy(pancakeswapFees));
-		basicCheapNew = basicCheap.minus(numeratorCheap.dividedBy(denumeratorExpensive));
-
-		this.adjustmentValueBasic = basicCheap.minus(basicCheapNew); 
-        	
-		let gasLimitBsc = await this._arbitrageContractBsc.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable));
-		let gasLimitEth = await this._arbitrageContractEth.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic));
-
-		// getGasPrice for BSC legacy transactions
-		// getFeeData()).maxFeePerGas for ETH EIP-1559
-		let gasPriceBsc = await this._arbitrageContractBsc.provider.getGasPrice();
-		let gasPriceEth = (await this._arbitrageContractEth.provider.getFeeData()).maxFeePerGas;
-		
-		let totalGasPriceBsc = gasPriceBsc.mul(gasLimitBsc);
-		let totalGasPriceEth = gasPriceEth.mul(gasLimitEth);
-		
-		let transactionFees = totalGasPriceBsc.add(totalGasPriceEth);
+		this.adjustmentValueBasic = this.amountOut(this.pancakeswapFees, this.adjustmentValueStable, basicCheap, stableCheap);
 		 
-		this.stableProfitAfterGas = await this.swapSlippageProfitEth(this.fromEthersToBigNumber(transactionFees), basicExpensive, stableExpensive, constantExpensive);
+		this.stableProfitAfterGas = await this.calculateSwapProfitEth(basicExpensive, stableExpensive);
 
 		logger.info("Adjustment Value stable: " + this.adjustmentValueStable); 
 		logger.info("Adjustment Value basic: " + this.adjustmentValueBasic);    
@@ -190,32 +169,12 @@ class ArbitrageService {
 		logger.info("Absolute profit after arbitrage: " + realProfit.toString());
 	}
 
-	async calculateSwapBsc(basicCheap, stableCheap, basicExpensive, stableExpensive){ // When BSC is more expensive
+	async calculateSwapBsc(basicCheap, stableCheap, basicExpensive, stableExpensive){ // When BSC is more expensive  
+		this.adjustmentValueStable = this.getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, stableExpensive);
 
-		let constantCheap = stableCheap.multipliedBy(basicCheap);
-		let constantExpensive = stableExpensive.multipliedBy(basicExpensive); 
-          
-		this.adjustmentValueStable = this.getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, constantCheap, constantExpensive);
+		this.adjustmentValueBasic = this.amountOut(this.uniswapFees, this.adjustmentValueStable, basicCheap, stableCheap);
 
-		let stableCheapNew = stableCheap.plus(this.adjustmentValueStable);
-		let basicCheapNew = constantCheap.div(stableCheapNew);
-
-		this.adjustmentValueBasic = basicCheap.minus(basicCheapNew);
-        
-		let gasLimitEth = await this._arbitrageContractEth.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable));
-		let gasLimitBsc = await this._arbitrageContractBsc.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic));
-		
-		// getGasPrice for BSC legacy transactions
-		// getFeeData()).maxFeePerGas for ETH EIP-1559
-		let gasPriceBsc = await this._arbitrageContractBsc.provider.getGasPrice();
-		let gasPriceEth = (await this._arbitrageContractEth.provider.getFeeData()).maxFeePerGas;
-		
-		let totalGasPriceBsc = gasPriceBsc.mul(gasLimitBsc);
-		let totalGasPriceEth = gasPriceEth.mul(gasLimitEth);
-		
-		let transactionFees = totalGasPriceBsc.add(totalGasPriceEth);
-
-		this.stableProfitAfterGas = await this.swapSlippageProfitBsc(this.fromEthersToBigNumber(transactionFees), basicExpensive, stableExpensive, constantExpensive);
+		this.stableProfitAfterGas = await this.calculateSwapProfitBsc(basicExpensive, stableExpensive);
 
 		logger.info("Adjustment Value stable: " + this.adjustmentValueStable); 
 		logger.info("Adjustment Value basic: " + this.adjustmentValueBasic);    
@@ -258,58 +217,88 @@ class ArbitrageService {
 		logger.info("Absolute profit after arbitrage: " + realProfit.toString());
     }
 
-	async swapSlippageProfitEth(sumFees, basicExpensive, stableExpensive, constantExpensive){
+	async calculateSwapProfitEth(basicExpensive, stableExpensive){
+		let gasLimitBsc = await this._arbitrageContractBsc.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable));
+		let gasLimitEth = await this._arbitrageContractEth.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic));
 
-		let standardDeviationEth = await this._dataService.getStandardDeviation("ETH");
-		let standardDeviationBsc = await this._dataService.getStandardDeviation("BSC");
+		// getGasPrice for BSC legacy transactions
+		// getFeeData()).maxFeePerGas for ETH EIP-1559
+		let gasPriceBsc = (await this._arbitrageContractBsc.provider.getFeeData()).gasPrice;
+		let gasPriceEth = (await this._arbitrageContractEth.provider.getFeeData()).maxFeePerGas;
 
-		let slippagePriceBsc = this.poolPriceBsc.plus(standardDeviationBsc);
-		let slippagePriceEth = this.poolPriceEth.minus(standardDeviationEth);
-
-		let basicSlippageGain = this.poolPriceBsc.dividedBy(slippagePriceBsc).multipliedBy(this.adjustmentValueBasic);
 		
-		let basicExpensiveNew = basicExpensive.plus(basicSlippageGain);
-		let stableExpensiveNew = constantExpensive.div(basicExpensiveNew);
-    
-		let stableSlippageGain = stableExpensive.minus(stableExpensiveNew).minus(this.adjustmentValueStable);
+		console.log(gasPriceBsc.toString());
+		console.log(gasLimitBsc.toString());
+		
+		let wethPrice = await this._oracleContractEth.getWrappedPrice();
+		let wbnbPrice = await this._oracleContractBsc.getWrappedPrice();
 
-		let stableProfitAfterGas = slippagePriceEth.dividedBy(this.poolPriceEth).multipliedBy(stableSlippageGain);
+		
+		console.log(wethPrice.toString());
+		console.log(wbnbPrice.toString());
 
-		let swapProfit = stableProfitAfterGas.minus(sumFees);
+		console.log(this.fromEthersToBigNumber(gasPriceBsc.mul(gasLimitBsc)));
 
-		logger.info("Maximum sum of transaction fees: " + sumFees);
+
+		let totalFeeBsc = this.fromEthersToBigNumber(gasPriceBsc.mul(gasLimitBsc)).multipliedBy(wbnbPrice);
+		let totalFeeEth = this.fromEthersToBigNumber(gasPriceEth.mul(gasLimitEth)).multipliedBy(wethPrice);
+		
+		console.log(totalFeeBsc);
+
+		let transactionFees = totalFeeBsc.plus(totalFeeEth);
+
+		let basicAmountOut = this.adjustmentValueBasic.multipliedBy(this.slippageBsc);
+		
+		let stableAmountOut = this.amountOut(this.uniswapFees, basicAmountOut, basicExpensive, stableExpensive).multipliedBy(this.slippageEth);
+
+		let swapProfit = stableAmountOut.minus(transactionFees);
+
+		logger.info("Maximum sum of transaction fees: " + transactionFees);
 		logger.info("Worst case profit after slippage: " + swapProfit);
 
 		return swapProfit;  
 	}
 
-	async swapSlippageProfitBsc(sumFees, basicExpensive, stableExpensive, constantExpensive){
+	async calculateSwapProfitBsc(basicExpensive, stableExpensive){
 
-		let standardDeviationEth = await this._dataService.getStandardDeviation("ETH");
-		let standardDeviationBsc = await this._dataService.getStandardDeviation("BSC");
-
-		let slippagePriceEth = this.poolPriceEth.plus(standardDeviationEth);
-		let slippagePriceBsc = this.poolPriceBsc.minus(standardDeviationBsc);
-
-		let basicSlippageGain = this.poolPriceEth.dividedBy(slippagePriceEth).multipliedBy(this.adjustmentValueBasic);
+		let gasLimitEth = await this._arbitrageContractEth.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable));
+		let gasLimitBsc = await this._arbitrageContractBsc.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic));
 		
-		let basicExpensiveNew = basicExpensive.plus(basicSlippageGain);
-		let stableExpensiveNew = constantExpensive.dividedBy(basicExpensiveNew);
-    
-		let stableSlippageGain = stableExpensive.minus(stableExpensiveNew).minus(this.adjustmentValueStable);
+		// getGasPrice for BSC legacy transactions
+		// getFeeData()).maxFeePerGas for ETH EIP-1559
+		let gasPriceBsc = (await this._arbitrageContractBsc.provider.getFeeData()).gasPrice;
+		let gasPriceEth = (await this._arbitrageContractEth.provider.getFeeData()).maxFeePerGas;
+		
+		let wethPrice = await this._oracleContractEth.getWrappedPrice();
+		let wbnbPrice = await this._oracleContractBsc.getWrappedPrice();
 
-		let stableProfitAfterGas = slippagePriceBsc.dividedBy(this.poolPriceBsc).multipliedBy(stableSlippageGain);
+		console.log(wethPrice.toString());
+		console.log(wbnbPrice.toString());
 
-		let swapProfit = stableProfitAfterGas.minus(sumFees);
+		console.log(gasPriceBsc);
+		console.log(gasLimitBsc);
 
-		logger.info("Maximum sum of transaction fees: " + sumFees);
-		logger.info("Worst case profit after slippage: " + swapProfit);
+		let totalFeeBsc = this.fromEthersToBigNumber(gasPriceBsc.mul(gasLimitBsc)).multipliedBy(wbnbPrice);
+		let totalFeeEth = this.fromEthersToBigNumber(gasPriceEth.mul(gasLimitEth)).multipliedBy(wethPrice);
+		
+		let transactionFees = totalFeeBsc.plus(totalFeeEth);
+
+		let basicAmountOut = this.adjustmentValueBasic.multipliedBy(this.slippageEth);
+		
+		let stableAmountOut = this.amountOut(this.pancakeswapFees, basicAmountOut, basicExpensive, stableExpensive).multipliedBy(this.slippageBsc);
+
+		let swapProfit = stableAmountOut.minus(transactionFees);
+
+		logger.info("Maximum sum of transaction fees: " + transactionFees.toString());
+		logger.info("Worst case profit after slippage: " + swapProfit.toString());
 
 		return swapProfit;  
 	}
 
     
-	getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, constantCheap, constantExpensive) {
+	getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, stableExpensive) {
+		let constantCheap = stableCheap.multipliedBy(basicCheap);
+		let constantExpensive = stableExpensive.multipliedBy(basicExpensive);   
 
 		let term1 = basicCheap.exponentiatedBy(2).multipliedBy(constantCheap).multipliedBy(constantExpensive).multipliedBy(this.pancakeswapFees.exponentiatedBy(2)).multipliedBy(this.uniswapFees.exponentiatedBy(2));
 		let term2 = (new BigNumber("2")).multipliedBy(basicCheap).multipliedBy(basicExpensive).multipliedBy(constantCheap).multipliedBy(constantExpensive).multipliedBy(this.pancakeswapFees.exponentiatedBy(2)).multipliedBy(this.uniswapFees);
@@ -329,6 +318,14 @@ class ArbitrageService {
 		let adjustmentValue = term1_8.dividedBy(term9_11);
 		
 		return adjustmentValue;		
+	}
+
+	amountOut(fees, input, basic, stable) {
+		let numeratorCheap = input.multipliedBy(fees).multipliedBy(basic);
+		let denumeratorExpensive = stable.plus(input.multipliedBy(fees));
+		let basicNew = basic.minus(numeratorCheap.dividedBy(denumeratorExpensive));
+
+		return basic.minus(basicNew);
 	}
 
 	async getPoolPrices(){
