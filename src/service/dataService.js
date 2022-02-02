@@ -51,18 +51,17 @@ class DataService {
 
 	async getTokenBalance(network) {
 		let arbitrageContract = new ArbitrageContract(network);
-		let stableTokenSupply = await arbitrageContract.getStableBalance()
-		stableTokenSupply = ethers.utils.formatEther(stableTokenSupply);
-		let basicTokenSupply = await arbitrageContract.getBasicBalance()
-		basicTokenSupply = ethers.utils.formatEther(basicTokenSupply);
-		return [stableTokenSupply, basicTokenSupply]
+		let stableTokenSupply = await arbitrageContract.getStableBalance();
+		let basicTokenSupply = await arbitrageContract.getBasicBalance();
+
+		return [stableTokenSupply.toString(), basicTokenSupply.toString()];
 	}
 
 	async getTokenNamesArbitrage(network) {
 		let arbitrageContract = new ArbitrageContract(network);
-		let stableTokenName = await arbitrageContract.getStableName()
-		let basicTokenName = await arbitrageContract.getBasicName()
-		return [stableTokenName, basicTokenName]
+		let stableTokenName = await arbitrageContract.getStableName();
+		let basicTokenName = await arbitrageContract.getBasicName();
+		return [stableTokenName, basicTokenName];
 	}
 
 	async getTokenNamesLiquidity(network) {

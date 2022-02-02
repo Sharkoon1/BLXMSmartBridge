@@ -10,16 +10,16 @@ export default class Poolsize extends Component {
 		this.visitPageBsc = this.visitPageBsc.bind(this);
 		this.visitPageEth = this.visitPageEth.bind(this);
 		this.state = {
-			PancakeswapBNB: "Loading...",
-			PancakeswapBLXM: "Loading...",
-			UniswapETH: "Loading...",
-			UniswapBLXM: "Loading...",
+			PancakeswapBNB: "Loading",
+			PancakeswapBLXM: "Loading",
+			UniswapETH: "Loading",
+			UniswapBLXM: "Loading",
 			bscStableName: "",
 			bscBasicName: "",
 			ethStableName: "",
 			ethBasicName: "",
-			poolAddressEth: "",
-			poolAddressBsc: ""
+			poolAddressEth: "0x0000000000000000000000000000000000000000",
+			poolAddressBsc: "0x0000000000000000000000000000000000000000"
 		}
 	}
 	componentDidMount() {
@@ -64,10 +64,10 @@ export default class Poolsize extends Component {
 				<h1 className='headingPoolsize'>Liquidity Pool Overview</h1>
 				<div className="displayPoolsizeBSC">
 					<div className="contentPoolsize">
-					<h1>
+					<h1 className="textPoolsize">
 						<span className="poolsizeSubHeading">Pancakeswap Pool </span>
 						<span className="displayPoolAddress">{this.state.poolAddressBsc}</span>
-						<span><button onClick={this.visitPageBsc} target="_blank" type="button" class="btn btn-default btn-circle"><i class="fa fa-check"></i>test</button>
+						<span><button onClick={this.visitPageBsc} type="button" className="poolsizeButton"><img className="poolsizeButtonPicture" src="../copy2.png"></img></button>
 						</span>
 							</h1>
 							<div>
@@ -81,10 +81,10 @@ export default class Poolsize extends Component {
 
 				<div className="displayPoolsizeETH">
 					<div className="contentPoolsize">
-						<h1>
+						<h1 className="textPoolsize">
 							<span className="poolsizeSubHeading">Uniswap Pool </span>
 							<span className="displayPoolAddress">{this.state.poolAddressEth}</span>
-							<span><button onClick={this.visitPageEth} type="button" class="btn btn-default btn-circle"><i class="fa fa-check"></i>test</button>
+							<span><button onClick={this.visitPageEth} type="button" className="poolsizeButton"><img className="poolsizeButtonPicture" src="../copy2.png"></img></button>
 							</span></h1>
 						<div>
 							<span>{this.state.UniswapETH} {this.state.ethStableName}</span>
