@@ -1,7 +1,6 @@
 const apiResponse = require("../helpers/apiResponse");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
 const DataBaseService = require("../service/DataBaseService");
 
 /**
@@ -12,20 +11,20 @@ const DataBaseService = require("../service/DataBaseService");
 exports.login = [
 	async function (req, res) {
 		try {
-			const { account, password } = req.body;
+			const { account } = req.body;
 
 			// Validate user input
-			if (!(account && password)) {
+			if (!(account)) {
 				res.status(400).send("All input is required");
 			}
 
 			const userData = await User.findOne({ account });
-
-			if (userData && (await bcrypt.compare(password, userData.password))) {
+			
+			if (userData) {
 				// Create token
 				const token = jwt.sign(
-				  { user_id: userData._id, account },
-				  process.env.TOKEN_KEY,
+				  { user_id: userData._id, account: userData.account },
+				  	process.env.TOKEN_KEY,
 				  {
 					expiresIn: "2h",
 				  }
@@ -49,7 +48,7 @@ exports.login = [
  * 
  * @returns {Object}
  */
- exports.register = [
+ /* exports.register = [
 	async function (req, res) {
 		try {
 			const { account, password } = req.body;
@@ -83,14 +82,14 @@ exports.login = [
 			return apiResponse.ErrorResponse(res, err);
 		}
 	}
-];
+]; */
 
 /**
  * Authorize user wallets.
  * 
  * @returns {Object}
  */
- exports.isRegistered = [
+/*  exports.isRegistered = [
 	async function (req, res) {
 		try {
 			const { account } = req.query.account;  
@@ -107,4 +106,4 @@ exports.login = [
 			return apiResponse.ErrorResponse(res, err);
 		}
 	}
-];
+]; */

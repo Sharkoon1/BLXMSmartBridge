@@ -22,13 +22,15 @@ import UrlHandler from "./UrlHandler";
 const connectWalletHandler = (setError, setOtherError) => {
 	if (window.ethereum && window.ethereum.isMetaMask) {
 		window.ethereum.request({ method: "eth_requestAccounts" })
-			.then(result => {
-				fetch(UrlHandler() + "api/authorization",
+			.then(result => {						
+				fetch(UrlHandler() + "api/authorization/login",
 					{
 						method: "post",
 						headers: new Headers({ "content-type": "application/json" }),
-						body: JSON.stringify({ User: result[0] })
+						body: JSON.stringify({ account: result[0] })
 					}).then(response => response.json()).then(result => {
+						localStorage.setItem("token", result.data.token);
+
 						if (result.status === 1) {
 							//####### NAVBAR #######
 							const navbar = document.getElementById("navbar");
