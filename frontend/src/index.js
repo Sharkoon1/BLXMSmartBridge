@@ -31,41 +31,7 @@ const connectWalletHandler = (setError, setOtherError) => {
 					}).then(response => response.json()).then(result => {
 						localStorage.setItem("token", result.data.token);
 						if (result.status === 1) {
-							//####### NAVBAR #######
-							const navbar = document.getElementById("navbar");
-							ReactDOM.render(
-								<StrictMode>
-									<Navbar />
-								</StrictMode>,
-								navbar
-							);
-
-							//####### Abitrage Console Full Autonomous ####### 
-							const rootElement2 = document.getElementById("buttons");
-							ReactDOM.render(
-								<StrictMode>
-									<FullAutonomous />
-								</StrictMode>,
-								rootElement2
-							);
-
-							//####### Abitrage Console Single Step ####### 
-
-							ReactDOM.render(
-								<StrictMode>
-									<SingleStep />
-								</StrictMode>,
-								rootElement1
-							);
-
-							//####### Dashboard ####### 
-							const dashboardGraph = document.getElementById("root2");
-							ReactDOM.render(
-								<StrictMode>
-									<Dashboad />
-								</StrictMode>,
-								dashboardGraph
-							);
+							RenderPages();
 						} else {
 							setError(true);
 						}
@@ -81,10 +47,49 @@ const connectWalletHandler = (setError, setOtherError) => {
 	}
 }
 
+function RenderPages() {
+	//####### NAVBAR #######
+	const navbar = document.getElementById("navbar");
+	ReactDOM.render(
+		<StrictMode>
+			<Navbar />
+		</StrictMode>,
+		navbar
+	);
+
+	//####### Abitrage Console Full Autonomous ####### 
+	const rootElement2 = document.getElementById("buttons");
+	ReactDOM.render(
+		<StrictMode>
+			<FullAutonomous />
+		</StrictMode>,
+		rootElement2
+	);
+
+	//####### Abitrage Console Single Step ####### 
+	const rootElement1 = document.getElementById("root1");
+	ReactDOM.render(
+		<StrictMode>
+			<SingleStep />
+		</StrictMode>,
+		rootElement1
+	);
+
+	//####### Dashboard ####### 
+	const dashboardGraph = document.getElementById("root2");
+	ReactDOM.render(
+		<StrictMode>
+			<Dashboad />
+		</StrictMode>,
+		dashboardGraph
+	);
+}
+
 
 function LoginPage() {
 	const [error, setError] = useState(false);
 	const [othererror, setOtherError] = useState("");
+	
 	return (
 		<Fragment>
 			<div className="empty"></div>
@@ -102,12 +107,20 @@ function LoginPage() {
 	);
 }
 
-const rootElement1 = document.getElementById("root1");
-ReactDOM.render(
-	<StrictMode>
-		<LoginPage />
-	</StrictMode>,
-	rootElement1);
 
+let token = localStorage.getItem("token");
+
+if(token) {
+	 RenderPages();
+}
+
+else {
+	const rootElement1 = document.getElementById("root1");
+	ReactDOM.render(
+		<StrictMode>
+			<LoginPage />
+		</StrictMode>,
+		rootElement1);
+}
 
 
