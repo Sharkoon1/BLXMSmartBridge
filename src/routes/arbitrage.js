@@ -5,10 +5,10 @@ let router = express.Router();
 
 router.post("/single", ArbitrageController.startSingleArbitrage);
 router.post("/toggle",  ArbitrageController.toggleArbitrage);
-router.get("/status", ArbitrageController.currentArbitrageStatus);
+router.get("/status", Authentication.authenticateToken, ArbitrageController.currentArbitrageStatus);
 router.post("/singleStep", ArbitrageController.singleStep);
 router.post("/stopStep", ArbitrageController.stopStep);
-router.get("/stepStatus", ArbitrageController.getStepStatus);
+router.get("/stepStatus", Authentication.authenticateToken, ArbitrageController.getStepStatus);
 
 module.exports = router;
 
