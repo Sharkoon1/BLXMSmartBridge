@@ -8,8 +8,10 @@ export default function SettingsModal() {
     var url = UrlHandler();
     const [alert, setAlert] = useState();
     const [error, setError] = useState();
+    
     const [slippageEth, setSlippageEth] = useState(0);
     const [slippageBsc, setSlippageBsc] = useState(0);
+
 
     useEffect(() => {   
         fetch(url +"api/slippage/",
@@ -39,6 +41,21 @@ export default function SettingsModal() {
             });
     }
 
+    function onChangeBsc(e){
+        const re = /^[0-9\b]+$/;
+        if (re.test(e.target.value)) {
+            setSlippageBsc(e.target.value);
+        }    
+    }
+
+    function onChangeEth(e){
+        const re = /^[0-9\b]+$/;
+        if (re.test(e.target.value)) {
+            setSlippageEth(e.target.value);
+        }    
+    }
+
+
     return (
         <div className='settingsModal' id='settingsModal'>
             <div className='modalContent'>
@@ -48,12 +65,12 @@ export default function SettingsModal() {
                     <div> 
                         <div>
                             <span className='modalSubHeading'>ETH</span>
-                            <input className='modalInput' onInput={e => setSlippageEth(e.target.value)} placeholder={slippageEth}></input>
+                            <input className='modalInput' type="number"  onChange={onChangeEth} placeholder={slippageEth}></input>
                         </div> 
 
                         <div>
                             <span className='modalSubHeading'>BSC</span>
-                            <input className='modalInput' onInput={e => setSlippageBsc(e.target.value)} placeholder={slippageBsc}></input>
+                            <input className='modalInput' type="number" onChange={onChangeBsc} placeholder={slippageBsc}></input>
                         </div> 
                         
                         <AlertInfo className="alertInfo" message={alert}></AlertInfo>
