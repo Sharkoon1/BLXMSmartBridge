@@ -3,7 +3,7 @@ const AuthorizationController = require("../controllers/authorizationController"
 
 var router = express.Router();
 
-router.post("/login", AuthorizationController.authorize);
+router.post("/login", AuthorizationController.login);
 router.post("/register", AuthorizationController.register);
 router.get("/register:account", AuthorizationController.isRegistered);
 

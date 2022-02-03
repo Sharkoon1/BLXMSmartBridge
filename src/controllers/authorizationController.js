@@ -1,8 +1,8 @@
 const apiResponse = require("../helpers/apiResponse");
-const constants = require("../constants");
-const DataBaseService = require("../service/DataBaseService");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const DataBaseService = require("../service/DataBaseService");
 
 /**
  * Authorize user wallets.
@@ -10,9 +10,8 @@ const jwt = require("jsonwebtoken");
  * @returns {Object}
  */
 exports.login = [
-	function (req, res) {
+	async function (req, res) {
 		try {
-
 			const { account, password } = req.body;
 
 			// Validate user input
@@ -25,18 +24,14 @@ exports.login = [
 			if (userData && (await bcrypt.compare(password, userData.password))) {
 				// Create token
 				const token = jwt.sign(
-				  { user_id: user._id, account },
+				  { user_id: userData._id, account },
 				  process.env.TOKEN_KEY,
 				  {
 					expiresIn: "2h",
 				  }
 				);
 		  
-				// save user token
-				userData.token = token;
-		  
-				// user
-				return apiResponse.successResponseWithData(res, "Login succesful.", {user: userData});
+				return apiResponse.successResponseWithData(res, "Login succesful.", {token: token});
 			}
 
 			return apiResponse.unauthorizedResponse(res, "Invalid credentials.");
@@ -48,21 +43,22 @@ exports.login = [
 	}
 ];
 
+
 /**
  * Authorize user wallets.
  * 
  * @returns {Object}
  */
  exports.register = [
-	function (req, res) {
+	async function (req, res) {
 		try {
 			const { account, password } = req.body;
 
-			encryptedPassword = await bcrypt.hash(password, 10);
+			let encryptedPassword = await bcrypt.hash(password, 10);
 
-			const authorizedWallet = await User.findOne({ account });
+			const user = await User.findOne({ account });
 
-			if(!authorizedWallet) {
+			if(!user) {
 				return apiResponse.unauthorizedResponse(res, "User is not authorized to connect.");
 			}
 
@@ -78,7 +74,6 @@ exports.login = [
 			DataBaseService.AddData({
 				account: account, 
 				password: encryptedPassword,
-				token: token,
 				isRegistered: true
 			}, User);
 
@@ -96,7 +91,7 @@ exports.login = [
  * @returns {Object}
  */
  exports.isRegistered = [
-	function (req, res) {
+	async function (req, res) {
 		try {
 			const { account } = req.query.account;  
 

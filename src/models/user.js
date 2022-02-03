@@ -3,8 +3,7 @@ const mongoose = require("mongoose");
 const User = new mongoose.Schema({
     account: { type: String, unique: true },
     password: { type: String},
-    token: { type: String },
-    isRegistered: { type: Boolean }
+    isRegistered: { type: Boolean}
 });
 
 module.exports = mongoose.model("User", User);
