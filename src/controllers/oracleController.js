@@ -1,5 +1,7 @@
 const apiResponse = require("../helpers/apiResponse");
 const dataService = require("../service/dataService");
+const constants = require("../constants");
+
 
 /**
  * Get prices for tokens on both networks. 
@@ -36,6 +38,8 @@ exports.liquidity = [
 			let ETHBasicName = ETHTokenNames[1];
 			let BSCWalletBalance = await dataService.getWalletBalance("BSC");
 			let ETHWalletBalance = await dataService.getWalletBalance("ETH");
+			let BSCArbitrageContractAddress = constants.ARBITRAGE_CONTRACT_ADDRESS_BSC_TESTNET;
+			let ETHArbitrageContractAddress = constants.ARBITRAGE_CONTRACT_ADDRESS_ETH_TESTNET;
 			return await apiResponse.successResponseWithData(res, "Operation success", {
 				BSCStable: BSCStableBalance,
 				BSCBasic: BSCBasicBalance,
@@ -46,7 +50,9 @@ exports.liquidity = [
 				NameBSCStable: BSCStableName,
 				NameBSCBasic: BSCBasicName,
 				NameETHStable: ETHStableName,
-				NameETHBasic: ETHBasicName
+				NameETHBasic: ETHBasicName,
+				BSCArbitrageContractAddress: BSCArbitrageContractAddress,
+				ETHArbitrageContractAddress: ETHArbitrageContractAddress
 			});
 		} catch (err) {
 			//throw error in json response with status 500. 
