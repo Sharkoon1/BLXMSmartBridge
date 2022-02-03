@@ -37,8 +37,14 @@ class ArbitrageService {
 			this.stopCycle = false;
 			this.isRunning = false;
 	
-			this.uniswapFees = new BigNumber(constants.UNISWAP_FEES);
-			this.pancakeswapFees = new BigNumber(constants.PANCAKESWAP_FEES);
+			if (process.env.NODE_ENV === "production") {
+				this.uniswapFees = new BigNumber(constants.UNISWAP_FEES);
+				this.pancakeswapFees = new BigNumber(constants.PANCAKESWAP_FEES);
+			}
+			else {
+				this.uniswapFees = new BigNumber(constants.UNISWAP_FEES_TESTNET);
+				this.pancakeswapFees = new BigNumber(constants.PANCAKESWAP_FEES_TESTNET);
+			}
 	}
 
 	async init() {
@@ -124,7 +130,7 @@ class ArbitrageService {
 	async calculateSwapEth(basicCheap, stableCheap, basicExpensive, stableExpensive){ // When ETH is more expensive
 		this.adjustmentValueStable = this.getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, stableExpensive);
 
-		this.adjustmentValueBasic = this.amountOut(this.pancakeswapFees, this.adjustmentValueStable, basicCheap, stableCheap);
+		this.adjustmentValueBasic = this.amountOut(this.pancakeswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
 		 
 		this.stableProfitAfterGas = await this.calculateSwapProfitEth(basicExpensive, stableExpensive);
 
@@ -172,7 +178,7 @@ class ArbitrageService {
 	async calculateSwapBsc(basicCheap, stableCheap, basicExpensive, stableExpensive){ // When BSC is more expensive  
 		this.adjustmentValueStable = this.getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, stableExpensive);
 
-		this.adjustmentValueBasic = this.amountOut(this.uniswapFees, this.adjustmentValueStable, basicCheap, stableCheap);
+		this.adjustmentValueBasic = this.amountOut(this.uniswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
 
 		this.stableProfitAfterGas = await this.calculateSwapProfitBsc(basicExpensive, stableExpensive);
 
@@ -226,29 +232,16 @@ class ArbitrageService {
 		let gasPriceBsc = (await this._arbitrageContractBsc.provider.getFeeData()).gasPrice;
 		let gasPriceEth = (await this._arbitrageContractEth.provider.getFeeData()).maxFeePerGas;
 
-		
-		console.log(gasPriceBsc.toString());
-		console.log(gasLimitBsc.toString());
-		
 		let wethPrice = await this._oracleContractEth.getWrappedPrice();
 		let wbnbPrice = await this._oracleContractBsc.getWrappedPrice();
-
-		
-		console.log(wethPrice.toString());
-		console.log(wbnbPrice.toString());
-
-		console.log(this.fromEthersToBigNumber(gasPriceBsc.mul(gasLimitBsc)));
-
 
 		let totalFeeBsc = this.fromEthersToBigNumber(gasPriceBsc.mul(gasLimitBsc)).multipliedBy(wbnbPrice);
 		let totalFeeEth = this.fromEthersToBigNumber(gasPriceEth.mul(gasLimitEth)).multipliedBy(wethPrice);
 		
-		console.log(totalFeeBsc);
-
 		let transactionFees = totalFeeBsc.plus(totalFeeEth);
 
 		let basicAmountOut = this.adjustmentValueBasic.multipliedBy(this.slippageBsc);
-		
+
 		let stableAmountOut = this.amountOut(this.uniswapFees, basicAmountOut, basicExpensive, stableExpensive).multipliedBy(this.slippageEth);
 
 		let swapProfit = stableAmountOut.minus(transactionFees);
@@ -271,12 +264,6 @@ class ArbitrageService {
 		
 		let wethPrice = await this._oracleContractEth.getWrappedPrice();
 		let wbnbPrice = await this._oracleContractBsc.getWrappedPrice();
-
-		console.log(wethPrice.toString());
-		console.log(wbnbPrice.toString());
-
-		console.log(gasPriceBsc);
-		console.log(gasLimitBsc);
 
 		let totalFeeBsc = this.fromEthersToBigNumber(gasPriceBsc.mul(gasLimitBsc)).multipliedBy(wbnbPrice);
 		let totalFeeEth = this.fromEthersToBigNumber(gasPriceEth.mul(gasLimitEth)).multipliedBy(wethPrice);
@@ -320,12 +307,12 @@ class ArbitrageService {
 		return adjustmentValue;		
 	}
 
-	amountOut(fees, input, basic, stable) {
-		let numeratorCheap = input.multipliedBy(fees).multipliedBy(basic);
-		let denumeratorExpensive = stable.plus(input.multipliedBy(fees));
-		let basicNew = basic.minus(numeratorCheap.dividedBy(denumeratorExpensive));
-
-		return basic.minus(basicNew);
+	amountOut(fees, input, inputReserve, outputReserve) {
+		let amountInWithFees = input.multipliedBy(fees.multipliedBy(1000));
+		let numerator = amountInWithFees.multipliedBy(outputReserve);
+		let denominator = inputReserve.multipliedBy(1000).plus(amountInWithFees);
+		
+		return numerator.dividedBy(denominator);
 	}
 
 	async getPoolPrices(){

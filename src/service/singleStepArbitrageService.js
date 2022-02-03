@@ -88,20 +88,20 @@ class SingleStepArbitrageService{
 
     async executeSwap(){
         if(ArbitrageService.poolPriceEth.gt(ArbitrageService.poolPriceBsc)){
-            if(ArbitrageService.profitAfterSlippage.gt(0)) {
+            if(ArbitrageService.stableProfitAfterGas.gt(0)) {
                 await ArbitrageService.swapEth();
             }
             else {
-                logger.info("ETH: Calculated profit after slippage: " + ArbitrageService.profitAfterSlippage + " is negative.");
+                logger.info("ETH: Calculated profit after slippage: " + ArbitrageService.stableProfitAfterGas + " is negative.");
                 logger.info("Skipping current arbitrage cycle...");
             }
         }
         else {
-            if(ArbitrageService.profitAfterSlippage.gt(0)) {
+            if(ArbitrageService.stableProfitAfterGas.gt(0)) {
                 await ArbitrageService.swapBsc();
             }
             else {
-                logger.info("BSC: Calculated profit after slippage: " + ArbitrageService.profitAfterSlippage + " is negative.");
+                logger.info("BSC: Calculated profit after slippage: " + ArbitrageService.stableProfitAfterGas + " is negative.");
                 logger.info("Skipping current arbitrage cycle...");
             }
         }
