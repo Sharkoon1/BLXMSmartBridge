@@ -30,7 +30,6 @@ const connectWalletHandler = (setError, setOtherError) => {
 						body: JSON.stringify({ account: result[0] })
 					}).then(response => response.json()).then(result => {
 						localStorage.setItem("token", result.data.token);
-
 						if (result.status === 1) {
 							//####### NAVBAR #######
 							const navbar = document.getElementById("navbar");

@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import UrlHandler from "./UrlHandler";
 const url = UrlHandler();
 import "./style/Poolsize.css";
+import { get } from "./RequestHandler";
 
 export default class Poolsize extends Component {
 
@@ -24,8 +25,7 @@ export default class Poolsize extends Component {
 		}
 	}
 	componentDidMount() {
-		fetch(url + "api/oracle/poolData ").then(res => res.json())
-										   .then(result => {
+		get(url + "api/oracle/poolData").then(result => {
 			this.setState(prevState => {
 				return {
 					PancakeswapBNB: result.data.liquidities.PancakeswapStable,
