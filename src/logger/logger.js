@@ -34,6 +34,10 @@ module.exports = createLogger({
 		}),
 		new transports.MongoDB({
 			db: process.env.MONGODB_URL,
+			options: {
+				useNewUrlParser: true,
+				useUnifiedTopology: true
+			},
 			collection: "logs",
 			format: format.combine(format.timestamp(), format.json()),
 			decolorize: true
