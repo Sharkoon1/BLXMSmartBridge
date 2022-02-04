@@ -1,4 +1,4 @@
-import React, { StrictMode, Component, Fragment, useState } from "react";
+import React, { StrictMode, Component, Fragment } from "react";
 import "./style/LoginPage.css"
 
 import ReactDOM from "react-dom";
@@ -13,101 +13,99 @@ import Buttons from "./Buttons";
 import SingleStep from "./SingleStep"
 import FullAutonomous from "./FullAutonomous";
 import AlertInfo from "./AlertInfo";
+import ErrorMessage from "./ErrorMessage";
 import ProgressOutline from "./ProgressOutline";
+import { post } from "./RequestHandler";
 
 import Dashboad from "./Dashboad";
 import UrlHandler from "./UrlHandler";
 //import LoginPage from "./LoginPage";
 
-const connectWalletHandler = (setError, setOtherError) => {
-	if (window.ethereum && window.ethereum.isMetaMask) {
-		window.ethereum.request({ method: "eth_requestAccounts" })
-			.then(result => {						
-				fetch(UrlHandler() + "api/authorization/login",
-					{
-						method: "post",
-						headers: new Headers({ "content-type": "application/json" }),
-						body: JSON.stringify({ account: result[0] })
-					}).then(response => response.json()).then(result => {
-						localStorage.setItem("token", result.data.token);
-						if (result.status === 1) {
-							//####### NAVBAR #######
-							const navbar = document.getElementById("navbar");
-							ReactDOM.render(
-								<StrictMode>
-									<Navbar />
-								</StrictMode>,
-								navbar
-							);
+const connectWalletHandler = () => {
+    if (window.ethereum && window.ethereum.isMetaMask) {
+        window.ethereum.request({ method: "eth_requestAccounts" })
+            .then(result => {
+                post(UrlHandler() + "api/authorization", { User: result[0] }).then(result => {
+                        debugger;
+                        if (result.status === 1) {
+                            //####### NAVBAR #######
+                            const navbar = document.getElementById("navbar");
+                            ReactDOM.render(
+                                <StrictMode>
+                                    <Navbar />
+                                </StrictMode>,
+                                navbar
+                            );
 
-							//####### Abitrage Console Full Autonomous ####### 
-							const rootElement2 = document.getElementById("buttons");
-							ReactDOM.render(
-								<StrictMode>
-									<FullAutonomous />
-								</StrictMode>,
-								rootElement2
-							);
+                            //####### Abitrage Console Full Autonomous ####### 
+                            const rootElement2 = document.getElementById("buttons");
+                            ReactDOM.render(
+                                <StrictMode>
+                                    <FullAutonomous />
+                                </StrictMode>,
+                                rootElement2
+                            );
 
-							//####### Abitrage Console Single Step ####### 
+                            //####### Abitrage Console Single Step ####### 
 
-							ReactDOM.render(
-								<StrictMode>
-									<SingleStep />
-								</StrictMode>,
-								rootElement1
-							);
+                            ReactDOM.render(
+                                <StrictMode>
+                                    <SingleStep />
+                                </StrictMode>,
+                                rootElement1
+                            );
 
-							//####### Dashboard ####### 
-							const dashboardGraph = document.getElementById("root2");
-							ReactDOM.render(
-								<StrictMode>
-									<Dashboad />
-								</StrictMode>,
-								dashboardGraph
-							);
-						} else {
-							setError(true);
-						}
-					});
-			})
-			.catch(error => {
-				setOtherError(error.message);
-			});
+                            //####### Dashboard ####### 
+                            const dashboardGraph = document.getElementById("root2");
+                            ReactDOM.render(
+                                <StrictMode>
+                                    <Dashboad />
+                                </StrictMode>,
+                                dashboardGraph
+                            );
+                        } else {
+                            //TODO
+                            const alertWindow = document.getElementsByClassName("alert-info");
+                            console.log(alertWindow);
+                            alertWindow.style.display("block");
+                        }
+                    });
+            })
+            .catch(error => {
+                const ErrorMessage = document.getElementById("root");
+                ReactDOM.render(
+                    <StrictMode>
+                        <AlertInfo message={error.message} />
+                    </StrictMode>,
+                    ErrorMessage
+                );
+            });
 
-	} else {
-		console.log("Need to install MetaMask");
-		setErrorMessage("Please install MetaMask browser extension to interact");
-	}
+    } else {
+        console.log("Need to install MetaMask");
+    }
 }
 
 
 function LoginPage() {
-	const [error, setError] = useState(false);
-	const [othererror, setOtherError] = useState("");
-	return (
-		<Fragment>
-			<div className="empty"></div>
-			<div className="loginPage">
-				<img className="logoBLXM" src="../BLXMToken.png"></img>
-				<h1 className="textLogin">Welcome to BLXM Smartbridge!</h1>
-				<h1 className="textLogin">Login to enter admin view</h1>
-				<button className="button" id="loginButton" onClick={() => connectWalletHandler(setError, setOtherError)}>Login with MetaMask</button>
-			</div>
-			<div style={{ width: "40%" , marginLeft: "auto", marginRight: "auto"}}>
-				{error ? <AlertInfo message={"You are not authorized to access this website."} /> : null}
-				{othererror !== "" ? <AlertInfo message={othererror} /> : null}
-			</div>
-		</Fragment>
-	);
+    return (
+        <Fragment>
+            <div className="empty"></div>
+            <div className="loginPage">
+                <img className="logoBLXM" src="../BLXMToken.png"></img>
+                <h1 className="textLogin">Welcome to BLXM Smartbridge!!!</h1>
+                <h1 className="textLogin">Login to enter admin view</h1>
+                <button className="button" id="loginButton" onClick={connectWalletHandler}>Login with MetaMask</button>
+            </div>
+            <AlertInfo message={"You are not authorized to access this website."} />
+            <ErrorMessage message={"An error occured"}/>
+        </Fragment>
+    );
 }
 
 const rootElement1 = document.getElementById("root1");
 ReactDOM.render(
-	<StrictMode>
-		<LoginPage />
-	</StrictMode>,
-	rootElement1);
-
-
-
+    <StrictMode>
+        <LoginPage />
+    </StrictMode>,
+    rootElement1);

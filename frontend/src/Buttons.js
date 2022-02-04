@@ -2,6 +2,7 @@ import React, { Component, Fragment } from "react";
 import socketIOClient from "socket.io-client";
 import "./style/Buttons.css";
 import UrlHandler from "./UrlHandler";
+import { get } from "./RequestHandler";
 
 export default class Buttons extends Component  {
 
@@ -20,11 +21,7 @@ export default class Buttons extends Component  {
 
 
 	componentDidMount() {
-	 fetch(this.url+"api/arbitrage/status",
-				{
-					method: "get",
-				}).then(response => response.json())
-				.then(result => {
+		get(this.url+"api/arbitrage/status").then(result => {
 					if(result.data.ArbitrageCycleStatus) {
 						this.setState({connButtonText: 'Job running', isRunning: true});
 					}
