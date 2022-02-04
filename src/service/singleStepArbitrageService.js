@@ -52,7 +52,12 @@ class SingleStepArbitrageService{
                         break;
                     case 3: 
                         logger.info("Calculating arbitrage ...");
-                        await this.calculateArbitrage();
+                        
+                        var liquidityAvaible = await this.calculateArbitrage();
+
+                        if(!liquidityAvaible) {
+                            this.resetSingleStepArbitrage();
+                        }
                         
                         logger.info("Next step: Executing swaps ...");
                         break;
@@ -79,10 +84,10 @@ class SingleStepArbitrageService{
 
     async calculateArbitrage(){
         if(ArbitrageService.poolPriceEth.gt(ArbitrageService.poolPriceBsc)){
-            await ArbitrageService.calculateSwapEth(ArbitrageService.tokenArrayBsc[1], ArbitrageService.tokenArrayBsc[0], ArbitrageService.tokenArrayEth[1], ArbitrageService.tokenArrayEth[0]);
+            return await ArbitrageService.calculateSwapEth(ArbitrageService.tokenArrayBsc[1], ArbitrageService.tokenArrayBsc[0], ArbitrageService.tokenArrayEth[1], ArbitrageService.tokenArrayEth[0]);
         }
         else {
-            await ArbitrageService.calculateSwapBsc(ArbitrageService.tokenArrayEth[1], ArbitrageService.tokenArrayEth[0], ArbitrageService.tokenArrayBsc[1], ArbitrageService.tokenArrayBsc[0]);  
+            return await ArbitrageService.calculateSwapBsc(ArbitrageService.tokenArrayEth[1], ArbitrageService.tokenArrayEth[0], ArbitrageService.tokenArrayBsc[1], ArbitrageService.tokenArrayBsc[0]);  
         }
     }
 
