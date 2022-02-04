@@ -80,8 +80,14 @@ class ArbitrageService {
 	
 				if(this.poolPriceEth.gt(this.poolPriceBsc)){
 	
-					await this.calculateSwapEth(this.tokenArrayBsc[1], this.tokenArrayBsc[0], this.tokenArrayEth[1], this.tokenArrayEth[0]);
+					let liquidityAvaible = await this.calculateSwapEth(this.tokenArrayBsc[1], this.tokenArrayBsc[0], this.tokenArrayEth[1], this.tokenArrayEth[0]);
 	
+					if(!liquidityAvaible) {
+						await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
+
+						continue;
+					}
+
 					if(this.stableProfitAfterGas.gt(0)) {
 						await this.swapEth();
 					}
@@ -89,19 +95,29 @@ class ArbitrageService {
 					else {
 						logger.info("ETH: Calculated profit after gas fees: " + this.stableProfitAfterGas + " is negative.");
 						logger.info("Skipping current arbitrage cycle...");
+
+						await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
 					}
 					
 				}
 	
 				else {
-					await this.calculateSwapBsc(this.tokenArrayEth[1], this.tokenArrayEth[0], this.tokenArrayBsc[1], this.tokenArrayBsc[0]);  
-	
+					let liquidityAvaible = await this.calculateSwapBsc(this.tokenArrayEth[1], this.tokenArrayEth[0], this.tokenArrayBsc[1], this.tokenArrayBsc[0]);  
+
+					if(!liquidityAvaible) {
+						await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
+
+						continue;
+					}
+
 					if(this.stableProfitAfterGas.gt(0)) {
 						await this.swapBsc();
 					}
 					else {
 						logger.info("BSC: Calculated profit after gas fees: " + this.stableProfitAfterGas + " is negative.");
 						logger.info("Skipping current arbitrage cycle...");
+
+						await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
 					}
 				
 				}
@@ -131,34 +147,35 @@ class ArbitrageService {
 		this.adjustmentValueStable = this.getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, stableExpensive);
 
 		this.adjustmentValueBasic = this.amountOut(this.pancakeswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
-		 
-		this.stableProfitAfterGas = await this.calculateSwapProfitEth(basicExpensive, stableExpensive);
 
 		logger.info("Adjustment Value stable: " + this.adjustmentValueStable); 
-		logger.info("Adjustment Value basic: " + this.adjustmentValueBasic);    
-	}		
-
-	async swapEth(){
-		logger.info("Executing swaps...");
+		logger.info("Adjustment Value basic: " + this.adjustmentValueBasic); 
 
 		if(this.adjustmentValueStable.gt(this.bscArbitrageBalance.stable)) { // validate if arbitrage contract has enough stable tokens for swap
 			logger.warn("BSC: Arbitrage contract stable balance is less than adjustment value.");
 			logger.warn("Stable balance: " + this.bscArbitrageBalance.stable);
 			logger.info("Skipping swaps and current cycle...");
 
-			return;
+			return false;
 		}
 
-		let swapStableToBasicTx = await this._arbitrageContractBsc.swapStableToBasic(this.toEthersBigNumber(this.adjustmentValueStable));
-		
 		if(this.adjustmentValueBasic.gt(this.ethArbitrageBalance.basic)) { // validate if arbitrage contract has enough basic tokens for swap
 			logger.warn("ETH: Arbitrage contract basic balance is less than adjustment value.");
 			logger.warn("Basic balance: " + this.ethArbitrageBalance.basic);
 			logger.info("Skipping swaps and current cycle...");
 
-			return;
+			return false;
 		}
 
+		this.stableProfitAfterGas = await this.calculateSwapProfitEth(basicExpensive, stableExpensive); 
+
+		return true;
+	}		
+
+	async swapEth(){
+		logger.info("Executing swaps...");
+
+		let swapStableToBasicTx = await this._arbitrageContractBsc.swapStableToBasic(this.toEthersBigNumber(this.adjustmentValueStable));
 		let swapBasicToStableTx = await this._arbitrageContractEth.swapBasicToStable(this.toEthersBigNumber(this.adjustmentValueBasic));
 		
 		await swapStableToBasicTx.wait(); //waits for the promise of swapStableToBasic to be resolved
@@ -180,33 +197,34 @@ class ArbitrageService {
 
 		this.adjustmentValueBasic = this.amountOut(this.uniswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
 
-		this.stableProfitAfterGas = await this.calculateSwapProfitBsc(basicExpensive, stableExpensive);
-
 		logger.info("Adjustment Value stable: " + this.adjustmentValueStable); 
-		logger.info("Adjustment Value basic: " + this.adjustmentValueBasic);    
-	}
-
-	async swapBsc(){
-		logger.info("Executing swaps...");
-
+		logger.info("Adjustment Value basic: " + this.adjustmentValueBasic); 
+	
 		if(this.adjustmentValueStable.gt(this.ethArbitrageBalance.stable)) { // validate if arbitrage contract has enough stable tokens for swap
 			logger.warn("ETH: Arbitrage contract stable balance is less than the adjustment value.");
 			logger.warn("Stable token balance: " + this.ethArbitrageBalance.stable);
 			logger.info("Skipping swaps and current cycle...");
 
-			return;
+			return false;
 		}
-
-		let swapStableToBasicTx = await this._arbitrageContractEth.swapStableToBasic(this.toEthersBigNumber(this.adjustmentValueStable));
 
 		if(this.adjustmentValueBasic.gt(this.bscArbitrageBalance.basicBalance)) { // validate if arbitrage contract has enough basic tokens for swap
 			logger.warn("BSC: Arbitrage contract basic balance is less than the adjustment value.");
 			logger.warn("Basic token balance: " + this.bscArbitrageBalance.basicBalance);
 			logger.info("Skipping swaps and current cycle...");
 
-			return;
+			return false;
 		}
 
+		this.stableProfitAfterGas = await this.calculateSwapProfitBsc(basicExpensive, stableExpensive);
+
+		return true;
+	}
+
+	async swapBsc(){
+		logger.info("Executing swaps...");
+
+		let swapStableToBasicTx = await this._arbitrageContractEth.swapStableToBasic(this.toEthersBigNumber(this.adjustmentValueStable));
 		let swapBasicToStableTx = await this._arbitrageContractBsc.swapBasicToStable(this.toEthersBigNumber(this.adjustmentValueBasic));
 
 		await swapStableToBasicTx.wait(); //waits for the promise of swapStableToBasic to be resolved
