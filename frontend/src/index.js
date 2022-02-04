@@ -1,4 +1,4 @@
-import React, { StrictMode, Component, Fragment, useState } from "react";
+import React, { StrictMode, Component, Fragment } from "react";
 import "./style/LoginPage.css"
 
 import ReactDOM from "react-dom";
@@ -13,7 +13,9 @@ import Buttons from "./Buttons";
 import SingleStep from "./SingleStep"
 import FullAutonomous from "./FullAutonomous";
 import AlertInfo from "./AlertInfo";
+import ErrorMessage from "./ErrorMessage";
 import ProgressOutline from "./ProgressOutline";
+import { post } from "./RequestHandler";
 
 import Dashboad from "./Dashboad";
 import UrlHandler from "./UrlHandler";
@@ -41,10 +43,9 @@ const connectWalletHandler = (setError, setOtherError) => {
 				setOtherError(error.message);
 			});
 
-	} else {
-		console.log("Need to install MetaMask");
-		setErrorMessage("Please install MetaMask browser extension to interact");
-	}
+    } else {
+        console.log("Need to install MetaMask");
+    }
 }
 
 function RenderPages() {

@@ -3,6 +3,8 @@ import "./style/SettingsModal.css"
 import UrlHandler from "./UrlHandler";
 import AlertInfo from "./AlertInfo";
 import ErrorMessage from './ErrorMessage';
+import { get } from "./RequestHandler";
+import { post } from "./RequestHandler";
 
 export default function SettingsModal() {
     var url = UrlHandler();
@@ -12,11 +14,7 @@ export default function SettingsModal() {
     const [slippageBsc, setSlippageBsc] = useState(0);
 
     useEffect(() => {   
-        fetch(url +"api/slippage/",
-        {
-            method: "get",
-        }).then(response => response.json())
-        .then(result => {
+        get(url +"api/slippage/").then(result => {
             if(result.data.slippage) {
                 setSlippageBsc(result.data.slippage.bsc);
                 setSlippageEth(result.data.slippage.eth);
@@ -25,12 +23,7 @@ export default function SettingsModal() {
      }, []);
 
     function apply() {
-        fetch(url+"api/slippage/",
-        {
-            headers: { "Content-Type": "application/json" },
-            method: "post",
-            body: JSON.stringify({slippageEth:parseInt(slippageEth), slippageBsc: parseInt(slippageBsc)},)
-        }).then(response => {
+        post(url+"api/slippage/", {slippageEth:parseInt(slippageEth), slippageBsc: parseInt(slippageBsc)}).then(response => {
             if(response.status === 200) {
                 setAlert("Success!");
             } else {

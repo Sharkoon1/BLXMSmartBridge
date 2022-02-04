@@ -9,7 +9,7 @@ import {
 	Legend
 } from "recharts";
 import UrlHandler from "./UrlHandler";
-import axios from 'axios';
+import { get } from "./RequestHandler";
 import "./style/DashboardGraph.css";
 
 
@@ -40,9 +40,9 @@ class DashboardGraph extends Component {
 	}
 
 	componentDidMount() {
-		axios.get(url + "api/oracle/price").then((res) => {
-			let uni = res.data.data.UniBLXMPrice;
-			let pancake = res.data.data.PancakeBLXMPrice;
+		get(url + "api/oracle/price").then(result => {
+			let uni = result.data.UniBLXMPrice;
+			let pancake = result.data.PancakeBLXMPrice;
 
 			let dataArray = [];
 
@@ -55,11 +55,7 @@ class DashboardGraph extends Component {
 
 			let distinctTimeStampData = dataArray.filter((v,i,a)=>a.findIndex(t=>(t.timestamp===v.timestamp))===i);
 
-			console.log(this.state.data);
-			console.log(res.data.data.UniBLXMPrice.Price);
-			console.log(res.data.data.UniBLXMPrice.Timestamp);
-			console.log(res.data.data.PancakeBLXMPrice.Price);
-			console.log(res.data.data.PancakeBLXMPrice.Timestamp);
+		
 			this.setState(prevState => {
 				return {
 					data: [...prevState.data, ...distinctTimeStampData]

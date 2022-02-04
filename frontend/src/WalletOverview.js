@@ -1,45 +1,43 @@
 import React, { Component } from "react";
 import UrlHandler from "./UrlHandler";
-import axios from 'axios';
+import { get } from "./RequestHandler";
 const url = UrlHandler();
 
-//Todo
-//get data
-//insert to frontend
 
 export default class WalletOverview extends Component {
 
 	constructor(props) {
 		super(props)
 		this.state = {
-			AbitrageETH: "Loading ",
-			AbitrageBNB: "Loading ",
-			BinanceBNB: "Loading",
-			BinanceBLXM: "Loading",
-			EthereumETH: "Loading",
-			EthereumBLXM: "Loading",
-			NameBSCStable: "",
-			NameBSCBasic: "",
-			NameETHStable: "",
-			NameETHBasic: ""
+			AbitrageETH: "Loading...",
+			AbitrageBNB: "Loading...",
+			BinanceBNB: "Loading...",
+			BinanceBLXM: "Loading...",
+			EthereumETH: "Loading...",
+			EthereumBLXM: "Loading...",
+			NameBSCStable: "Loading...",
+			NameBSCBasic: "Loading...",
+			NameETHStable: "Loading...",
+			NameETHBasic: "Loading..."
 		}
 	}
 	
 	componentDidMount() {
-		axios.get(url + "api/oracle/liquidity ").then((res) => {
-			console.log(res);
+		get(url + "api/oracle/liquidity ").then(result => {
+			console.log(result);
 			this.setState(prevState => {
 				return {
-					AbitrageETH: res.data.data.ETHBalance,
-					AbitrageBNB: res.data.data.BSCBalance,
-					BinanceBNB: res.data.data.BSCStable,
-					BinanceBLXM: res.data.data.BSCBasic,
-					EthereumETH: res.data.data.ETHStable,
-					EthereumBLXM: res.data.data.ETHBasic,
-					NameBSCStable: res.data.data.NameBSCStable,
-					NameBSCBasic: res.data.data.NameBSCBasic,
-					NameETHStable: res.data.data.NameETHStable,
-					NameETHBasic: res.data.data.NameETHBasic
+					AbitrageETH: result.data.ETHBalance,
+					AbitrageBNB: result.data.BSCBalance,
+					BinanceBNB: result.data.BSCStable,
+					BinanceBLXM: result.data.BSCBasic,
+					EthereumETH: result.data.ETHStable,
+					EthereumBLXM: result.data.ETHBasic,
+					//Pooladres
+					NameBSCStable: result.data.NameBSCStable,
+					NameBSCBasic: result.data.NameBSCBasic,
+					NameETHStable: result.data.NameETHStable,
+					NameETHBasic: result.data.NameETHBasic
 				};
 			});
 		});
