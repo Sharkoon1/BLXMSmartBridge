@@ -1,7 +1,6 @@
 const apiResponse = require("../helpers/apiResponse");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
-const DataBaseService = require("../service/DataBaseService");
 
 /**
  * Authorize user wallets.
@@ -24,7 +23,7 @@ exports.login = [
 				// Create token
 				const token = jwt.sign(
 				  { user_id: userData._id, account: userData.account },
-				  	process.env.TOKEN_KEY,
+				  	process.env.TOKEN_SECRET,
 				  {
 					expiresIn: "2h",
 				  }

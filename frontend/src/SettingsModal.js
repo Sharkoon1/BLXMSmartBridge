@@ -24,7 +24,7 @@ export default function SettingsModal() {
 
     function apply() {
         post(url+"api/slippage/", {slippageEth:parseInt(slippageEth), slippageBsc: parseInt(slippageBsc)}).then(response => {
-            if(response.status === 200) {
+            if(response.status === 1) {
                 setAlert("Success!");
             } else {
                 setError("An error occured. Response code: " + response.status)
