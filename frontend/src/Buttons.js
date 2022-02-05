@@ -2,7 +2,7 @@ import React, { Component, Fragment } from "react";
 import socketIOClient from "socket.io-client";
 import "./style/Buttons.css";
 import UrlHandler from "./UrlHandler";
-import { get } from "./RequestHandler";
+import { get, post } from "./RequestHandler";
 
 export default class Buttons extends Component  {
 
@@ -54,10 +54,7 @@ export default class Buttons extends Component  {
 			this.setState({connButtonText: 'Job running', isRunning: true});
 		}
 
-		fetch(this.url+"api/arbitrage/toggle",
-			{
-				method: "post",
-			});
+		post(this.url+"api/arbitrage/toggle",{});
 	};
 
 

@@ -7,6 +7,7 @@ const app = require("../app");
 const ArbitrageContract = require("../contracts/ArbitrageContract");
 const OracleContract = require("../contracts/OracleContract");
 const DataService = require("./DataService");
+const equationSolver = require("../math/equationSolver");
 
 class ArbitrageService {
 	constructor(){
@@ -144,7 +145,7 @@ class ArbitrageService {
 	}
 
 	async calculateSwapEth(basicCheap, stableCheap, basicExpensive, stableExpensive){ // When ETH is more expensive
-		this.adjustmentValueStable = this.getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, stableExpensive);
+		this.adjustmentValueStable = await this.getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, stableExpensive, this.pancakeswapFees, this.uniswapFees);
 
 		this.adjustmentValueBasic = this.amountOut(this.pancakeswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
 
@@ -193,7 +194,7 @@ class ArbitrageService {
 	}
 
 	async calculateSwapBsc(basicCheap, stableCheap, basicExpensive, stableExpensive){ // When BSC is more expensive  
-		this.adjustmentValueStable = this.getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, stableExpensive);
+		this.adjustmentValueStable = await this.getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, stableExpensive, this.pancakeswapFees, this.uniswapFees);
 
 		this.adjustmentValueBasic = this.amountOut(this.uniswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
 
@@ -301,28 +302,10 @@ class ArbitrageService {
 	}
 
     
-	getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, stableExpensive) {
-		let constantCheap = stableCheap.multipliedBy(basicCheap);
-		let constantExpensive = stableExpensive.multipliedBy(basicExpensive);   
-
-		let term1 = basicCheap.exponentiatedBy(2).multipliedBy(constantCheap).multipliedBy(constantExpensive).multipliedBy(this.pancakeswapFees.exponentiatedBy(2)).multipliedBy(this.uniswapFees.exponentiatedBy(2));
-		let term2 = (new BigNumber("2")).multipliedBy(basicCheap).multipliedBy(basicExpensive).multipliedBy(constantCheap).multipliedBy(constantExpensive).multipliedBy(this.pancakeswapFees.exponentiatedBy(2)).multipliedBy(this.uniswapFees);
-		let term3 = basicExpensive.exponentiatedBy(2).multipliedBy(constantCheap).multipliedBy(constantExpensive).multipliedBy(this.pancakeswapFees.exponentiatedBy(2));
-		let term4 = basicCheap.exponentiatedBy(2).multipliedBy(this.pancakeswapFees).multipliedBy(this.uniswapFees.exponentiatedBy(2)).multipliedBy(stableCheap);
-		let term5 = (new BigNumber("2")).multipliedBy(basicCheap).multipliedBy(basicExpensive).multipliedBy(this.pancakeswapFees).multipliedBy(this.uniswapFees).multipliedBy(stableCheap);
-		let term6 = basicCheap.multipliedBy(constantCheap).multipliedBy(this.pancakeswapFees).multipliedBy(this.uniswapFees.exponentiatedBy(2));
-		let term7 = basicExpensive.exponentiatedBy(2).multipliedBy(this.pancakeswapFees).multipliedBy(stableCheap);
-		let term8 = basicExpensive.multipliedBy(constantCheap).multipliedBy(this.pancakeswapFees).multipliedBy(this.uniswapFees);
-		let term9 = basicCheap.exponentiatedBy(2).multipliedBy(this.pancakeswapFees.exponentiatedBy(2)).multipliedBy(this.uniswapFees.exponentiatedBy(2));
-		let term10 = (new BigNumber("2")).multipliedBy(basicCheap).multipliedBy(basicExpensive).multipliedBy(this.pancakeswapFees.exponentiatedBy(2)).multipliedBy(this.uniswapFees);
-		let term11 = basicExpensive.exponentiatedBy(2).multipliedBy(this.pancakeswapFees.exponentiatedBy(2));
+	async getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, stableExpensive, feesExpansive, feesCheap) {
+		let adjustmentValue = await equationSolver.solveAdjustmentValue(basicCheap.toString(), stableCheap.toString(), basicExpensive.toString(), stableExpensive.toString(), feesExpansive.toString(), feesCheap.toString());
 		
-		let term1_8 = ((term1.plus(term2).plus(term3)).squareRoot()).minus(term4).minus(term5).plus(term6).minus(term7).plus(term8);
-		let term9_11 = term9.plus(term10).plus(term11);
-		
-		let adjustmentValue = term1_8.dividedBy(term9_11);
-		
-		return adjustmentValue;		
+		return new BigNumber(adjustmentValue);		
 	}
 
 	amountOut(fees, input, inputReserve, outputReserve) {
