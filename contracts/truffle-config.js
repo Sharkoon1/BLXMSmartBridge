@@ -55,14 +55,14 @@ module.exports = {
     },
     rinkeby: {
       networkCheckTimeout: 10000, 
-      provider: () => new HDWalletProvider([process.env.PRIVATE_KEY], `https://rinkeby.infura.io/v3/cc9d34df18bf4e29aa284200acaf8911`),
+      provider: () => new HDWalletProvider([process.env.PRIVATE_KEY], `https://eth.getblock.io/rinkeby/?api_key=2cea88c6-0bf3-41a7-9fe7-1368697f3806`),
       network_id: 4,       // Ropsten's id
       gas: 4500000,        // Ropsten has a lower block limit than mainnet
       gasPrice: 10000000000,
     },
     bsc: {
       networkCheckTimeout: 10000, 
-      provider: () => new HDWalletProvider([process.env.PRIVATE_KEY], `https://data-seed-prebsc-2-s3.binance.org:8545/`),
+      provider: () => new HDWalletProvider([process.env.PRIVATE_KEY], `https://bsc.getblock.io/testnet/?api_key=2cea88c6-0bf3-41a7-9fe7-1368697f3806`),
       network_id: 97,       // Ropsten's id
       gas: 4500000,        // Ropsten has a lower block limit than mainnet
       gasPrice: 10000000000,
