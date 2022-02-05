@@ -54,7 +54,7 @@ export default function SettingsModal() {
             <div className='modalContent'>
                 <h1 className='modalHeading'>Settings</h1>
                 <div className='modalSettings'>
-                    <h1>Set Slippage </h1>
+                    <h1>Set Slippage %</h1>
                     <div> 
                         <div>
                             <span className='modalSubHeading'>ETH</span>
