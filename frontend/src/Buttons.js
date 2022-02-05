@@ -21,11 +21,7 @@ export default class Buttons extends Component  {
 
 
 	componentDidMount() {
-	 fetch(this.url+"api/arbitrage/status",
-				{
-					method: "get",
-				}).then(response => response.json())
-				.then(result => {
+		get(this.url+"api/arbitrage/status").then(result => {
 					if(result.data.ArbitrageCycleStatus) {
 						this.setState({connButtonText: 'Job running', isRunning: true});
 					}

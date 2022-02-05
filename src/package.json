@@ -18,7 +18,7 @@
     "apollo-client": "^2.6.10",
     "apollo-link-http": "^1.5.17",
     "axios": "^0.24.0",
-    "bcrypt": "^3.0.6",
+    "bcrypt": "^3.0.8",
     "bignumber": "^1.1.0",
     "bignumber.js": "^9.0.2",
     "bnc-sdk": "^4.0.0",

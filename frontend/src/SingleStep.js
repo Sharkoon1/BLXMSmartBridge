@@ -4,6 +4,9 @@ import "./style/SingleStep.css"
 import SettingsModal from './SettingsModal';
 import UrlHandler from "./UrlHandler";
 import ProgressOutline from './ProgressOutline';
+import { get } from "./RequestHandler";
+import { post } from "./RequestHandler";
+
 
 export default function SingleStep() {
 	var url = UrlHandler();
@@ -15,11 +18,7 @@ export default function SingleStep() {
 	const onClick = () => setShowResults(!showResults)
 
 	useEffect(() => {
-		fetch(url + "api/arbitrage/stepStatus",
-			{
-				method: "get",
-			}).then(response => response.json())
-			.then(result => {
+		get(url + "api/arbitrage/stepStatus").then(result => {
 				if (result.data.stepStatus) {
 					setStepStatus(result.data.stepStatus);
 				}
@@ -30,24 +29,14 @@ export default function SingleStep() {
 		setStopDisabled(true);
 		setStepStatus(1);
 
-		fetch(url + "api/arbitrage/stopStep",
-			{
-				headers: { "Content-Type": "application/json" },
-				method: "post"
-			}).then(response => response.json())
-			.then(() => {
+		post(url + "api/arbitrage/stopStep").then(() => {
 				setStopDisabled(false);
 			});
 	}
 
 	function onNextStep() {
 		setStartDisabled(true);
-		fetch(url + "api/arbitrage/singleStep",
-			{
-				headers: { "Content-Type": "application/json" },
-				method: "post",
-				body: JSON.stringify({ stepStatus: status })
-			}).then(response => response.json())
+		post(url + "api/arbitrage/singleStep", { stepStatus: status })
 			.then(() => {
 				if (status !== 4) {
 					setStepStatus(status + 1)

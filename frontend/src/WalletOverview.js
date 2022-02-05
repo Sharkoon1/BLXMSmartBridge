@@ -4,9 +4,6 @@ import { get } from "./RequestHandler";
 import { ethers } from "ethers";
 const url = UrlHandler();
 
-//Todo
-//get data
-//insert to frontend
 
 export default class WalletOverview extends Component {
 
@@ -15,6 +12,16 @@ export default class WalletOverview extends Component {
 		this.visitPageBsc = this.visitPageBsc.bind(this);
 		this.visitPageEth = this.visitPageEth.bind(this);
 		this.state = {
+			AbitrageETH: "Loading...",
+			AbitrageBNB: "Loading...",
+			BinanceBNB: "Loading...",
+			BinanceBLXM: "Loading...",
+			EthereumETH: "Loading...",
+			EthereumBLXM: "Loading...",
+			NameBSCStable: "Loading...",
+			NameBSCBasic: "Loading...",
+			NameETHStable: "Loading...",
+			NameETHBasic: "Loading...",
 			AbitrageETH: "Loading ",
 			AbitrageBNB: "Loading ",
 			BinanceBNB: "Loading",
@@ -31,8 +38,8 @@ export default class WalletOverview extends Component {
 	}
 	
 	componentDidMount() {
-		fetch(url + "api/oracle/liquidity ").then(res => res.json())
-											.then(result => {
+		get(url + "api/oracle/liquidity ").then(result => {
+			console.log(result);
 			this.setState(prevState => {
 				return {
 					AbitrageETH: result.data.ETHBalance,

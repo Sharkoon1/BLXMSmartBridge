@@ -13,7 +13,9 @@ import Buttons from "./Buttons";
 import SingleStep from "./SingleStep"
 import FullAutonomous from "./FullAutonomous";
 import AlertInfo from "./AlertInfo";
+import ErrorMessage from "./ErrorMessage";
 import ProgressOutline from "./ProgressOutline";
+import { post } from "./RequestHandler";
 
 import Dashboad from "./Dashboad";
 import UrlHandler from "./UrlHandler";
@@ -22,49 +24,16 @@ import UrlHandler from "./UrlHandler";
 const connectWalletHandler = (setError, setOtherError) => {
 	if (window.ethereum && window.ethereum.isMetaMask) {
 		window.ethereum.request({ method: "eth_requestAccounts" })
-			.then(result => {
-				fetch(UrlHandler() + "api/authorization",
+			.then(result => {						
+				fetch(UrlHandler() + "api/authorization/login",
 					{
 						method: "post",
 						headers: new Headers({ "content-type": "application/json" }),
-						body: JSON.stringify({ User: result[0] })
+						body: JSON.stringify({ account: result[0] })
 					}).then(response => response.json()).then(result => {
+						localStorage.setItem("token", result.data.token);
 						if (result.status === 1) {
-							//####### NAVBAR #######
-							const navbar = document.getElementById("navbar");
-							ReactDOM.render(
-								<StrictMode>
-									<Navbar />
-								</StrictMode>,
-								navbar
-							);
-
-							//####### Abitrage Console Full Autonomous ####### 
-							const rootElement2 = document.getElementById("buttons");
-							ReactDOM.render(
-								<StrictMode>
-									<FullAutonomous />
-								</StrictMode>,
-								rootElement2
-							);
-
-							//####### Abitrage Console Single Step ####### 
-
-							ReactDOM.render(
-								<StrictMode>
-									<SingleStep />
-								</StrictMode>,
-								rootElement1
-							);
-
-							//####### Dashboard ####### 
-							const dashboardGraph = document.getElementById("root2");
-							ReactDOM.render(
-								<StrictMode>
-									<Dashboad />
-								</StrictMode>,
-								dashboardGraph
-							);
+							RenderPages();
 						} else {
 							setError(true);
 						}
@@ -74,16 +43,54 @@ const connectWalletHandler = (setError, setOtherError) => {
 				setOtherError(error.message);
 			});
 
-	} else {
-		console.log("Need to install MetaMask");
-		setErrorMessage("Please install MetaMask browser extension to interact");
-	}
+    } else {
+        console.log("Need to install MetaMask");
+    }
+}
+
+function RenderPages() {
+	//####### NAVBAR #######
+	const navbar = document.getElementById("navbar");
+	ReactDOM.render(
+		<StrictMode>
+			<Navbar />
+		</StrictMode>,
+		navbar
+	);
+
+	//####### Abitrage Console Full Autonomous ####### 
+	const rootElement2 = document.getElementById("buttons");
+	ReactDOM.render(
+		<StrictMode>
+			<FullAutonomous />
+		</StrictMode>,
+		rootElement2
+	);
+
+	//####### Abitrage Console Single Step ####### 
+	const rootElement1 = document.getElementById("root1");
+	ReactDOM.render(
+		<StrictMode>
+			<SingleStep />
+		</StrictMode>,
+		rootElement1
+	);
+
+	//####### Dashboard ####### 
+	const dashboardGraph = document.getElementById("root2");
+	ReactDOM.render(
+		<StrictMode>
+			<Dashboad />
+		</StrictMode>,
+		dashboardGraph
+	);
 }
 
 
 function LoginPage() {
 	const [error, setError] = useState(false);
 	const [othererror, setOtherError] = useState("");
+	
 	return (
 		<Fragment>
 			<div className="empty"></div>
@@ -101,12 +108,20 @@ function LoginPage() {
 	);
 }
 
-const rootElement1 = document.getElementById("root1");
-ReactDOM.render(
-	<StrictMode>
-		<LoginPage />
-	</StrictMode>,
-	rootElement1);
 
+let token = localStorage.getItem("token");
+
+if(token) {
+	 RenderPages();
+}
+
+else {
+	const rootElement1 = document.getElementById("root1");
+	ReactDOM.render(
+		<StrictMode>
+			<LoginPage />
+		</StrictMode>,
+		rootElement1);
+}
 
 
