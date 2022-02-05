@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import UrlHandler from "./UrlHandler";
+import { get } from "./RequestHandler";
 import { ethers } from "ethers";
 const url = UrlHandler();
 
