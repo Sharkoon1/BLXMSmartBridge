@@ -1,6 +1,4 @@
 import cmath
-import numpy
-import math
 
 basicCheap = 15000
 stableCheap = 298
