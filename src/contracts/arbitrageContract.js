@@ -74,24 +74,24 @@ class ArbitrageContract extends BaseContract {
 		return await this._contract.callStatic.stableAddress();
 	}
 
-	async swapBasicToStableGasLimit(amount) {
-		let gasLimit = await this._contract.estimateGas.swapBasicToStable(amount);
+	async swapBasicToStableGasLimit(amount, minAmountOut) {
+		let gasLimit = await this._contract.estimateGas.swapBasicToStable(amount, minAmountOut);
 
 		return gasLimit;
 	}
 	
-	async swapStableToBasicGasLimit(amount) {
-		let gasLimit = await this._contract.estimateGas.swapStableToBasic(amount);
+	async swapStableToBasicGasLimit(amount, minAmountOut) {
+		let gasLimit = await this._contract.estimateGas.swapStableToBasic(amount, minAmountOut);
 
 		return gasLimit;
 	}
 
-	async swapBasicToStable(amount) {
-		return await this._contract.swapBasicToStable(amount);
+	async swapBasicToStable(amount, minAmountOut) {
+		return await this._contract.swapBasicToStable(amount, minAmountOut);
 	}
 
-	async swapStableToBasic(amount) {
-		return await this._contract.swapStableToBasic(amount);
+	async swapStableToBasic(amount, minAmountOut) {
+		return await this._contract.swapStableToBasic(amount, minAmountOut);
 	}
 
 }
