@@ -31,8 +31,8 @@ const connectWalletHandler = (setError, setOtherError) => {
 						headers: new Headers({ "content-type": "application/json" }),
 						body: JSON.stringify({ account: result[0] })
 					}).then(response => response.json()).then(result => {
-						localStorage.setItem("token", result.data.token);
 						if (result.status === 1) {
+							localStorage.setItem("token", result.data.token);
 							RenderPages();
 						} else {
 							setError(true);
