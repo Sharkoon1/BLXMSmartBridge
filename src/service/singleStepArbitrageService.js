@@ -48,7 +48,7 @@ class SingleStepArbitrageService{
                         logger.info("ETH network: Current price = " + ArbitrageService.poolPriceEth + " USD/BLXM");
                         logger.info("BSC network: Current price = " + ArbitrageService.poolPriceBsc + " USD/BLXM");
                         
-                        logger.info("Next step: calculating aribtrage ...");
+                        logger.info("Next step: calculating aribtrage...");
                         break;
                     case 3: 
                         logger.info("Calculating arbitrage ...");
@@ -59,7 +59,7 @@ class SingleStepArbitrageService{
                             this.resetSingleStepArbitrage();
                         }
                         
-                        logger.info("Next step: Executing swaps ...");
+                        logger.info("Next step: Executing swaps...");
                         break;
                     case 4: 
                         await this.executeSwap();        
@@ -75,8 +75,8 @@ class SingleStepArbitrageService{
         }
         catch(error) {
 			logger.error("Single step arbitrage service failed. Error: " +  error);
-			logger.error("Service stopped ...");
-            logger.info("Resetting to step 1 ...");
+			logger.error("Service stopped...");
+            logger.info("Resetting to step 1...");
 
             this.stepStatus = 1;
 		}

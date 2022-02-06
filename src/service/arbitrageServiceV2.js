@@ -35,8 +35,8 @@ class ArbitrageService {
 			this.adjustmentValueBasic;
 			this.stableProfitAfterGas;
 
-			this.slippageEth = new BigNumber(1);
-			this.slippageBsc = new BigNumber(1);
+			this.slippageEth = new BigNumber(0.99); //default slippageEth
+			this.slippageBsc = new BigNumber(0.99); //default slippageBsc
 	
 			this.stopCycle = false;
 			this.isRunning = false;
@@ -271,8 +271,8 @@ class ArbitrageService {
 
 		let swapProfit = this.stableAmountOut.minus(transactionFees);
 
-		logger.info("Maximum sum of transaction fees: " + transactionFees);
-		logger.info("Worst case profit after slippage: " + swapProfit);
+		logger.info("Maximum sum of transaction fees: " + transactionFees + " USD");
+		logger.info("Worst case profit after slippage: " + swapProfit + " USD");
 
 		return swapProfit;  
 	}
@@ -303,8 +303,8 @@ class ArbitrageService {
 
 		let swapProfit = this.stableAmountOut.minus(transactionFees);
 
-		logger.info("Maximum sum of transaction fees: " + transactionFees.toString());
-		logger.info("Worst case profit after slippage: " + swapProfit.toString());
+		logger.info("Maximum sum of transaction fees: " + transactionFees + " USD");
+		logger.info("Worst case profit after slippage: " + swapProfit + " USD");
 
 		return swapProfit;  
 	}
