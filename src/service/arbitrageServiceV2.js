@@ -148,7 +148,7 @@ class ArbitrageService {
 	}
 
 	async calculateSwapEth(basicCheap, stableCheap, basicExpensive, stableExpensive){ // When ETH is more expensive
-		this.adjustmentValueStable = await this.getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, stableExpensive, this.pancakeswapFees, this.uniswapFees);
+		this.adjustmentValueStable = await this.getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, stableExpensive, this.uniswapFees, this.pancakeswapFees);
 
 		this.adjustmentValueBasic = this.amountOut(this.pancakeswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
 
