@@ -103,13 +103,13 @@ class OracleContract {
 	async getsAmountOutStable(amountIn) {
 		let amountOut = await this.router.getAmountsOut(amountIn, [this.basicTokenAddress, this.stableTokenAddress]);
 
-		return new BigNumber(ethers.utils.formatEther(amountOut[1]));
+		return amountOut[1];
 	}
 
 	async getsAmountOutBasic(amountIn) {
 		let amountOut = await this.router.getAmountsOut(amountIn, [this.stableTokenAddress, this.basicTokenAddress]);
 
-		return new BigNumber(ethers.utils.formatEther(amountOut[1]));
+		return amountOut[1];
 	}
 
 	async getPoolAddress(){
