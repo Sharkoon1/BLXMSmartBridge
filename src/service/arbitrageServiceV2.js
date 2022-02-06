@@ -77,64 +77,74 @@ class ArbitrageService {
 			while (!this.poolPriceBsc.eq(this.poolPriceEth)) {
 				await this.getArbitrageBalances(); //overwrites this.bscArbitrageBalance and this.ethArbitrageBalance from the arbitrage contract
 				await this.getReserves();  //overwrites this.tokenArrayBsc and this.tokenArrayEth with the current reserves from the LPs
-	
-				logger.info("Price difference found");
-				logger.info("ETH network: Current price = " + this.poolPriceEth + " USD/BLXM");
-				logger.info("BSC network: Current price = " + this.poolPriceBsc + " USD/BLXM");
-	
-				if(this.poolPriceEth.gt(this.poolPriceBsc)){
-	
-					let liquidityAvaible = await this.calculateSwapEth(this.tokenArrayBsc[1], this.tokenArrayBsc[0], this.tokenArrayEth[1], this.tokenArrayEth[0]);
-	
-					if(!liquidityAvaible) {
-						await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
 
-						continue;
-					}
+				if(Number.parseFloat(this.poolPriceBsc.toString()).toFixed(2) === Number.parseFloat(this.poolPriceEth.toString()).toFixed(2)) {
+					logger.info("Prices are currently equal.");
+					logger.info("ETH network: Current price = " + this.poolPriceEth + " USD/BLXM");
+					logger.info("BSC network: Current price = " + this.poolPriceBsc + " USD/BLXM");
 
-					if(this.stableProfitAfterGas.gt(0)) {
-						await this.swapEth();
-					}
-	
-					else {
-						logger.info("ETH: Calculated profit after gas fees: " + this.stableProfitAfterGas + " is negative.");
-						logger.info("Skipping current arbitrage cycle...");
-
-						await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
-					}
-					
+					logger.info("Skipping current arbitrage cycle.");
+					await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
 				}
-	
+
 				else {
-					let liquidityAvaible = await this.calculateSwapBsc(this.tokenArrayEth[1], this.tokenArrayEth[0], this.tokenArrayBsc[1], this.tokenArrayBsc[0]);  
-
-					if(!liquidityAvaible) {
-						await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
-
-						continue;
-					}
-
-					if(this.stableProfitAfterGas.gt(0)) {
-						await this.swapBsc();
-					}
-					else {
-						logger.info("BSC: Calculated profit after gas fees: " + this.stableProfitAfterGas + " is negative.");
-						logger.info("Skipping current arbitrage cycle...");
-
-						await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
-					}
-				
-				}
-	 
-				if(this.stopCycle) {
-					logger.info("The arbitrage service has been stopped and the last cycle has been completed.");
+					logger.info("Price difference found");
+					logger.info("ETH network: Current price = " + this.poolPriceEth + " USD/BLXM");
+					logger.info("BSC network: Current price = " + this.poolPriceBsc + " USD/BLXM");
+		
+					if(this.poolPriceEth.gt(this.poolPriceBsc)){
+		
+						let liquidityAvaible = await this.calculateSwapEth(this.tokenArrayBsc[1], this.tokenArrayBsc[0], this.tokenArrayEth[1], this.tokenArrayEth[0]);
+		
+						if(!liquidityAvaible) {
+							await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
 	
-					this.isRunning = false;
-					app.logEvent.emit("cycleCompleted", true);
-					break;
+							continue;
+						}
+	
+						if(this.stableProfitAfterGas.gt(0)) {
+							await this.swapEth();
+						}
+		
+						else {
+							logger.info("ETH: Calculated profit after gas fees: " + this.stableProfitAfterGas + " is negative.");
+							logger.info("Skipping current arbitrage cycle...");
+	
+							await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
+						}
+						
+					}
+		
+					else {
+						let liquidityAvaible = await this.calculateSwapBsc(this.tokenArrayEth[1], this.tokenArrayEth[0], this.tokenArrayBsc[1], this.tokenArrayBsc[0]);  
+	
+						if(!liquidityAvaible) {
+							await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
+	
+							continue;
+						}
+	
+						if(this.stableProfitAfterGas.gt(0)) {
+							await this.swapBsc();
+						}
+						else {
+							logger.info("BSC: Calculated profit after gas fees: " + this.stableProfitAfterGas + " is negative.");
+							logger.info("Skipping current arbitrage cycle...");
+	
+							await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
+						}
+					
+					}
+		 
+					if(this.stopCycle) {
+						logger.info("The arbitrage service has been stopped and the last cycle has been completed.");
+		
+						this.isRunning = false;
+						app.logEvent.emit("cycleCompleted", true);
+						break;
+					}
 				}
 			}
-	
 		
 			this.isRunning = false;
 		}	
