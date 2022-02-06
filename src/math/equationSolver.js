@@ -28,7 +28,8 @@ async function solveAdjustmentValue(basic_chp, stable_chp, basic_exp, stable_exp
     if( exitCode) {
         throw new Error( `subprocess error exit ${exitCode}, ${error}`);
     }
-    return data;
+
+    return data.replace(/[^\d.-]/g, '');
 }
 
 module.exports = { solveAdjustmentValue };
