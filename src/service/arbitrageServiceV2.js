@@ -171,7 +171,7 @@ class ArbitrageService {
 			return false;
 		}
 
-		this.stableProfitAfterGas = await this.calculateSwapProfitEth(basicExpensive, stableExpensive); 
+		this.stableProfitAfterGas = await this.calculateSwapProfitEth(); 
 
 		return true;
 	}		
@@ -220,7 +220,7 @@ class ArbitrageService {
 			return false;
 		}
 
-		this.stableProfitAfterGas = await this.calculateSwapProfitBsc(basicExpensive, stableExpensive);
+		this.stableProfitAfterGas = await this.calculateSwapProfitBsc();
 
 		return true;
 	}
@@ -245,15 +245,18 @@ class ArbitrageService {
 		logger.info("Absolute profit after arbitrage: " + realProfit.toString());
     }
 
-	async calculateSwapProfitEth(basicExpensive, stableExpensive){
+	async calculateSwapProfitEth(){
 		
-		this.basicAmountOut = this.adjustmentValueBasic.multipliedBy(this.slippageBsc);
-		this.stableAmountOut = this.amountOut(this.uniswapFees, this.basicAmountOut, basicExpensive, stableExpensive).multipliedBy(this.slippageEth);
+		let basicAmountOut = await this._oracleContractBsc.getsAmountOutBasic(this.toEthersBigNumber(this.adjustmentValueStable));
+		this.basicAmountOut = basicAmountOut.multipliedBy(this.slippageBsc);
 
-		console.log(this.slippageEth);
-		console.log(this.slippageBsc);
-		console.log(this.basicAmountOut);
-		console.log(this.stableAmountOut);
+		let stableAmountOut = await this._oracleContractEth.getsAmountOutStable(this.toEthersBigNumber(this.basicAmountOut));
+		this.stableAmountOut = stableAmountOut.multipliedBy(this.slippageEth);
+
+		console.log(this.basicAmountOut.toString())
+		console.log(this.stableAmountOut.toString())
+		console.log(this.slippageBsc.toString())
+		console.log(this.slippageEth.toString())
 
 		let gasLimitBsc = await this._arbitrageContractBsc.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable), this.toEthersBigNumber(this.basicAmountOut));
 		let gasLimitEth = await this._arbitrageContractEth.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic), this.toEthersBigNumber(this.stableAmountOut));
@@ -279,10 +282,13 @@ class ArbitrageService {
 		return swapProfit;  
 	}
 
-	async calculateSwapProfitBsc(basicExpensive, stableExpensive){
+	async calculateSwapProfitBsc(){
 
-		this.basicAmountOut = this.adjustmentValueBasic.multipliedBy(this.slippageEth);
-		this.stableAmountOut = this.amountOut(this.pancakeswapFees, this.basicAmountOut, basicExpensive, stableExpensive).multipliedBy(this.slippageBsc);
+		let basicAmountOut = await this._oracleContractEth.getsAmountOutBasic(this.toEthersBigNumber(this.adjustmentValueStable));
+		this.basicAmountOut = basicAmountOut.multipliedBy(this.slippageEth);
+
+		let stableAmountOut = await this._oracleContractBsc.getsAmountOutStable(this.toEthersBigNumber(this.basicAmountOut));
+		this.stableAmountOut = stableAmountOut.multipliedBy(this.slippageBsc);
 
 		let gasLimitEth = await this._arbitrageContractEth.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable), this.toEthersBigNumber(this.basicAmountOut));
 		let gasLimitBsc = await this._arbitrageContractBsc.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic), this.toEthersBigNumber(this.stableAmountOut));
