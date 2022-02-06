@@ -47,7 +47,7 @@ class SingleStepArbitrageService{
                         logger.info("ETH network: Current price = " + ArbitrageService.poolPriceEth + " USD/BLXM");
                         logger.info("BSC network: Current price = " + ArbitrageService.poolPriceBsc + " USD/BLXM");
     
-                        this.resetSingleStepArbitrage();
+                        return this.resetSingleStepArbitrage();
                     }
                     else {
                         logger.info("Price difference found");
@@ -64,7 +64,7 @@ class SingleStepArbitrageService{
                     var liquidityAvaible = await this.calculateArbitrage();
 
                     if(!liquidityAvaible) {
-                        this.resetSingleStepArbitrage();
+                        return this.resetSingleStepArbitrage();
                     }
                     
                     logger.info("Next step: Executing swaps...");
