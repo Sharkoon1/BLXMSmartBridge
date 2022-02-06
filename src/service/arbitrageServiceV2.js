@@ -135,14 +135,14 @@ class ArbitrageService {
 						}
 					
 					}
-		 
-					if(this.stopCycle) {
-						logger.info("The arbitrage service has been stopped and the last cycle has been completed.");
-		
-						this.isRunning = false;
-						app.logEvent.emit("cycleCompleted", true);
-						break;
-					}
+				}
+				
+				if(this.stopCycle) {
+					logger.info("The arbitrage service has been stopped and the last cycle has been completed.");
+	
+					this.isRunning = false;
+					app.logEvent.emit("cycleCompleted", true);
+					break;
 				}
 			}
 		
