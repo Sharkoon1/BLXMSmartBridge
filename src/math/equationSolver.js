@@ -6,8 +6,6 @@ async function solveAdjustmentValue(basic_chp, stable_chp, basic_exp, stable_exp
 
     const args = [basic_chp, stable_chp, basic_exp, stable_exp, fees_exp, fees_chp];
 
-    console.log(args.join(" "));
-
     args.unshift(pyFile);
 
     const child = spawn("python", args);
