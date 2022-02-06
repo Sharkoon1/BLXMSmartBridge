@@ -1,8 +1,8 @@
-import React, { Fragment, useState, useEffect } from "react";
+import React, { StrictMode, useState, useEffect } from "react";
 import { ethers } from "ethers";
 import "./style/Navbar.css";
-
-
+import ReactDOM from "react-dom"
+import Dashboad from "./Dashboad";
 
 export default function App() {
 
@@ -37,6 +37,7 @@ export default function App() {
 		root1.style.display = "block";
 		//####### Dashboard ####### 
 		root2.style.display = "none";
+		ReactDOM.unmountComponentAtNode(root2); 
 
 		buttons.style.display = "none";
 		fullautonomous.classList.remove("topnav-centered-focus");
@@ -57,6 +58,13 @@ export default function App() {
 		const fullautonomous = document.getElementById("fullautonomous");
 		const dashboard = document.getElementById("dashboard");
 
+		ReactDOM.render(
+			<StrictMode>
+				<Dashboad />
+			</StrictMode>,
+			root2
+		);
+
 		singlestep.classList.remove("topnav-centered-focus");
 		fullautonomous.classList.remove("topnav-centered-focus");
 		dashboard.classList.add("topnav-centered-focus");
@@ -75,6 +83,7 @@ export default function App() {
 
 		root1.style.display = "none";
 		root2.style.display = "none";
+		ReactDOM.unmountComponentAtNode(root2); 
 		buttons.style.display = "block";
 	}
 
