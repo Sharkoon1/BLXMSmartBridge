@@ -94,4 +94,12 @@ function checkBignumberOp(basicCheap, stableCheap, basicExpensive, constantCheap
 
 //getAdjustmentValueWithFees(basicCheapA, stableCheapA, basicExpensiveA, constantCheapA, constantExpensiveA, UniswapFees, pancakeswapFees);
 
-checkBignumberOp(basicCheapA, stableCheapA, basicExpensiveA, constantCheapA, constantExpensiveA, UniswapFees, pancakeswapFees);
+//checkBignumberOp(basicCheapA, stableCheapA, basicExpensiveA, constantCheapA, constantExpensiveA, UniswapFees, pancakeswapFees);
+
+
+const one = new BigNumber(1);
+let value = new BigNumber("0.97");
+
+x = (one.minus(value)).multipliedBy(100)
+
+console.log(x.toString())

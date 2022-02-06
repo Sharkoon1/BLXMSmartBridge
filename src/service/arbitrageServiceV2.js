@@ -249,7 +249,12 @@ class ArbitrageService {
 		
 		this.basicAmountOut = this.adjustmentValueBasic.multipliedBy(this.slippageBsc);
 		this.stableAmountOut = this.amountOut(this.uniswapFees, this.basicAmountOut, basicExpensive, stableExpensive).multipliedBy(this.slippageEth);
-		
+
+		console.log(this.slippageEth);
+		console.log(this.slippageBsc);
+		console.log(this.basicAmountOut);
+		console.log(this.stableAmountOut);
+
 		let gasLimitBsc = await this._arbitrageContractBsc.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable), this.toEthersBigNumber(this.basicAmountOut));
 		let gasLimitEth = await this._arbitrageContractEth.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic), this.toEthersBigNumber(this.stableAmountOut));
 
