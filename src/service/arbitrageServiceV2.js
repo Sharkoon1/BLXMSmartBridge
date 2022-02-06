@@ -35,8 +35,8 @@ class ArbitrageService {
 			this.adjustmentValueBasic;
 			this.stableProfitAfterGas;
 
-			this.slippageEth = new BigNumber(1);
-			this.slippageBsc = new BigNumber(1);
+			this.slippageEth = new BigNumber(0.99); //default slippageEth
+			this.slippageBsc = new BigNumber(0.99); //default slippageBsc
 	
 			this.stopCycle = false;
 			this.isRunning = false;
@@ -252,11 +252,6 @@ class ArbitrageService {
 
 		let stableAmountOut = await this._oracleContractEth.getsAmountOutStable(this.toEthersBigNumber(this.basicAmountOut));
 		this.stableAmountOut = stableAmountOut.multipliedBy(this.slippageEth);
-
-		console.log(this.basicAmountOut.toString())
-		console.log(this.stableAmountOut.toString())
-		console.log(this.slippageBsc.toString())
-		console.log(this.slippageEth.toString())
 
 		let gasLimitBsc = await this._arbitrageContractBsc.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable), this.toEthersBigNumber(this.basicAmountOut));
 		let gasLimitEth = await this._arbitrageContractEth.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic), this.toEthersBigNumber(this.stableAmountOut));
