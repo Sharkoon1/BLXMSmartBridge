@@ -37,13 +37,8 @@ export default function SingleStep() {
 	function onNextStep() {
 		setStartDisabled(true);
 		post(url + "api/arbitrage/singleStep", { stepStatus: status })
-			.then(() => {
-				if (status !== 4) {
-					setStepStatus(status + 1)
-				}
-				else {
-					setStepStatus(1)
-				}
+			.then((res) => {
+				setStepStatus(res.data.stepStatus)
 				setStartDisabled(false);
 			});
 	}

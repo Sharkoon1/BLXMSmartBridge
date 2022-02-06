@@ -73,11 +73,11 @@ exports.startSingleArbitrage = [
 
             if(stepStatus) {
                 SingleStepArbitrageService.startSingleStepArbitrage(stepStatus).then( () => {
-					return apiResponse.successResponse(res, "Arbitrage step status: " + stepStatus + " has been successful.");
+					return apiResponse.successResponseWithData(res, "Arbitrage step status: " + stepStatus + " has been successful.", {stepStatus: SingleStepArbitrageService.stepStatus});
 				});
             }
             else {
-                return apiResponse.validationError(res, "Arbitrage step status was missing.", {"stepStatus": stepStatus});
+                return apiResponse.validationError(res, "Arbitrage step status was missing.", {stepStatus: stepStatus});
             }
 			
 		} catch (err) {
@@ -114,7 +114,7 @@ exports.startSingleArbitrage = [
  exports.getStepStatus = [
 	function (req, res) {
         try {
-			return apiResponse.successResponseWithData(res, "success", { "stepStatus": SingleStepArbitrageService.stepStatus });
+			return apiResponse.successResponseWithData(res, "success", { stepStatus: SingleStepArbitrageService.stepStatus });
 		} catch (err) {
 			//throw error in json response with status 500. 
 			return apiResponse.ErrorResponse(res, err);
