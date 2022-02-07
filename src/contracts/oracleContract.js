@@ -1,6 +1,7 @@
 const routerAbi = require("../abi/router_abi.json");
 const liquidityPoolAbi = require("../abi/liquidityPool_abi.json");
 const factoryAbi = require("../abi/factory_abi.json");
+const arbitrageAbi = require("../abi/arbitrage_abi.json");
 const constants = require("../constants");
 const { ethers } = require("ethers");
 const BigNumber = require("bignumber.js");
@@ -12,11 +13,13 @@ class OracleContract {
 			this.provider = new ethers.providers.JsonRpcProvider(constants["PROVIDER_" + network]);
 			this.signer = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
 			this.router = new ethers.Contract(constants["ROUTER_" + network], routerAbi, this.signer);
+			this.arbitrageContract = new ethers.Contract(constants["ARBITRAGE_CONTRACT_ADDRESS_" + network], arbitrageAbi, this.signer);
 		}
 		else {
 			this.provider = new ethers.providers.JsonRpcProvider(constants["PROVIDER_" + network + "_TEST"]);
 			this.signer = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
 			this.router = new ethers.Contract(constants["ROUTER_" + network + "_TESTNET"], routerAbi, this.signer);
+			this.arbitrageContract = new ethers.Contract(constants["ARBITRAGE_CONTRACT_ADDRESS_" + network + "_TESTNET"], arbitrageAbi, this.signer);
 		}
 		
 		this._wrappedTokenAddress = constants["WRAPPED_TOKEN_ADDRESS_" + network];
@@ -36,12 +39,34 @@ class OracleContract {
 	async init() {
 		let factoryAddress = await this.router.factory();
 		this.factory = new ethers.Contract(factoryAddress, factoryAbi, this.signer);
-		this.liquidityPoolAddress = this.factory.getPair(this.basicTokenAddress, this.stableTokenAddress);
+		this.liquidityPoolAddress = await this.factory.getPair(this.basicTokenAddress, this.stableTokenAddress);
 		if(this.liquidityPoolAddress === ethers.constants.AddressZero) {
 			logger.error(this.network +  ": liquidity pool does not exist. For basic token address:" + this.basicTokenAddress 
 									   + "and stable token address: " +  this.stableTokenAddress);
 		}
 		this.liquidityPool = new ethers.Contract(this.liquidityPoolAddress, liquidityPoolAbi, this.signer);
+
+		this.arbitrageContract.on("changedBasic", (newBasicAddress) => {
+			this.factory.getPair(newBasicAddress, this.stableTokenAddress).then((poolAddress) => {
+				this.liquidityPoolAddress = poolAddress;
+				if(this.liquidityPoolAddress === ethers.constants.AddressZero) {
+					logger.error(this.network +  ": liquidity pool does not exist. For basic token address:" + newBasicAddress 
+											   + "and stable token address: " +  this.stableTokenAddress);
+				}
+				this.liquidityPool = new ethers.Contract(this.liquidityPoolAddress, liquidityPoolAbi, this.signer);
+			});
+		});
+
+		this.arbitrageContract.on("changedStable", (newStableAddress) => {
+			this.factory.getPair(this.basicTokenAddress, newStableAddress).then((poolAddress) => {
+				this.liquidityPoolAddress = poolAddress;
+				if(this.liquidityPoolAddress === ethers.constants.AddressZero) {
+					logger.error(this.network +  ": liquidity pool does not exist. For basic token address:" + this.basicTokenAddress 
+											   + "and stable token address: " +  newStableAddress);
+				}
+				this.liquidityPool = new ethers.Contract(this.liquidityPoolAddress, liquidityPoolAbi, this.signer);
+			});
+		});
 	}
 
 	async getStableUsdPrice() {
@@ -113,7 +138,7 @@ class OracleContract {
 		let basicToken = poolReserves[1];
 	
 		if(this.stableTokenAddress !== constants["HUSD_" + this.network + "_TESTNET"] 
-		&& this._oracleContractBsc.stableTokenAddress === constants["USD_TOKEN_ADDRESS_" + this.network]) {
+		&& this.stableTokenAddress === constants["USD_TOKEN_ADDRESS_" + this.network]) {
 			let stableUsdPrice = await this.getStableUsdPrice();
 
 			stableToken = stableToken.mul(stableUsdPrice);

@@ -10,7 +10,7 @@ class TokenContract extends BaseContract {
 	}
 
 	async getTokenBalance(address) {
-		return await this._contract.callStatic.balanceOf(address);
+		return await this._contract.balanceOf(address);
 	}
 
 	async transferTokens(address, amount) {
