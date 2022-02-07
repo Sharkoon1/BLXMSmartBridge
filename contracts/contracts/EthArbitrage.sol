@@ -9,7 +9,8 @@ pragma solidity ^0.8.0;
 
 contract EthArbitrage is Ownable {
     using SafeMath for uint256;
-
+	event ChangedStable(address stable);
+	event ChangedBasic(address basic);
     IUniswapV2Router02 uniswapRouter;
     address public uniswapRouterAddress = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
 
@@ -31,11 +32,13 @@ contract EthArbitrage is Ownable {
     function changeStable(address newStableAddress) public onlyOwner {
         stableAddress = newStableAddress;
         stables = IERC20(newStableAddress);
+		emit ChangedStable(newStableAddress);
     }
 
     function changeBasic(address newBasicAddress) public onlyOwner {
         basicAddress = newBasicAddress;
         basics = IERC20(newBasicAddress);
+		emit ChangedBasic(newBasicAddress);
     }
 
     function withdrawStable(uint256 amount) public onlyOwner returns (uint256) {

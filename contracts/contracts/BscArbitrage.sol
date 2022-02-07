@@ -8,6 +8,8 @@ import "./interfaces/IPancakeRouter02.sol";
 pragma solidity ^0.8.0;
 
 contract BscArbitrage is Ownable {
+	event ChangedStable(address stable);
+	event ChangedBasic(address basic);
     using SafeMath for uint256;
 
     IPancakeRouter02 pancakeRouter;
@@ -31,11 +33,13 @@ contract BscArbitrage is Ownable {
     function changeStable(address newStableAddress) public onlyOwner {
         stableAddress = newStableAddress;
         stables = IERC20(newStableAddress);
+		emit ChangedStable(newStableAddress);
     }
 
     function changeBasic(address newBasicAddress) public onlyOwner {
         basicAddress = newBasicAddress;
         basics = IERC20(newBasicAddress);
+		emit ChangedBasic(newBasicAddress);
     }
 
     function withdrawStable(uint256 amount) public onlyOwner returns (uint256) {
