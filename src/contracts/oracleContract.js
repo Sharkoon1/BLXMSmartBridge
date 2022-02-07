@@ -79,7 +79,7 @@ class OracleContract {
 				let signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 				let router = new ethers.Contract(constants["ROUTER_" + this.network], routerAbi, signer);
 
-				price = await router.getAmountsOut(ethers.utils.parseEther("1"), [this.stableTokenAddress, this._usdTokenAddress]);
+				price = await router.getAmountsOut(ethers.utils.parseEther("1"), [this._wrappedTokenAddress, this._usdTokenAddress]);
 			}
 			else {
 				price = await this.router.getAmountsOut(ethers.utils.parseEther("1"), [this.stableTokenAddress, this._usdTokenAddress]);
@@ -138,13 +138,13 @@ class OracleContract {
 		let basicToken = poolReserves[1];
 	
 		if(this.stableTokenAddress !== constants["HUSD_" + this.network + "_TESTNET"] 
-		&& this.stableTokenAddress === constants["USD_TOKEN_ADDRESS_" + this.network]) {
+		&& this.stableTokenAddress !== constants["USD_TOKEN_ADDRESS_" + this.network]) {
 			let stableUsdPrice = await this.getStableUsdPrice();
 
-			stableToken = stableToken.mul(stableUsdPrice);
+			stableToken = stableToken.multipliedBy(stableUsdPrice);
 		}
 
-		return stableToken.div(basicToken);
+		return stableToken.dividedBy(basicToken);
 	}
 
 	async getReserves() {

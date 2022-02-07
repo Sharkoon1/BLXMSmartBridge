@@ -170,12 +170,12 @@ class ArbitrageService {
 		await this.getUsdExchangeRates(); //overwrites this.usdExchangeRateBsc and this.usdExchangeRateEth from the arbitrage contract
 
 		// convert stable to usd to get correct adjustment value to adjust prices
-		let stableBsc = await this.convertStableToUsdBsc(stableCheap);
-		let stableEth = await this.convertStableToUsdEth(stableExpensive);
+		let stableBsc = this.convertStableToUsdBsc(stableCheap);
+		let stableEth = this.convertStableToUsdEth(stableExpensive);
 
 		let adjustmentValueStableUsd = await this.getAdjustmentValueUsdWithFees(basicCheap, stableBsc, basicExpensive, stableEth, this.uniswapFees, this.pancakeswapFees);
 
-		this.adjustmentValueStable = await this.convertStableToUsdBsc(adjustmentValueStableUsd);
+		this.adjustmentValueStable = await this.convertUsdToStableBsc(adjustmentValueStableUsd);
 		this.adjustmentValueBasic = this.amountOut(this.uniswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
 
 		logger.info("Adjustment Value stable: " + this.adjustmentValueStable); 
@@ -229,12 +229,12 @@ class ArbitrageService {
 		await this.getUsdExchangeRates(); //overwrites this.usdExchangeRateBsc and this.usdExchangeRateEth from the arbitrage contract
 
 		// convert stable to usd to get correct adjustment value to adjust prices
-		let stableBsc = await this.convertStableToUsdBsc(stableExpensive);
-		let stableEth = await this.convertStableToUsdEth(stableCheap);
+		let stableBsc = this.convertStableToUsdBsc(stableExpensive);
+		let stableEth = this.convertStableToUsdEth(stableCheap);
 
 		let adjustmentValueStableUsd = await this.getAdjustmentValueUsdWithFees(basicCheap, stableEth, basicExpensive, stableBsc, this.pancakeswapFees, this.uniswapFees);
 
-		this.adjustmentValueStable = await this.convertStableToUsdEth(adjustmentValueStableUsd);
+		this.adjustmentValueStable = await this.convertUsdToStableEth(adjustmentValueStableUsd);
 
 		this.adjustmentValueBasic = this.amountOut(this.pancakeswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
 
@@ -313,8 +313,8 @@ class ArbitrageService {
 		let transactionFees = totalFeeBsc.plus(totalFeeEth);
 
 		// convert stable to usd in case stable token is not usd
-		let stableUsdOut = this.convertStableToUsdEth(this.stableAmountOut);
-		let swapProfit = this.fromEthersToBigNumber(stableUsdOut).minus(transactionFees);
+		let stableUsdOut = this.convertStableToUsdEth(this.fromEthersToBigNumber(this.stableAmountOut));
+		let swapProfit = stableUsdOut.minus(transactionFees);
 
 		logger.info("Maximum sum of transaction fees: " + transactionFees + " USD");
 		logger.info("Worst case profit after slippage: " + swapProfit + " USD");
@@ -348,8 +348,8 @@ class ArbitrageService {
 		
 		let transactionFees = totalFeeBsc.plus(totalFeeEth);
 
-		// convert stable to usd in case stable token is not usd
-		let stableUsdOut = this.convertStableToUsdBsc(this.stableAmountOut);
+		// convert stable to usd in case stable token is not usd	
+		let stableUsdOut = this.convertStableToUsdBsc(this.fromEthersToBigNumber(this.stableAmountOut));
 		let swapProfit = this.fromEthersToBigNumber(stableUsdOut).minus(transactionFees);
 
 		logger.info("Maximum sum of transaction fees: " + transactionFees + " USD");
@@ -372,49 +372,45 @@ class ArbitrageService {
 		return numerator.dividedBy(denominator);
 	}
 
-	async convertStableToUsdBsc(stable) {
+	convertStableToUsdBsc(stable) {
 		// Convert stable reserves to usd prices for adjustment value
 		// leave it as usd, if it's already usd
 		if(this._oracleContractBsc.stableTokenAddress !== constants["HUSD_BSC_TESTNET"]
-		 && this._oracleContractBsc.stableTokenAddress === constants["USD_TOKEN_ADDRESS_BSC"]) {
-			let stableUsdPrice = await this._oracleContractBsc.getStableUsdPrice();
-
-			stable = stable.mul(stableUsdPrice);
+		 && this._oracleContractBsc.stableTokenAddress !== constants["USD_TOKEN_ADDRESS_BSC"]) {
+			stable = stable.multipliedBy(this.usdExchangeRateBsc);
 		}
 
 		return stable;
 	}
 
-	async convertStableToUsdEth(stable) {
+	convertStableToUsdEth(stable) {
 		// Convert stable reserves to usd prices for adjustment value
 		// leave it as usd, if it's already usd
 		if(this._oracleContractEth.stableTokenAddress !== constants["HUSD_ETH_TESTNET"]
-		 && this._oracleContractEth.stableTokenAddress === constants["USD_TOKEN_ADDRESS_ETH"]) {
-			let stableUsdPrice = await this._oracleContractEth.getStableUsdPrice();
-
-			stable = stable.mul(stableUsdPrice);
+		 && this._oracleContractEth.stableTokenAddress !== constants["USD_TOKEN_ADDRESS_ETH"]) {
+			stable = stable.multipliedBy(this.usdExchangeRateEth);
 		}
 
 		return stable;
 	}
 
-	async convertUsdToStableBsc(stableUsd) {
+	convertUsdToStableBsc(stableUsd) {
 		// Convert stable reserves to usd prices for adjustment value
 		// leave it as usd, if it's already usd
 		if(this._oracleContractEth.stableTokenAddress !== constants["HUSD_ETH_TESTNET"]
-		 && this._oracleContractEth.stableTokenAddress === constants["USD_TOKEN_ADDRESS_ETH"]) {
-			stableUsd = stableUsd.div(this.usdExchangeRateBsc);
+		 && this._oracleContractEth.stableTokenAddress !== constants["USD_TOKEN_ADDRESS_ETH"]) {
+			stableUsd = stableUsd.dividedBy(this.usdExchangeRateBsc);
 		}
 
 		return stableUsd;
 	}
 
-	async convertUsdToStableEth(stableUsd) {
+	convertUsdToStableEth(stableUsd) {
 		// Convert stable reserves to usd prices for adjustment value
 		// leave it as usd, if it's already usd
 		if(this._oracleContractEth.stableTokenAddress !== constants["HUSD_ETH_TESTNET"]
-		 && this._oracleContractEth.stableTokenAddress === constants["USD_TOKEN_ADDRESS_ETH"]) {
-			stableUsd = stableUsd.div(this.usdExchangeRateEth);
+		 && this._oracleContractEth.stableTokenAddress !== constants["USD_TOKEN_ADDRESS_ETH"]) {
+			stableUsd = stableUsd.dividedBy(this.usdExchangeRateEth);
 		}
 
 		return stableUsd;
@@ -451,12 +447,12 @@ class ArbitrageService {
 		gasLimit = this.fromEthersToBigNumber(gasLimit);
 		gasLimit = gasLimit.multipliedBy(1.1);
 
-		return this.toEthersBigNumber(gasLimit);
+		let x = new BigNumber(10).pow(18);
+		return ethers.BigNumber.from(gasLimit.multipliedBy(x).dp(0).toString());
 	}
 
 	toEthersBigNumber(value){
-		let x = new BigNumber(10).pow(18);
-		return ethers.BigNumber.from(value.multipliedBy(x).dp(0).toString());
+		return ethers.utils.parseEther(value.dp(18).toString());
 	}
 
 	fromEthersToBigNumber(value){
