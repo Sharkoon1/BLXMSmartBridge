@@ -41,6 +41,9 @@ class ArbitrageService {
 			this.gasPriceBsc;
 			this.gasPriceEth;
 
+			this.usdExchangeRateBsc;
+			this.usdExchangeRateEth;
+
 			this.slippageEth = new BigNumber(0.99); //default slippageEth
 			this.slippageBsc = new BigNumber(0.99); //default slippageBsc
 	
@@ -164,9 +167,16 @@ class ArbitrageService {
 	}
 
 	async calculateSwapEth(basicCheap, stableCheap, basicExpensive, stableExpensive){ // When ETH is more expensive
-		this.adjustmentValueStable = await this.getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, stableExpensive, this.uniswapFees, this.pancakeswapFees);
+		await this.getUsdExchangeRates(); //overwrites this.usdExchangeRateBsc and this.usdExchangeRateEth from the arbitrage contract
 
-		this.adjustmentValueBasic = this.amountOut(this.pancakeswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
+		// convert stable to usd to get correct adjustment value to adjust prices
+		let stableBsc = await this.convertStableToUsdBsc(stableCheap);
+		let stableEth = await this.convertStableToUsdEth(stableExpensive);
+
+		let adjustmentValueStableUsd = await this.getAdjustmentValueUsdWithFees(basicCheap, stableBsc, basicExpensive, stableEth, this.uniswapFees, this.pancakeswapFees);
+
+		this.adjustmentValueStable = await this.convertStableToUsdBsc(adjustmentValueStableUsd);
+		this.adjustmentValueBasic = this.amountOut(this.uniswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
 
 		logger.info("Adjustment Value stable: " + this.adjustmentValueStable); 
 		logger.info("Adjustment Value basic: " + this.adjustmentValueBasic); 
@@ -208,14 +218,25 @@ class ArbitrageService {
 
 		let postStableBalance = await this._arbitrageContractEth.getStableBalance();
 		let realProfit = postStableBalance.minus(this.ethArbitrageBalance.stable);
+
+		// get usd profit
+		let profitUsd = await this.convertStableToUsdEth(realProfit);
 		
-		logger.info("Absolute profit after arbitrage: " + realProfit.toString());
+		logger.info("Absolute profit after arbitrage: " + profitUsd.toString());
 	}
 
 	async calculateSwapBsc(basicCheap, stableCheap, basicExpensive, stableExpensive){ // When BSC is more expensive  
-		this.adjustmentValueStable = await this.getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, stableExpensive, this.pancakeswapFees, this.uniswapFees);
+		await this.getUsdExchangeRates(); //overwrites this.usdExchangeRateBsc and this.usdExchangeRateEth from the arbitrage contract
 
-		this.adjustmentValueBasic = this.amountOut(this.uniswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
+		// convert stable to usd to get correct adjustment value to adjust prices
+		let stableBsc = await this.convertStableToUsdBsc(stableExpensive);
+		let stableEth = await this.convertStableToUsdEth(stableCheap);
+
+		let adjustmentValueStableUsd = await this.getAdjustmentValueUsdWithFees(basicCheap, stableEth, basicExpensive, stableBsc, this.pancakeswapFees, this.uniswapFees);
+
+		this.adjustmentValueStable = await this.convertStableToUsdEth(adjustmentValueStableUsd);
+
+		this.adjustmentValueBasic = this.amountOut(this.pancakeswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
 
 		logger.info("Adjustment Value stable: " + this.adjustmentValueStable); 
 		logger.info("Adjustment Value basic: " + this.adjustmentValueBasic); 
@@ -257,8 +278,11 @@ class ArbitrageService {
 
 		let postStableBalance = await this._arbitrageContractBsc.getStableBalance();
 		let realProfit = postStableBalance.minus(this.bscArbitrageBalance.stable);
+
+		// get usd profit
+		let profitUsd = await this.convertStableToUsdBsc(realProfit);
 		
-		logger.info("Absolute profit after arbitrage: " + realProfit.toString());
+		logger.info("Absolute profit after arbitrage: " + profitUsd.toString());
     }
 
 	async calculateSwapProfitEth(){
@@ -288,7 +312,9 @@ class ArbitrageService {
 		
 		let transactionFees = totalFeeBsc.plus(totalFeeEth);
 
-		let swapProfit = this.fromEthersToBigNumber(this.stableAmountOut).minus(transactionFees);
+		// convert stable to usd in case stable token is not usd
+		let stableUsdOut = this.convertStableToUsdEth(this.stableAmountOut);
+		let swapProfit = this.fromEthersToBigNumber(stableUsdOut).minus(transactionFees);
 
 		logger.info("Maximum sum of transaction fees: " + transactionFees + " USD");
 		logger.info("Worst case profit after slippage: " + swapProfit + " USD");
@@ -322,14 +348,15 @@ class ArbitrageService {
 		
 		let transactionFees = totalFeeBsc.plus(totalFeeEth);
 
-		let swapProfit = this.fromEthersToBigNumber(this.stableAmountOut).minus(transactionFees);
+		// convert stable to usd in case stable token is not usd
+		let stableUsdOut = this.convertStableToUsdBsc(this.stableAmountOut);
+		let swapProfit = this.fromEthersToBigNumber(stableUsdOut).minus(transactionFees);
 
 		logger.info("Maximum sum of transaction fees: " + transactionFees + " USD");
 		logger.info("Worst case profit after slippage: " + swapProfit + " USD");
 
 		return swapProfit;  
 	}
-
     
 	async getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, stableExpensive, feesExpansive, feesCheap) {
 		let adjustmentValue = await equationSolver.solveAdjustmentValue(basicCheap.toString(), stableCheap.toString(), basicExpensive.toString(), stableExpensive.toString(), feesExpansive.toString(), feesCheap.toString());
@@ -345,6 +372,59 @@ class ArbitrageService {
 		return numerator.dividedBy(denominator);
 	}
 
+	async convertStableToUsdBsc(stable) {
+		// Convert stable reserves to usd prices for adjustment value
+		// leave it as usd, if it's already usd
+		if(this._oracleContractBsc.stableTokenAddress !== constants["HUSD_BSC_TESTNET"]
+		 && this._oracleContractBsc.stableTokenAddress === constants["USD_TOKEN_ADDRESS_BSC"]) {
+			let stableUsdPrice = await this._oracleContractBsc.getStableUsdPrice();
+
+			stable = stable.mul(stableUsdPrice);
+		}
+
+		return stable;
+	}
+
+	async convertStableToUsdEth(stable) {
+		// Convert stable reserves to usd prices for adjustment value
+		// leave it as usd, if it's already usd
+		if(this._oracleContractEth.stableTokenAddress !== constants["HUSD_ETH_TESTNET"]
+		 && this._oracleContractEth.stableTokenAddress === constants["USD_TOKEN_ADDRESS_ETH"]) {
+			let stableUsdPrice = await this._oracleContractEth.getStableUsdPrice();
+
+			stable = stable.mul(stableUsdPrice);
+		}
+
+		return stable;
+	}
+
+	async convertUsdToStableBsc(stableUsd) {
+		// Convert stable reserves to usd prices for adjustment value
+		// leave it as usd, if it's already usd
+		if(this._oracleContractEth.stableTokenAddress !== constants["HUSD_ETH_TESTNET"]
+		 && this._oracleContractEth.stableTokenAddress === constants["USD_TOKEN_ADDRESS_ETH"]) {
+			stableUsd = stableUsd.div(this.usdExchangeRateBsc);
+		}
+
+		return stableUsd;
+	}
+
+	async convertUsdToStableEth(stableUsd) {
+		// Convert stable reserves to usd prices for adjustment value
+		// leave it as usd, if it's already usd
+		if(this._oracleContractEth.stableTokenAddress !== constants["HUSD_ETH_TESTNET"]
+		 && this._oracleContractEth.stableTokenAddress === constants["USD_TOKEN_ADDRESS_ETH"]) {
+			stableUsd = stableUsd.div(this.usdExchangeRateEth);
+		}
+
+		return stableUsd;
+	}
+
+	async getUsdExchangeRates() {
+		this.usdExchangeRateBsc = await this._oracleContractBsc.getStableUsdPrice();
+		this.usdExchangeRateEth = await this._oracleContractEth.getStableUsdPrice();
+	}
+	
 	async getPoolPrices(){
 		this.poolPriceBsc = await this._oracleContractBsc.getPrice();
 		this.poolPriceEth = await this._oracleContractEth.getPrice();

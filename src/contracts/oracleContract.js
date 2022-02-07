@@ -20,7 +20,7 @@ class OracleContract {
 		}
 		
 		this._wrappedTokenAddress = constants["WRAPPED_TOKEN_ADDRESS_" + network];
-		this._stableTokenAddress = constants["STABLE_TOKEN_ADDRESS_" + network];
+		this._usdTokenAddress = constants["USD_TOKEN_ADDRESS_" + network];
 
 		this.network = network;
 		this.basicTokenAddress = basicTokenAddress;
@@ -44,6 +44,34 @@ class OracleContract {
 		this.liquidityPool = new ethers.Contract(this.liquidityPoolAddress, liquidityPoolAbi, this.signer);
 	}
 
+	async getStableUsdPrice() {
+		let price;
+		try {
+			// Workaround since wrapped bnb pools in testnet are not dynamic and prices are not accurate.
+			// So we also have to use production pools to get the price in the testnet
+			if (process.env.NODE_ENV !== "production") { 	
+				let provider = new ethers.providers.JsonRpcProvider(constants["PROVIDER_" + this.network]);
+				let signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+				let router = new ethers.Contract(constants["ROUTER_" + this.network], routerAbi, signer);
+
+				price = await router.getAmountsOut(ethers.utils.parseEther("1"), [this.stableTokenAddress, this._usdTokenAddress]);
+			}
+			else {
+				price = await this.router.getAmountsOut(ethers.utils.parseEther("1"), [this.stableTokenAddress, this._usdTokenAddress]);
+			}
+		} catch (error) {
+			logger.error("An error occured retrieving the network prices.");
+			logger.error("Error: " + error);
+		}
+
+		if(this.network === "BSC") {
+			return new BigNumber(ethers.utils.formatEther(price[1]));
+		}
+		else {
+			return new BigNumber(price[1].toString()).dividedBy(10**6);
+		}
+	}
+
 	async getWrappedPrice() {
 		let price;
 		try {
@@ -54,10 +82,10 @@ class OracleContract {
 				let signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 				let router = new ethers.Contract(constants["ROUTER_" + this.network], routerAbi, signer);
 
-				price = await router.getAmountsOut(ethers.utils.parseEther("1"), [this._wrappedTokenAddress, this._stableTokenAddress]);
+				price = await router.getAmountsOut(ethers.utils.parseEther("1"), [this._wrappedTokenAddress, this._usdTokenAddress]);
 			}
 			else {
-				price = await this.router.getAmountsOut(ethers.utils.parseEther("1"), [this._wrappedTokenAddress, this._stableTokenAddress]);
+				price = await this.router.getAmountsOut(ethers.utils.parseEther("1"), [this._wrappedTokenAddress, this._usdTokenAddress]);
 			}
 		} catch (error) {
 			logger.error("An error occured retrieving the network prices.");
@@ -80,8 +108,17 @@ class OracleContract {
 			logger.error("An error occured retrieving the network prices.");
 			logger.error("Error: " + error);
 		}
+
 		let stableToken = poolReserves[0];
 		let basicToken = poolReserves[1];
+	
+		if(this.stableTokenAddress !== constants["HUSD_" + this.network + "_TESTNET"] 
+		&& this._oracleContractBsc.stableTokenAddress === constants["USD_TOKEN_ADDRESS_" + this.network]) {
+			let stableUsdPrice = await this.getStableUsdPrice();
+
+			stableToken = stableToken.mul(stableUsdPrice);
+		}
+
 		return stableToken.div(basicToken);
 	}
 
