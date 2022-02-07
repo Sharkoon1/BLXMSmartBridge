@@ -36,33 +36,34 @@ export default class WalletOverview extends Component {
 			ETHArbitrageContractAddress: "0x0000000000000000000000000000000000000000"
 		}
 	}
-	
+
 	componentDidMount() {
 		get(url + "api/oracle/liquidity ").then(result => {
-			console.log(result);
-			this.setState(prevState => {
-				return {
-					AbitrageETH: result.data.ETHBalance,
-					AbitrageBNB: result.data.BSCBalance,
-					BinanceBNB: result.data.BSCStable,
-					BinanceBLXM: result.data.BSCBasic,
-					EthereumETH: result.data.ETHStable,
-					EthereumBLXM: result.data.ETHBasic,
-					NameBSCStable: result.data.NameBSCStable,
-					NameBSCBasic: result.data.NameBSCBasic,
-					NameETHStable: result.data.NameETHStable,
-					NameETHBasic: result.data.NameETHBasic,
-					BSCArbitrageContractAddress: result.data.BSCArbitrageContractAddress,
-					ETHArbitrageContractAddress: result.data.ETHArbitrageContractAddress
-				};
-			});
+			if (result.status === 1) {
+				this.setState(prevState => {
+					return {
+						AbitrageETH: result.data.ETHBalance,
+						AbitrageBNB: result.data.BSCBalance,
+						BinanceBNB: result.data.BSCStable,
+						BinanceBLXM: result.data.BSCBasic,
+						EthereumETH: result.data.ETHStable,
+						EthereumBLXM: result.data.ETHBasic,
+						NameBSCStable: result.data.NameBSCStable,
+						NameBSCBasic: result.data.NameBSCBasic,
+						NameETHStable: result.data.NameETHStable,
+						NameETHBasic: result.data.NameETHBasic,
+						BSCArbitrageContractAddress: result.data.BSCArbitrageContractAddress,
+						ETHArbitrageContractAddress: result.data.ETHArbitrageContractAddress
+					};
+				});
+			} 
 		});
 	}
 
-	async getChainId(){
+	async getChainId() {
 		const provider = new ethers.providers.Web3Provider(window.ethereum);
 		const networkId = await provider.getNetwork()
-		if (networkId.chainId === 4 || networkId.chainId === 97){
+		if (networkId.chainId === 4 || networkId.chainId === 97) {
 			return "Testnet";
 		} else if (networkId.chainId === 1 || networkId.chainId === 96) {
 			return "Mainnet";
@@ -74,33 +75,33 @@ export default class WalletOverview extends Component {
 
 			let urlBsc;
 
-			if(network === "Testnet"){
+			if (network === "Testnet") {
 				urlBsc = 'https://testnet.bscscan.com/address/' + this.state.BSCArbitrageContractAddress;
 			}
-			else if(network === "Mainnet"){
+			else if (network === "Mainnet") {
 				urlBsc = 'https://bscscan.com/address/' + this.state.BSCArbitrageContractAddress;
-				}
-				console.log(urlBsc)
-				window.open(urlBsc, "_blank")
-			})
-		}
-    
+			}
+			console.log(urlBsc)
+			window.open(urlBsc, "_blank")
+		})
+	}
 
-	visitPageEth(){
+
+	visitPageEth() {
 		this.getChainId().then((network) => {
 
 			let urlEth;
 
-			if(network === "Testnet"){
+			if (network === "Testnet") {
 				urlEth = 'https://rinkeby.etherscan.io/address/' + this.state.ETHArbitrageContractAddress;
 			}
-			else if(network === "Mainnet"){
+			else if (network === "Mainnet") {
 				urlEth = 'https://etherscan.io/address/' + this.state.ETHArbitrageContractAddress;
-				}
+			}
 
-				window.open(urlEth, "_blank")
-			})
-		}
+			window.open(urlEth, "_blank")
+		})
+	}
 	render() {
 		return (
 			<div className="displayPoolsizes">
@@ -119,10 +120,10 @@ export default class WalletOverview extends Component {
 				<div className="displayPoolsizeBSC">
 					<div className="contentPoolsize">
 						<h1>
-						<span className="poolsizeSubHeading">BSC Arbitrage Contract </span>
-						<span className="displayPoolAddress">{this.state.BSCArbitrageContractAddress}</span>
-						<span><button onClick={this.visitPageBsc} type="button" title="Link to testnet.bscscan.com" className="poolsizeButton"><img className="poolsizeButtonPicture" src="../copy2.png"></img></button>
-						</span></h1>
+							<span className="poolsizeSubHeading">BSC Arbitrage Contract </span>
+							<span className="displayPoolAddress">{this.state.BSCArbitrageContractAddress}</span>
+							<span><button onClick={this.visitPageBsc} type="button" title="Link to testnet.bscscan.com" className="poolsizeButton"><img className="poolsizeButtonPicture" src="../copy2.png"></img></button>
+							</span></h1>
 						<div>
 							<span>{this.state.BinanceBNB} {this.state.NameBSCStable}</span>
 							<span className="and"> | </span>
@@ -134,11 +135,11 @@ export default class WalletOverview extends Component {
 
 				<div className="displayPoolsizeETH">
 					<div className="contentPoolsize">
-					<h1>
-						<span className="poolsizeSubHeading">ETH Arbitrage Contract </span>
-						<span className="displayPoolAddress">{this.state.ETHArbitrageContractAddress}</span>
-						<span><button onClick={this.visitPageEth} type="button" title="Link to testnet.bscscan.com" className="poolsizeButton"><img className="poolsizeButtonPicture" src="../copy2.png"></img></button>
-						</span></h1>
+						<h1>
+							<span className="poolsizeSubHeading">ETH Arbitrage Contract </span>
+							<span className="displayPoolAddress">{this.state.ETHArbitrageContractAddress}</span>
+							<span><button onClick={this.visitPageEth} type="button" title="Link to testnet.bscscan.com" className="poolsizeButton"><img className="poolsizeButtonPicture" src="../copy2.png"></img></button>
+							</span></h1>
 						<div>
 							<span>{this.state.EthereumETH} {this.state.NameETHStable}</span>
 							<span className="and"> | </span>

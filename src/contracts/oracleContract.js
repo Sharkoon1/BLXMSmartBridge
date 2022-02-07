@@ -91,8 +91,12 @@ class OracleContract {
 		}
 		try {
 			let reserves = await this.liquidityPool.getReserves();
-			let reservesStable = new BigNumber(ethers.utils.formatEther(reserves[0]));
-			let reservesBasic = new BigNumber(ethers.utils.formatEther(reserves[1]));
+			let token0 = await this.liquidityPool.token0();
+			let token1 = await this.liquidityPool.token1();
+			let index0 = token0 === this.stableTokenAddress ? 0 : 1;
+			let index1 = token1 === this.basicTokenAddress ? 1 : 0;
+			let reservesStable = new BigNumber(ethers.utils.formatEther(reserves[index0]));
+			let reservesBasic = new BigNumber(ethers.utils.formatEther(reserves[index1]));
 			return [reservesStable, reservesBasic];
 		} catch (error) {
 			logger.error("An error occured retrieving pool reserves.");
