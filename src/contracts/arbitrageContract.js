@@ -86,12 +86,12 @@ class ArbitrageContract extends BaseContract {
 		return gasLimit;
 	}
 
-	async swapBasicToStable(amount, minAmountOut) {
-		return await this._contract.swapBasicToStable(amount, minAmountOut);
+	async swapBasicToStable(amount, minAmountOut, gasLimit, gasPrice) {
+		return await this._contract.swapBasicToStable(amount, minAmountOut, {gasPrice: gasPrice, gasLimit: gasLimit});
 	}
 
-	async swapStableToBasic(amount, minAmountOut) {
-		return await this._contract.swapStableToBasic(amount, minAmountOut);
+	async swapStableToBasic(amount, minAmountOut, gasLimit, gasPrice) {
+		return await this._contract.swapStableToBasic(amount, minAmountOut, {gasPrice: gasPrice, gasLimit: gasLimit});
 	}
 
 }

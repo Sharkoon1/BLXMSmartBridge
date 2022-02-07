@@ -35,6 +35,12 @@ class ArbitrageService {
 			this.adjustmentValueBasic;
 			this.stableProfitAfterGas;
 
+			this.gasLimitBsc;
+			this.gasLimitEth;
+
+			this.gasPriceBsc;
+			this.gasPriceEth;
+
 			this.slippageEth = new BigNumber(0.99); //default slippageEth
 			this.slippageBsc = new BigNumber(0.99); //default slippageBsc
 	
@@ -189,8 +195,8 @@ class ArbitrageService {
 	async swapEth(){
 		logger.info("Executing swaps...");
 
-		let swapStableToBasicTx = await this._arbitrageContractBsc.swapStableToBasic(this.toEthersBigNumber(this.adjustmentValueStable), this.basicAmountOut);
-		let swapBasicToStableTx = await this._arbitrageContractEth.swapBasicToStable(this.toEthersBigNumber(this.adjustmentValueBasic), this.stableAmountOut);
+		let swapStableToBasicTx = await this._arbitrageContractBsc.swapStableToBasic(this.toEthersBigNumber(this.adjustmentValueStable), this.basicAmountOut, this.gasLimitEth, this.gasPriceEth);
+		let swapBasicToStableTx = await this._arbitrageContractEth.swapBasicToStable(this.toEthersBigNumber(this.adjustmentValueBasic), this.stableAmountOut, this.gasLimitBsc, this.gasPriceBsc);
 		
 		await swapStableToBasicTx.wait(); //waits for the promise of swapStableToBasic to be resolved
 		await swapBasicToStableTx.wait(); //waits for the promise of swapBasicToStable to be resolved
@@ -238,8 +244,8 @@ class ArbitrageService {
 	async swapBsc(){
 		logger.info("Executing swaps...");
 
-		let swapStableToBasicTx = await this._arbitrageContractEth.swapStableToBasic(this.toEthersBigNumber(this.adjustmentValueStable), this.basicAmountOut);
-		let swapBasicToStableTx = await this._arbitrageContractBsc.swapBasicToStable(this.toEthersBigNumber(this.adjustmentValueBasic), this.stableAmountOut);
+		let swapStableToBasicTx = await this._arbitrageContractEth.swapStableToBasic(this.toEthersBigNumber(this.adjustmentValueStable), this.basicAmountOut, this.gasLimitEth, this.gasPriceEth);
+		let swapBasicToStableTx = await this._arbitrageContractBsc.swapBasicToStable(this.toEthersBigNumber(this.adjustmentValueBasic), this.stableAmountOut, this.gasLimitBsc, this.gasPriceBsc);
 
 		await swapStableToBasicTx.wait(); //waits for the promise of swapStableToBasic to be resolved
 		await swapBasicToStableTx.wait(); //waits for the promise of swapBasicToStable to be resolved
@@ -263,19 +269,22 @@ class ArbitrageService {
 		let stableAmountOut = await this._oracleContractEth.getsAmountOutStable(this.basicAmountOut);
 		this.stableAmountOut = stableAmountOut.mul(ethers.BigNumber.from((this.slippageEth.multipliedBy(1000).toString()))).div(1000);
 
-		let gasLimitBsc = await this._arbitrageContractBsc.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable), this.basicAmountOut);
-		let gasLimitEth = await this._arbitrageContractEth.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic), this.stableAmountOut);
+		this.gasLimitBsc = await this._arbitrageContractBsc.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable), this.basicAmountOut);
+		this.gasLimitEth = await this._arbitrageContractEth.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic), this.stableAmountOut);
+
+		this.gasLimitEth = this.gasLimitBuffer(this.gasLimitEth); 
+		this.gasLimitBsc = this.gasLimitBuffer(this.gasLimitBsc); 
 
 		// getGasPrice for BSC legacy transactions
 		// getFeeData()).maxFeePerGas for ETH EIP-1559
-		let gasPriceBsc = (await this._arbitrageContractBsc.provider.getFeeData()).gasPrice;
-		let gasPriceEth = (await this._arbitrageContractEth.provider.getFeeData()).maxFeePerGas;
+		this.gasPriceBsc = (await this._arbitrageContractBsc.provider.getFeeData()).gasPrice;
+		this.gasPriceEth = (await this._arbitrageContractEth.provider.getFeeData()).maxFeePerGas;
 
 		let wethPrice = await this._oracleContractEth.getWrappedPrice();
 		let wbnbPrice = await this._oracleContractBsc.getWrappedPrice();
 
-		let totalFeeBsc = this.fromEthersToBigNumber(gasPriceBsc.mul(gasLimitBsc)).multipliedBy(wbnbPrice);
-		let totalFeeEth = this.fromEthersToBigNumber(gasPriceEth.mul(gasLimitEth)).multipliedBy(wethPrice);
+		let totalFeeBsc = this.fromEthersToBigNumber(this.gasPriceBsc.mul(this.gasLimitBsc)).multipliedBy(wbnbPrice);
+		let totalFeeEth = this.fromEthersToBigNumber(this.gasPriceEth.mul(this.gasLimitEth)).multipliedBy(wethPrice);
 		
 		let transactionFees = totalFeeBsc.plus(totalFeeEth);
 
@@ -294,19 +303,22 @@ class ArbitrageService {
 		let stableAmountOut = await this._oracleContractBsc.getsAmountOutStable(this.basicAmountOut);
 		this.stableAmountOut = stableAmountOut.mul(ethers.BigNumber.from((this.slippageBsc.multipliedBy(1000).toString()))).div(1000);
 
-		let gasLimitEth = await this._arbitrageContractEth.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable), this.basicAmountOut);
-		let gasLimitBsc = await this._arbitrageContractBsc.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic), this.stableAmountOut);
-		
+		this.gasLimitEth = await this._arbitrageContractEth.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable), this.basicAmountOut);
+		this.gasLimitBsc = await this._arbitrageContractBsc.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic), this.stableAmountOut);
+
+		this.gasLimitEth = this.gasLimitBuffer(this.gasLimitEth); 
+		this.gasLimitBsc = this.gasLimitBuffer(this.gasLimitBsc); 
+
 		// getGasPrice for BSC legacy transactions
 		// getFeeData()).maxFeePerGas for ETH EIP-1559
-		let gasPriceBsc = (await this._arbitrageContractBsc.provider.getFeeData()).gasPrice;
-		let gasPriceEth = (await this._arbitrageContractEth.provider.getFeeData()).maxFeePerGas;
+		this.gasPriceBsc = (await this._arbitrageContractBsc.provider.getFeeData()).gasPrice;
+		this.gasPriceEth = (await this._arbitrageContractEth.provider.getFeeData()).maxFeePerGas;
 		
 		let wethPrice = await this._oracleContractEth.getWrappedPrice();
 		let wbnbPrice = await this._oracleContractBsc.getWrappedPrice();
 
-		let totalFeeBsc = this.fromEthersToBigNumber(gasPriceBsc.mul(gasLimitBsc)).multipliedBy(wbnbPrice);
-		let totalFeeEth = this.fromEthersToBigNumber(gasPriceEth.mul(gasLimitEth)).multipliedBy(wethPrice);
+		let totalFeeBsc = this.fromEthersToBigNumber(this.gasPriceBsc.mul(this.gasLimitBsc)).multipliedBy(wbnbPrice);
+		let totalFeeEth = this.fromEthersToBigNumber(this.gasPriceEth.mul(this.gasLimitEth)).multipliedBy(wethPrice);
 		
 		let transactionFees = totalFeeBsc.plus(totalFeeEth);
 
@@ -354,6 +366,13 @@ class ArbitrageService {
 
 		this.bscArbitrageBalance = { basic: bscBasicBalance, stable: bscStableBalance};
     }
+
+	gasLimitBuffer(gasLimit) {
+		gasLimit = this.fromEthersToBigNumber(gasLimit);
+		gasLimit = gasLimit.multipliedBy(1.1);
+
+		return this.toEthersBigNumber(gasLimit);
+	}
 
 	toEthersBigNumber(value){
 		let x = new BigNumber(10).pow(18);
