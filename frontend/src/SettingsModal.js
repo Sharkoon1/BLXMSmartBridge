@@ -35,14 +35,16 @@ export default function SettingsModal() {
     }
 
     function onChangeBsc(e){
-        const re = /^[0-9\b]+$/;
+        // regex to only allow 1 to 100 percent slippage.
+        const re = /^[1-9][0-9]?$|^100$/;
         if (re.test(e.target.value)) {
             setSlippageBsc(e.target.value);
-        }    
+        }  
     }
 
     function onChangeEth(e){
-        const re = /^[0-9\b]+$/;
+        // regex to only allow 1 to 100 percent slippage.
+        const re = /^[1-9][0-9]?$|^100$/;
         if (re.test(e.target.value)) {
             setSlippageEth(e.target.value);
         }    
@@ -58,12 +60,12 @@ export default function SettingsModal() {
                     <div> 
                         <div>
                             <span className='modalSubHeading'>ETH</span>
-                            <input className='modalInput' type="number"  onChange={onChangeEth} placeholder={slippageEth}></input>
+                            <input className='modalInput' type="number"  onChange={onChangeEth} value={slippageEth}></input>
                         </div> 
 
                         <div>
                             <span className='modalSubHeading'>BSC</span>
-                            <input className='modalInput' type="number" onChange={onChangeBsc} placeholder={slippageBsc}></input>
+                            <input className='modalInput' type="number" onChange={onChangeBsc} value={slippageBsc}></input>
                         </div> 
                         
                         <AlertInfo className="alertInfo" message={alert}></AlertInfo>
