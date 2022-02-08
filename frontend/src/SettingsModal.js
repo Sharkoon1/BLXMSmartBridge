@@ -31,7 +31,7 @@ export default function SettingsModal() {
             } else {
                 setError("An error occured. Response code: " + response.status)
             }
-            });
+        });
     }
 
     function onChangeBsc(e){
@@ -39,6 +39,7 @@ export default function SettingsModal() {
         const re = /^[1-9][0-9]?$|^100$/;
         if (re.test(e.target.value)) {
             setSlippageBsc(e.target.value);
+            setAlert(null);
         }  
     }
 
@@ -47,6 +48,7 @@ export default function SettingsModal() {
         const re = /^[1-9][0-9]?$|^100$/;
         if (re.test(e.target.value)) {
             setSlippageEth(e.target.value);
+            setAlert(null);
         }    
     }
 
@@ -72,8 +74,6 @@ export default function SettingsModal() {
                         <ErrorMessage message={error}></ErrorMessage>
                         <button className='modalButton' onClick={apply}>Apply</button>
                     </div>
-                    
-
                 </div>           
             </div>         
         </div>
