@@ -84,8 +84,12 @@ class SingleStepArbitrageService{
 
             this.stepStatus = 1;
 		}
-
-        this.stepStatus = this.stepStatus + 1;
+        if(this.stepStatus === 4) {
+            this.stepStatus = 1;
+        }
+        else {
+            this.stepStatus = this.stepStatus + 1;
+        }
     }
 
     async calculateArbitrage(){
