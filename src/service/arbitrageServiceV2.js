@@ -44,7 +44,7 @@ class ArbitrageService {
 			this.usdExchangeRateBsc;
 			this.usdExchangeRateEth;
 
-			BigNumber.config([-100, 100]);
+			BigNumber.config({ EXPONENTIAL_AT: [-100, 100] });
 
 			this.slippageEth = new BigNumber(0.99); //default slippageEth
 			this.slippageBsc = new BigNumber(0.99); //default slippageBsc
