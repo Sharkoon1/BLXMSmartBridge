@@ -238,8 +238,8 @@ class ArbitrageService {
 
 		await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
 
-		logger.info("ETH network: price after swap = " + this.poolPriceEth);
-		logger.info("BSC network: price after swap = " + this.poolPriceBsc);
+		logger.info("ETH network: price after swap = " + this.poolPriceEth + " USD/BLXM");
+		logger.info("BSC network: price after swap = " + this.poolPriceBsc + " USD/BLXM");
 
 		let postStableBalance = await this._arbitrageContractEth.getStableBalance();
 		let realProfit = postStableBalance.minus(this.ethArbitrageBalance.stable);
@@ -247,7 +247,7 @@ class ArbitrageService {
 		// get usd profit
 		let profitUsd = await this.convertStableToUsdEth(realProfit);
 
-		logger.info("Absolute profit after arbitrage: " + profitUsd.toString());
+		logger.info("Absolute profit after arbitrage: " + profitUsd.toString()+ " USD");
 	}
 
 	async calculateSwapBsc(basicCheap, stableCheap, basicExpensive, stableExpensive) { // When BSC is more expensive  
@@ -298,8 +298,8 @@ class ArbitrageService {
 
 		await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
 
-		logger.info("ETH network: price after swap = " + this.poolPriceEth);
-		logger.info("BSC network: price after swap = " + this.poolPriceBsc);
+		logger.info("ETH network: price after swap = " + this.poolPriceEth + " USD/BLXM");
+		logger.info("BSC network: price after swap = " + this.poolPriceBsc + " USD/BLXM");
 
 		let postStableBalance = await this._arbitrageContractBsc.getStableBalance();
 		let realProfit = postStableBalance.minus(this.bscArbitrageBalance.stable);
@@ -307,7 +307,7 @@ class ArbitrageService {
 		// get usd profit
 		let profitUsd = await this.convertStableToUsdBsc(realProfit);
 
-		logger.info("Absolute profit after arbitrage: " + profitUsd.toString());
+		logger.info("Absolute profit after arbitrage: " + profitUsd.toString() + " USD");
 	}
 
 	async calculateSwapProfitEth() {
