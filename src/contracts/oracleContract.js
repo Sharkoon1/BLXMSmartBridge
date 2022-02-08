@@ -6,6 +6,7 @@ const constants = require("../constants");
 const { ethers } = require("ethers");
 const BigNumber = require("bignumber.js");
 const logger = require("../logger/logger");
+const ArbitrageService = require("../service/ArbitrageServicev2");
 
 class OracleContract {
 	constructor(network, basicTokenAddress, stableTokenAddress) {
@@ -54,6 +55,10 @@ class OracleContract {
 											   + "and stable token address: " +  this.stableTokenAddress);
 				}
 				this.liquidityPool = new ethers.Contract(this.liquidityPoolAddress, liquidityPoolAbi, this.signer);
+
+				ArbitrageService.stopCycle();
+
+				logger.info("Stopping arbitrage cycle, because basic address has been changed");
 			});
 		});
 
@@ -65,6 +70,10 @@ class OracleContract {
 											   + "and stable token address: " +  newStableAddress);
 				}
 				this.liquidityPool = new ethers.Contract(this.liquidityPoolAddress, liquidityPoolAbi, this.signer);
+
+				ArbitrageService.stopCycle();
+
+				logger.info("Stopping arbitrage cycle, because stable address has been changed");
 			});
 		});
 	}
