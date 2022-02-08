@@ -29,7 +29,7 @@ class DataService {
 		let PancakeswapReserves = await this._oracleContractBsc.getReserves();
 		let PancakeswapStableBalance = PancakeswapReserves[0].toString();
 		let PancakeswapBLXMBalance = PancakeswapReserves[1].toString();
-	
+
 		return {
 			UniswapStables: UniswapStableBalance,
 			UniswapBLXM: UniswapBLXMBalance,
@@ -38,7 +38,7 @@ class DataService {
 		};
 	}
 
-	async getPoolAddresses(){
+	async getPoolAddresses() {
 		if (this._oracleContractBsc === null || this._oracleContractEth === null) {
 			await this.init();
 		}
@@ -47,7 +47,7 @@ class DataService {
 		let liquidityPoolEth = await this._oracleContractEth.getPoolAddress();
 
 		return {
-			liquidityPoolBsc: liquidityPoolBsc, 
+			liquidityPoolBsc: liquidityPoolBsc,
 			liquidityPoolEth: liquidityPoolEth
 		};
 	}
@@ -70,7 +70,7 @@ class DataService {
 		let arbitrageContract = new ArbitrageContract(network);
 		let stableTokenName = await arbitrageContract.getStableName();
 		let basicTokenName = await arbitrageContract.getBasicName();
-		return [stableTokenName, basicTokenName];
+		return { stableTokenName: stableTokenName, basicTokenName: basicTokenName };
 	}
 
 	async getTokenNamesLiquidity(network) {
@@ -84,7 +84,7 @@ class DataService {
 		let stableToken = new TokenContract(oracle.stableTokenAddress, arbitrageContract.signer);
 		let stableTokenName = await stableToken.getName();
 		let basicTokenName = await basicToken.getName();
-		return [stableTokenName, basicTokenName];
+		return { stableTokenName: stableTokenName, basicTokenName: basicTokenName };
 	}
 
 	async init() {
