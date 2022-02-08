@@ -89,7 +89,7 @@ class ArbitrageService {
 				await this.getArbitrageBalances(); //overwrites this.bscArbitrageBalance and this.ethArbitrageBalance from the arbitrage contract
 				await this.getReserves();  //overwrites this.tokenArrayBsc and this.tokenArrayEth with the current reserves from the LPs
 
-				if(Number.parseFloat(this.poolPriceBsc.toString()).toFixed(2) === Number.parseFloat(this.poolPriceEth.toString()).toFixed(2)) {
+				if(Number.parseFloat(this.poolPriceBsc.toString()).toFixed(4) === Number.parseFloat(this.poolPriceEth.toString()).toFixed(4)) {
 					logger.info("Prices are currently equal.");
 					logger.info("ETH network: Current price = " + this.poolPriceEth + " USD/BLXM");
 					logger.info("BSC network: Current price = " + this.poolPriceBsc + " USD/BLXM");

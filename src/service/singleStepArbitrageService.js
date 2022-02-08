@@ -42,7 +42,7 @@ class SingleStepArbitrageService{
                     await ArbitrageService.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
                     await ArbitrageService.getReserves(); //overwrites this.tokenArrayBsc and this.tokenArrayEth with the current reserves from the LPs
                     
-                    if(Number.parseFloat(ArbitrageService.poolPriceBsc.toString()).toFixed(2) === Number.parseFloat(ArbitrageService.poolPriceEth.toString()).toFixed(2)) {
+                    if(Number.parseFloat(ArbitrageService.poolPriceBsc.toString()).toFixed(4) === Number.parseFloat(ArbitrageService.poolPriceEth.toString()).toFixed(4)) {
                         logger.info("Prices are currently equal");
                         logger.info("ETH network: Current price = " + ArbitrageService.poolPriceEth + " USD/BLXM");
                         logger.info("BSC network: Current price = " + ArbitrageService.poolPriceBsc + " USD/BLXM");
