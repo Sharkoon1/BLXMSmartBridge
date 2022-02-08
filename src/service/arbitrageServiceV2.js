@@ -85,6 +85,8 @@ class ArbitrageService {
 		this.stopCycle = false;
 		this.isRunning = true;
 
+		const delay = ms => new Promise(res => setTimeout(res, ms));
+
 		try {
 			logger.info("Starting the abitrage service ...");
 
@@ -178,6 +180,8 @@ class ArbitrageService {
 					app.logEvent.emit("cycleCompleted", true);
 					break;
 				}
+
+				await delay(2000);			
 			}
 
 			this.isRunning = false;
@@ -203,7 +207,7 @@ class ArbitrageService {
 		this.adjustmentValueStable = await this.convertUsdToStableBsc(adjustmentValueStableUsd);
 		this.adjustmentValueBasic = this.amountOut(this.pancakeswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
 
-		if(this.adjustmentValueStable.lt(ethers.BigNumber.from("0") || this.adjustmentValueBasic.lt(ethers.BigNumber.from("0")))) {
+		if(this.adjustmentValueStable.lt(ethers.constants.Zero) || this.adjustmentValueBasic.lt(ethers.constants.Zero)) { // in case wrong reserves 
 			await this.getReserves();  //overwrites this.tokenArrayBsc and this.tokenArrayEth with the current reserves from the LPs
 			await this.calculateSwapEth(this.tokenArrayBsc[1], this.tokenArrayBsc[0], this.tokenArrayEth[1], this.tokenArrayEth[0]);
 		}
@@ -268,7 +272,7 @@ class ArbitrageService {
 
 		this.adjustmentValueBasic = this.amountOut(this.uniswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
 
-		if(this.adjustmentValueStable.lt(ethers.BigNumber.from("0") || this.adjustmentValueBasic.lt(ethers.BigNumber.from("0")))) {
+		if(this.adjustmentValueStable.lt(ethers.constants.Zero) || this.adjustmentValueBasic.lt(ethers.constants.Zero)) {
 			await this.getReserves();  //overwrites this.tokenArrayBsc and this.tokenArrayEth with the current reserves from the LPs
 			await this.calculateSwapBsc(this.tokenArrayEth[1], this.tokenArrayEth[0], this.tokenArrayBsc[1], this.tokenArrayBsc[0]);
 		}
