@@ -470,7 +470,7 @@ class ArbitrageService {
 
 	gasLimitBuffer(gasLimit) {
 		gasLimit = this.fromEthersToBigNumber(gasLimit);
-		gasLimit = gasLimit.multipliedBy(1.1);
+		gasLimit = gasLimit.multipliedBy(1.3);
 
 		let x = new BigNumber(10).pow(18);
 		return ethers.BigNumber.from(gasLimit.multipliedBy(x).dp(0).toString());
