@@ -46,6 +46,9 @@ class ArbitrageService {
 	
 			this.stopCycle = false;
 			this.isRunning = false;
+
+			this.UniswapStableName;
+			this.PancakeSwapStableName;
 	
 			if (process.env.NODE_ENV === "production") {
 				this.uniswapFees = new BigNumber(constants.UNISWAP_FEES);
@@ -66,6 +69,8 @@ class ArbitrageService {
 			let basicTokenAddressBsc = await this._arbitrageContractBsc.getBasicAddress();
 			let stableTokenAddressBsc = await this._arbitrageContractBsc.getStableAddress();
 			this._oracleContractBsc = new OracleContract("BSC", basicTokenAddressBsc, stableTokenAddressBsc);
+			this.UniswapNames = await DataBaseService.getTokenNamesLiquidity("ETH");
+			this.PancakeSwapNames = await DataBaseService.getTokenNamesLiquidity("BSC");;
 		}
 	}
 
@@ -168,8 +173,8 @@ class ArbitrageService {
 
 		this.adjustmentValueBasic = this.amountOut(this.pancakeswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
 
-		logger.info("Adjustment Value stable: " + this.adjustmentValueStable); 
-		logger.info("Adjustment Value basic: " + this.adjustmentValueBasic); 
+		logger.info("Adjustment Value stable: " + this.adjustmentValueStable + this.UniswapNames[0]); 
+		logger.info("Adjustment Value basic: " + this.adjustmentValueBasic + this.UniswapNames[1]); 
 
 		if(this.adjustmentValueStable.gt(this.bscArbitrageBalance.stable)) { // validate if arbitrage contract has enough stable tokens for swap
 			logger.warn("BSC: Arbitrage contract stable balance is less than adjustment value.");
@@ -217,8 +222,8 @@ class ArbitrageService {
 
 		this.adjustmentValueBasic = this.amountOut(this.uniswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
 
-		logger.info("Adjustment Value stable: " + this.adjustmentValueStable); 
-		logger.info("Adjustment Value basic: " + this.adjustmentValueBasic); 
+		logger.info("Adjustment Value stable: " + this.adjustmentValueStable + this.PancakeSwapNames[0]); 
+		logger.info("Adjustment Value basic: " + this.adjustmentValueBasic + this.this.PancakeSwapNames[1]); 
 	
 		if(this.adjustmentValueStable.gt(this.ethArbitrageBalance.stable)) { // validate if arbitrage contract has enough stable tokens for swap
 			logger.warn("ETH: Arbitrage contract stable balance is less than the adjustment value.");
