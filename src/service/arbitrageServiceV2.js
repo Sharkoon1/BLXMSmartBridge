@@ -395,8 +395,8 @@ class ArbitrageService {
 	convertStableToUsdBsc(stable) {
 		// Convert stable reserves to usd prices for adjustment value
 		// leave it as usd, if it's already usd
-		if(this._oracleContractBsc.stableTokenAddress !== constants["HUSD_BSC_TESTNET"]
-		 && this._oracleContractBsc.stableTokenAddress !== constants["USD_TOKEN_ADDRESS_BSC"]) {
+		if(this._oracleContractBsc.stableTokenAddress.toLowerCase() !== constants["HUSD_BSC_TESTNET"].toLowerCase()
+		 && this._oracleContractBsc.stableTokenAddress.toLowerCase() !== constants["USD_TOKEN_ADDRESS_BSC"].toLowerCase()) {
 			stable = stable.multipliedBy(this.usdExchangeRateBsc);
 		}
 
@@ -406,8 +406,8 @@ class ArbitrageService {
 	convertStableToUsdEth(stable) {
 		// Convert stable reserves to usd prices for adjustment value
 		// leave it as usd, if it's already usd
-		if(this._oracleContractEth.stableTokenAddress !== constants["HUSD_ETH_TESTNET"]
-		 && this._oracleContractEth.stableTokenAddress !== constants["USD_TOKEN_ADDRESS_ETH"]) {
+		if(this._oracleContractEth.stableTokenAddress.toLowerCase() !== constants["HUSD_ETH_TESTNET"].toLowerCase()
+		 && this._oracleContractEth.stableTokenAddress.toLowerCase() !== constants["USD_TOKEN_ADDRESS_ETH"].toLowerCase()) {
 			stable = stable.multipliedBy(this.usdExchangeRateEth);
 		}
 
@@ -417,8 +417,8 @@ class ArbitrageService {
 	convertUsdToStableBsc(stableUsd) {
 		// Convert stable reserves to usd prices for adjustment value
 		// leave it as usd, if it's already usd
-		if(this._oracleContractEth.stableTokenAddress !== constants["HUSD_ETH_TESTNET"]
-		 && this._oracleContractEth.stableTokenAddress !== constants["USD_TOKEN_ADDRESS_ETH"]) {
+		if(this._oracleContractEth.stableTokenAddress.toLowerCase() !== constants["HUSD_ETH_TESTNET"].toLowerCase()
+		 && this._oracleContractEth.stableTokenAddress.toLowerCase() !== constants["USD_TOKEN_ADDRESS_ETH"].toLowerCase()) {
 			stableUsd = stableUsd.dividedBy(this.usdExchangeRateBsc);
 		}
 
@@ -428,8 +428,8 @@ class ArbitrageService {
 	convertUsdToStableEth(stableUsd) {
 		// Convert stable reserves to usd prices for adjustment value
 		// leave it as usd, if it's already usd
-		if(this._oracleContractEth.stableTokenAddress !== constants["HUSD_ETH_TESTNET"]
-		 && this._oracleContractEth.stableTokenAddress !== constants["USD_TOKEN_ADDRESS_ETH"]) {
+		if(this._oracleContractEth.stableTokenAddress.toLowerCase() !== constants["HUSD_ETH_TESTNET"].toLowerCase()
+		 && this._oracleContractEth.stableTokenAddress.toLowerCase() !== constants["USD_TOKEN_ADDRESS_ETH"].toLowerCase()) {
 			stableUsd = stableUsd.dividedBy(this.usdExchangeRateEth);
 		}
 

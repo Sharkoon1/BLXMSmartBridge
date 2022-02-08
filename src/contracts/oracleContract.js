@@ -137,8 +137,8 @@ class OracleContract {
 		let stableToken = poolReserves[0];
 		let basicToken = poolReserves[1];
 	
-		if(this.stableTokenAddress !== constants["HUSD_" + this.network + "_TESTNET"] 
-		&& this.stableTokenAddress !== constants["USD_TOKEN_ADDRESS_" + this.network]) {
+		if(this.stableTokenAddress.toLowerCase() !== constants["HUSD_" + this.network + "_TESTNET"].toLowerCase()
+		&& this.stableTokenAddress.toLowerCase() !== constants["USD_TOKEN_ADDRESS_" + this.network].toLowerCase()) {
 			let stableUsdPrice = await this.getStableUsdPrice();
 
 			stableToken = stableToken.multipliedBy(stableUsdPrice);
