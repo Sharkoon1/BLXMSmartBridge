@@ -44,6 +44,8 @@ class ArbitrageService {
 			this.usdExchangeRateBsc;
 			this.usdExchangeRateEth;
 
+			BigNumber.config([-100, 100]);
+
 			this.slippageEth = new BigNumber(0.99); //default slippageEth
 			this.slippageBsc = new BigNumber(0.99); //default slippageBsc
 	
@@ -108,7 +110,16 @@ class ArbitrageService {
 						if(!liquidityAvaible) {
 							await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
 	
-							continue;
+							if(this.stopCycle) {
+								logger.info("The arbitrage service has been stopped and the last cycle has been completed.");
+					
+								this.isRunning = false;
+								app.logEvent.emit("cycleCompleted", true);
+								break;
+							}
+							else {
+								continue;
+							}
 						}
 	
 						if(this.stableProfitAfterGas.gt(0)) {
@@ -130,7 +141,16 @@ class ArbitrageService {
 						if(!liquidityAvaible) {
 							await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
 	
-							continue;
+							if(this.stopCycle) {
+								logger.info("The arbitrage service has been stopped and the last cycle has been completed.");
+					
+								this.isRunning = false;
+								app.logEvent.emit("cycleCompleted", true);
+								break;
+							}
+							else {
+								continue;
+							}
 						}
 	
 						if(this.stableProfitAfterGas.gt(0)) {
@@ -452,7 +472,8 @@ class ArbitrageService {
 	}
 
 	toEthersBigNumber(value){
-		return ethers.utils.parseEther(value.dp(18).toString());
+		let x = new BigNumber(10).pow(18);
+		return ethers.BigNumber.from(value.multipliedBy(x).dp(0).toString());
 	}
 
 	fromEthersToBigNumber(value){
