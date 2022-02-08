@@ -562,8 +562,8 @@ abstract contract Ownable is Context {
 pragma solidity ^0.8.0;
 
 contract BscArbitrage is Ownable {
-	event changedStable(address stable);
-	event changedBasic(address basic);
+    event changedStable(address stable);
+    event changedBasic(address basic);
     using SafeMath for uint256;
 
     IPancakeRouter02 pancakeRouter;
@@ -587,13 +587,13 @@ contract BscArbitrage is Ownable {
     function changeStable(address newStableAddress) public onlyOwner {
         stableAddress = newStableAddress;
         stables = IERC20(newStableAddress);
-		emit changedStable(newStableAddress);
+	emit changedStable(newStableAddress);
     }
 
     function changeBasic(address newBasicAddress) public onlyOwner {
         basicAddress = newBasicAddress;
         basics = IERC20(newBasicAddress);
-		emit changedBasic(newBasicAddress);
+	emit changedBasic(newBasicAddress);
     }
 
     function withdrawStable(uint256 amount) public onlyOwner returns (uint256) {
