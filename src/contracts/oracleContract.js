@@ -56,7 +56,7 @@ class OracleContract {
 				}
 				this.liquidityPool = new ethers.Contract(this.liquidityPoolAddress, liquidityPoolAbi, this.signer);
 
-				ArbitrageService.stopCycle();
+				ArbitrageService.stopCycle = true;
 
 				logger.info("Stopping arbitrage cycle, because basic address has been changed");
 			});
@@ -71,7 +71,7 @@ class OracleContract {
 				}
 				this.liquidityPool = new ethers.Contract(this.liquidityPoolAddress, liquidityPoolAbi, this.signer);
 
-				ArbitrageService.stopCycle();
+				ArbitrageService.stopCycle = true;
 
 				logger.info("Stopping arbitrage cycle, because stable address has been changed");
 			});
