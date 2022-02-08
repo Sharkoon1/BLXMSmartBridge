@@ -196,7 +196,7 @@ class ArbitrageService {
 		let adjustmentValueStableUsd = await this.getAdjustmentValueUsdWithFees(basicCheap, stableBsc, basicExpensive, stableEth, this.uniswapFees, this.pancakeswapFees);
 
 		this.adjustmentValueStable = await this.convertUsdToStableBsc(adjustmentValueStableUsd);
-		this.adjustmentValueBasic = this.amountOut(this.uniswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
+		this.adjustmentValueBasic = this.amountOut(this.pancakeswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
 
 		logger.info("Adjustment Value stable: " + this.adjustmentValueStable); 
 		logger.info("Adjustment Value basic: " + this.adjustmentValueBasic); 
@@ -256,7 +256,7 @@ class ArbitrageService {
 
 		this.adjustmentValueStable = await this.convertUsdToStableEth(adjustmentValueStableUsd);
 
-		this.adjustmentValueBasic = this.amountOut(this.pancakeswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
+		this.adjustmentValueBasic = this.amountOut(this.uniswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
 
 		logger.info("Adjustment Value stable: " + this.adjustmentValueStable); 
 		logger.info("Adjustment Value basic: " + this.adjustmentValueBasic); 
