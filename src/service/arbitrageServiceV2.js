@@ -370,7 +370,7 @@ class ArbitrageService {
 
 		// convert stable to usd in case stable token is not usd	
 		let stableUsdOut = this.convertStableToUsdBsc(this.fromEthersToBigNumber(this.stableAmountOut));
-		let swapProfit = this.fromEthersToBigNumber(stableUsdOut).minus(transactionFees);
+		let swapProfit = stableUsdOut.minus(transactionFees);
 
 		logger.info("Maximum sum of transaction fees: " + transactionFees + " USD");
 		logger.info("Worst case profit after slippage: " + swapProfit + " USD");
