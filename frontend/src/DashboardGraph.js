@@ -75,8 +75,9 @@ class DashboardGraph extends Component {
 					<LineChart className='lineChart' data={this.state.data} width={1000} height={300}
 						margin={{ top: 50, right: 30, left: 20, bottom: 20 }}>
 						<CartesianGrid strokeDasharray="3 3" />
-						<XAxis dataKey="timestamp" />
-						<YAxis />
+						<XAxis dataKey="timestamp"  />
+						<YAxis tickFormatter={tick => {
+           					   return `${tick} $`;  }} />
 						<Tooltip />
 						<Legend />
 						<Line type="monotone" dataKey="Uniswap" stroke="#49956a" activeDot={{ r: 8 }} />
