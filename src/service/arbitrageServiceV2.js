@@ -203,6 +203,11 @@ class ArbitrageService {
 		this.adjustmentValueStable = await this.convertUsdToStableBsc(adjustmentValueStableUsd);
 		this.adjustmentValueBasic = this.amountOut(this.pancakeswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
 
+		if(this.adjustmentValueStable.lt(ethers.BigNumber.from("0") || this.adjustmentValueBasic.lt(ethers.BigNumber.from("0")))) {
+			await this.getReserves();  //overwrites this.tokenArrayBsc and this.tokenArrayEth with the current reserves from the LPs
+			await this.calculateSwapEth(this.tokenArrayBsc[1], this.tokenArrayBsc[0], this.tokenArrayEth[1], this.tokenArrayEth[0]);
+		}
+
 		logger.info("Adjustment Value stable: " + this.adjustmentValueStable + " " + this.pancakeswapTokenNames.stableTokenName);
 		logger.info("Adjustment Value basic: " + this.adjustmentValueBasic + " " + this.uniswapTokenNames.basicTokenName);
 
@@ -262,6 +267,11 @@ class ArbitrageService {
 		this.adjustmentValueStable = await this.convertUsdToStableEth(adjustmentValueStableUsd);
 
 		this.adjustmentValueBasic = this.amountOut(this.uniswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
+
+		if(this.adjustmentValueStable.lt(ethers.BigNumber.from("0") || this.adjustmentValueBasic.lt(ethers.BigNumber.from("0")))) {
+			await this.getReserves();  //overwrites this.tokenArrayBsc and this.tokenArrayEth with the current reserves from the LPs
+			await this.calculateSwapBsc(this.tokenArrayEth[1], this.tokenArrayEth[0], this.tokenArrayBsc[1], this.tokenArrayBsc[0]);
+		}
 
 		logger.info("Adjustment Value stable: " + this.adjustmentValueStable + " " + this.uniswapTokenNames.stableTokenName);
 		logger.info("Adjustment Value basic: " + this.adjustmentValueBasic + " " + this.pancakeswapTokenNames.basicTokenName);
