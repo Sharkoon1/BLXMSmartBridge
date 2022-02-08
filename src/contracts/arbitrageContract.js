@@ -67,11 +67,11 @@ class ArbitrageContract extends BaseContract {
 	}
 
 	async getBasicAddress() {
-		return await this._contract.callStatic.basicAddress();
+		return await this._contract.basicAddress();
 	}
 
 	async getStableAddress() {
-		return await this._contract.callStatic.stableAddress();
+		return await this._contract.stableAddress();
 	}
 
 	async swapBasicToStableGasLimit(amount, minAmountOut) {

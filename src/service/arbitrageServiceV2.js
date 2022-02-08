@@ -41,6 +41,11 @@ class ArbitrageService {
 			this.gasPriceBsc;
 			this.gasPriceEth;
 
+			this.usdExchangeRateBsc;
+			this.usdExchangeRateEth;
+
+			BigNumber.config({ EXPONENTIAL_AT: [-100, 100] });
+
 			this.slippageEth = new BigNumber(0.99); //default slippageEth
 			this.slippageBsc = new BigNumber(0.99); //default slippageBsc
 	
@@ -89,7 +94,7 @@ class ArbitrageService {
 				await this.getArbitrageBalances(); //overwrites this.bscArbitrageBalance and this.ethArbitrageBalance from the arbitrage contract
 				await this.getReserves();  //overwrites this.tokenArrayBsc and this.tokenArrayEth with the current reserves from the LPs
 
-				if(Number.parseFloat(this.poolPriceBsc.toString()).toFixed(2) === Number.parseFloat(this.poolPriceEth.toString()).toFixed(2)) {
+				if(Number.parseFloat(this.poolPriceBsc.toString()).toFixed(4) === Number.parseFloat(this.poolPriceEth.toString()).toFixed(4)) {
 					logger.info("Prices are currently equal.");
 					logger.info("ETH network: Current price = " + this.poolPriceEth + " USD/BLXM");
 					logger.info("BSC network: Current price = " + this.poolPriceBsc + " USD/BLXM");
@@ -110,7 +115,16 @@ class ArbitrageService {
 						if(!liquidityAvaible) {
 							await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
 	
-							continue;
+							if(this.stopCycle) {
+								logger.info("The arbitrage service has been stopped and the last cycle has been completed.");
+					
+								this.isRunning = false;
+								app.logEvent.emit("cycleCompleted", true);
+								break;
+							}
+							else {
+								continue;
+							}
 						}
 	
 						if(this.stableProfitAfterGas.gt(0)) {
@@ -132,7 +146,16 @@ class ArbitrageService {
 						if(!liquidityAvaible) {
 							await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
 	
-							continue;
+							if(this.stopCycle) {
+								logger.info("The arbitrage service has been stopped and the last cycle has been completed.");
+					
+								this.isRunning = false;
+								app.logEvent.emit("cycleCompleted", true);
+								break;
+							}
+							else {
+								continue;
+							}
 						}
 	
 						if(this.stableProfitAfterGas.gt(0)) {
@@ -169,8 +192,15 @@ class ArbitrageService {
 	}
 
 	async calculateSwapEth(basicCheap, stableCheap, basicExpensive, stableExpensive){ // When ETH is more expensive
-		this.adjustmentValueStable = await this.getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, stableExpensive, this.uniswapFees, this.pancakeswapFees);
+		await this.getUsdExchangeRates(); //overwrites this.usdExchangeRateBsc and this.usdExchangeRateEth from the arbitrage contract
 
+		// convert stable to usd to get correct adjustment value to adjust prices
+		let stableBsc = this.convertStableToUsdBsc(stableCheap);
+		let stableEth = this.convertStableToUsdEth(stableExpensive);
+
+		let adjustmentValueStableUsd = await this.getAdjustmentValueUsdWithFees(basicCheap, stableBsc, basicExpensive, stableEth, this.uniswapFees, this.pancakeswapFees);
+
+		this.adjustmentValueStable = await this.convertUsdToStableBsc(adjustmentValueStableUsd);
 		this.adjustmentValueBasic = this.amountOut(this.pancakeswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
 
 		logger.info("Adjustment Value stable: " + this.adjustmentValueStable + this.UniswapNames[0]); 
@@ -213,12 +243,23 @@ class ArbitrageService {
 
 		let postStableBalance = await this._arbitrageContractEth.getStableBalance();
 		let realProfit = postStableBalance.minus(this.ethArbitrageBalance.stable);
+
+		// get usd profit
+		let profitUsd = await this.convertStableToUsdEth(realProfit);
 		
-		logger.info("Absolute profit after arbitrage: " + realProfit.toString());
+		logger.info("Absolute profit after arbitrage: " + profitUsd.toString());
 	}
 
 	async calculateSwapBsc(basicCheap, stableCheap, basicExpensive, stableExpensive){ // When BSC is more expensive  
-		this.adjustmentValueStable = await this.getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, stableExpensive, this.pancakeswapFees, this.uniswapFees);
+		await this.getUsdExchangeRates(); //overwrites this.usdExchangeRateBsc and this.usdExchangeRateEth from the arbitrage contract
+
+		// convert stable to usd to get correct adjustment value to adjust prices
+		let stableBsc = this.convertStableToUsdBsc(stableExpensive);
+		let stableEth = this.convertStableToUsdEth(stableCheap);
+
+		let adjustmentValueStableUsd = await this.getAdjustmentValueUsdWithFees(basicCheap, stableEth, basicExpensive, stableBsc, this.pancakeswapFees, this.uniswapFees);
+
+		this.adjustmentValueStable = await this.convertUsdToStableEth(adjustmentValueStableUsd);
 
 		this.adjustmentValueBasic = this.amountOut(this.uniswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
 
@@ -262,8 +303,11 @@ class ArbitrageService {
 
 		let postStableBalance = await this._arbitrageContractBsc.getStableBalance();
 		let realProfit = postStableBalance.minus(this.bscArbitrageBalance.stable);
+
+		// get usd profit
+		let profitUsd = await this.convertStableToUsdBsc(realProfit);
 		
-		logger.info("Absolute profit after arbitrage: " + realProfit.toString());
+		logger.info("Absolute profit after arbitrage: " + profitUsd.toString());
     }
 
 	async calculateSwapProfitEth(){
@@ -293,7 +337,9 @@ class ArbitrageService {
 		
 		let transactionFees = totalFeeBsc.plus(totalFeeEth);
 
-		let swapProfit = this.fromEthersToBigNumber(this.stableAmountOut).minus(transactionFees);
+		// convert stable to usd in case stable token is not usd
+		let stableUsdOut = this.convertStableToUsdEth(this.fromEthersToBigNumber(this.stableAmountOut));
+		let swapProfit = stableUsdOut.minus(transactionFees);
 
 		logger.info("Maximum sum of transaction fees: " + transactionFees + " USD");
 		logger.info("Worst case profit after slippage: " + swapProfit + " USD");
@@ -327,14 +373,15 @@ class ArbitrageService {
 		
 		let transactionFees = totalFeeBsc.plus(totalFeeEth);
 
-		let swapProfit = this.fromEthersToBigNumber(this.stableAmountOut).minus(transactionFees);
+		// convert stable to usd in case stable token is not usd	
+		let stableUsdOut = this.convertStableToUsdBsc(this.fromEthersToBigNumber(this.stableAmountOut));
+		let swapProfit = stableUsdOut.minus(transactionFees);
 
 		logger.info("Maximum sum of transaction fees: " + transactionFees + " USD");
 		logger.info("Worst case profit after slippage: " + swapProfit + " USD");
 
 		return swapProfit;  
 	}
-
     
 	async getAdjustmentValueUsdWithFees(basicCheap, stableCheap, basicExpensive, stableExpensive, feesExpansive, feesCheap) {
 		let adjustmentValue = await equationSolver.solveAdjustmentValue(basicCheap.toString(), stableCheap.toString(), basicExpensive.toString(), stableExpensive.toString(), feesExpansive.toString(), feesCheap.toString());
@@ -350,6 +397,55 @@ class ArbitrageService {
 		return numerator.dividedBy(denominator);
 	}
 
+	convertStableToUsdBsc(stable) {
+		// Convert stable reserves to usd prices for adjustment value
+		// leave it as usd, if it's already usd
+		if(this._oracleContractBsc.stableTokenAddress.toLowerCase() !== constants["HUSD_BSC_TESTNET"].toLowerCase()
+		 && this._oracleContractBsc.stableTokenAddress.toLowerCase() !== constants["USD_TOKEN_ADDRESS_BSC"].toLowerCase()) {
+			stable = stable.multipliedBy(this.usdExchangeRateBsc);
+		}
+
+		return stable;
+	}
+
+	convertStableToUsdEth(stable) {
+		// Convert stable reserves to usd prices for adjustment value
+		// leave it as usd, if it's already usd
+		if(this._oracleContractEth.stableTokenAddress.toLowerCase() !== constants["HUSD_ETH_TESTNET"].toLowerCase()
+		 && this._oracleContractEth.stableTokenAddress.toLowerCase() !== constants["USD_TOKEN_ADDRESS_ETH"].toLowerCase()) {
+			stable = stable.multipliedBy(this.usdExchangeRateEth);
+		}
+
+		return stable;
+	}
+
+	convertUsdToStableBsc(stableUsd) {
+		// Convert stable reserves to usd prices for adjustment value
+		// leave it as usd, if it's already usd
+		if(this._oracleContractEth.stableTokenAddress.toLowerCase() !== constants["HUSD_ETH_TESTNET"].toLowerCase()
+		 && this._oracleContractEth.stableTokenAddress.toLowerCase() !== constants["USD_TOKEN_ADDRESS_ETH"].toLowerCase()) {
+			stableUsd = stableUsd.dividedBy(this.usdExchangeRateBsc);
+		}
+
+		return stableUsd;
+	}
+
+	convertUsdToStableEth(stableUsd) {
+		// Convert stable reserves to usd prices for adjustment value
+		// leave it as usd, if it's already usd
+		if(this._oracleContractEth.stableTokenAddress.toLowerCase() !== constants["HUSD_ETH_TESTNET"].toLowerCase()
+		 && this._oracleContractEth.stableTokenAddress.toLowerCase() !== constants["USD_TOKEN_ADDRESS_ETH"].toLowerCase()) {
+			stableUsd = stableUsd.dividedBy(this.usdExchangeRateEth);
+		}
+
+		return stableUsd;
+	}
+
+	async getUsdExchangeRates() {
+		this.usdExchangeRateBsc = await this._oracleContractBsc.getStableUsdPrice();
+		this.usdExchangeRateEth = await this._oracleContractEth.getStableUsdPrice();
+	}
+	
 	async getPoolPrices(){
 		this.poolPriceBsc = await this._oracleContractBsc.getPrice();
 		this.poolPriceEth = await this._oracleContractEth.getPrice();
@@ -376,7 +472,8 @@ class ArbitrageService {
 		gasLimit = this.fromEthersToBigNumber(gasLimit);
 		gasLimit = gasLimit.multipliedBy(1.1);
 
-		return this.toEthersBigNumber(gasLimit);
+		let x = new BigNumber(10).pow(18);
+		return ethers.BigNumber.from(gasLimit.multipliedBy(x).dp(0).toString());
 	}
 
 	toEthersBigNumber(value){
