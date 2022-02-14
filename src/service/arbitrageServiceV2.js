@@ -338,16 +338,20 @@ class ArbitrageService {
 		this.gasLimitEth = this.gasLimitBuffer(this.gasLimitEth);
 		this.gasLimitBsc = this.gasLimitBuffer(this.gasLimitBsc);
 
-		// getGasPrice for BSC legacy transactions
+
+		// gasPrice for BSC legacy transactions
 		// getFeeData()).maxFeePerGas for ETH EIP-1559
-		this.gasPriceBsc = (await this._arbitrageContractBsc.provider.getFeeData()).gasPrice;
-		this.gasPriceEth = (await this._arbitrageContractEth.provider.getFeeData()).maxFeePerGas;
+		let feeDataBsc = (await this._arbitrageContractBsc.provider.getFeeData());
+		this.gasPriceBsc = feeDataBsc.gasPrice;
+
+		let feeDataEth = (await this._arbitrageContractEth.provider.getFeeData());
+		this.gasPriceEth = feeDataEth.gasPrice;
 
 		let wethPrice = await this._oracleContractEth.getWrappedPrice();
 		let wbnbPrice = await this._oracleContractBsc.getWrappedPrice();
 
-		let totalFeeBsc = this.fromEthersToBigNumber(this.gasPriceBsc.mul(this.gasLimitBsc)).multipliedBy(wbnbPrice);
-		let totalFeeEth = this.fromEthersToBigNumber(this.gasPriceEth.mul(this.gasLimitEth)).multipliedBy(wethPrice);
+		let totalFeeBsc = this.fromEthersToBigNumber(feeDataBsc.gasPrice.mul(this.gasLimitBsc)).multipliedBy(wbnbPrice);
+		let totalFeeEth = this.fromEthersToBigNumber(feeDataEth.maxFeePerGas.mul(this.gasLimitEth)).multipliedBy(wethPrice);
 
 		let transactionFees = totalFeeBsc.plus(totalFeeEth);
 
@@ -374,16 +378,19 @@ class ArbitrageService {
 		this.gasLimitEth = this.gasLimitBuffer(this.gasLimitEth);
 		this.gasLimitBsc = this.gasLimitBuffer(this.gasLimitBsc);
 
-		// getGasPrice for BSC legacy transactions
+		// gasPrice for BSC legacy transactions
 		// getFeeData()).maxFeePerGas for ETH EIP-1559
-		this.gasPriceBsc = (await this._arbitrageContractBsc.provider.getFeeData()).gasPrice;
-		this.gasPriceEth = (await this._arbitrageContractEth.provider.getFeeData()).maxFeePerGas;
+		let feeDataBsc = (await this._arbitrageContractBsc.provider.getFeeData());
+		this.gasPriceBsc = feeDataBsc.gasPrice;
+
+		let feeDataEth = (await this._arbitrageContractEth.provider.getFeeData());
+		this.gasPriceEth = feeDataEth.gasPrice;
 
 		let wethPrice = await this._oracleContractEth.getWrappedPrice();
 		let wbnbPrice = await this._oracleContractBsc.getWrappedPrice();
 
-		let totalFeeBsc = this.fromEthersToBigNumber(this.gasPriceBsc.mul(this.gasLimitBsc)).multipliedBy(wbnbPrice);
-		let totalFeeEth = this.fromEthersToBigNumber(this.gasPriceEth.mul(this.gasLimitEth)).multipliedBy(wethPrice);
+		let totalFeeBsc = this.fromEthersToBigNumber(feeDataBsc.gasPrice.mul(this.gasLimitBsc)).multipliedBy(wbnbPrice);
+		let totalFeeEth = this.fromEthersToBigNumber(feeDataEth.maxFeePerGas.mul(this.gasLimitEth)).multipliedBy(wethPrice);
 
 		let transactionFees = totalFeeBsc.plus(totalFeeEth);
 
