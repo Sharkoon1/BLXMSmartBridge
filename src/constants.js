@@ -31,3 +31,4 @@ module.exports = Object.freeze({
 	PANCAKESWAP_FEES: "0.9975",
 	UNISWAP_FEES_TESTNET: "0.997",
 	PANCAKESWAP_FEES_TESTNET: "0.998"
+});
