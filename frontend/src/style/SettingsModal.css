@@ -55,7 +55,39 @@
     text-align: center;
 }
 
+.setMaxSwapAmount{
+    margin-top: 40px;
+}
+
 .modalInput::placeholder {
     text-align: center;
     font-size: 17px
   }
+
+.toggleSwitchContent{
+    margin-top: 17px;
+}  
+.toggleSwitchSwitch{
+    margin-right: 20px;
+    margin-left: 2px;
+    margin-bottom: 20px; 
+    display: inline-block;
+    width: 52px;
+    height: 40px;
+}
+
+.toggleSwitchSwitchText {
+    vertical-align:top;
+    float: right;
+    display: inline-block;
+    width: 245px;
+    height: 98px;
+
+}
+.setMaxSwapAmountNetwork{
+    margin-top: 38px;
+}
+
+.modalSubHeading.SwapAmount{
+    width: 20px;
+}
