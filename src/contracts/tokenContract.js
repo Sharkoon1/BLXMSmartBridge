@@ -23,6 +23,10 @@ class TokenContract extends BaseContract {
 	async getName(){
 		return await this._contract.symbol();
 	}
+
+	async getDecimals(){
+		return await this._contract.decimals();
+	}
 }
 
 module.exports = TokenContract;

@@ -312,7 +312,7 @@ class ArbitrageService {
 			this.adjustmentValueStable = this.ethArbitrageBalance.stable;
 
 			logger.warn("Set adjustment stable to stable balance, to swap what is left.");
-			logger.warn("New adjustment Value stable: " + this.adjustmentValueStable + " " + this.pancakeswapTokenNames.stableTokenName);
+			logger.warn("New adjustment Value stable: " + this.adjustmentValueStable + " " + this.uniswapTokenNames.stableTokenName);
 		}
 
 		if (this.adjustmentValueBasic.gt(this.bscArbitrageBalance.basicBalance)) { // validate if arbitrage contract has enough basic tokens for swap
@@ -329,7 +329,7 @@ class ArbitrageService {
 			this.adjustmentValueBasic = this.bscArbitrageBalance.basic;
 
 			logger.info("Set adjustment basic to basic balance, to swap what is left.");
-			logger.info("New adjustment Value basic: " + this.adjustmentValueBasic + " " + this.uniswapTokenNames.basicTokenName);
+			logger.info("New adjustment Value basic: " + this.adjustmentValueBasic + " " + this.pancakeswapTokenNames.basicTokenName);
 		}
 
 		this.stableProfitAfterGas = await this.calculateSwapProfitBsc();
