@@ -80,7 +80,7 @@ export default class ToggleSwitch extends Component {
 					<div className="toggleSwitchSwitch">
 						<Switch onChange={this.handleChange} checked={this.state.checked} />
 					</div>
-					<h1 className="toggleSwitchSwitchText">Use full abitrage contract balance for maximum swap amount</h1>
+					<h1 className="toggleSwitchSwitchText">Use custom swap amount</h1>
 				</div>
 				{
 					this.state.checked ?
