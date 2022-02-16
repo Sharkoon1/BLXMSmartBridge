@@ -31,23 +31,29 @@ class ArbitrageService {
 		this.stableAmountOut;
 		this.basicAmountOut;
 
+		
 		this.adjustmentValueStable;
 		this.adjustmentValueBasic;
 		this.stableProfitAfterGas;
-
+		
 		this.gasLimitBsc;
 		this.gasLimitEth;
-
+		
 		this.gasPriceBsc;
 		this.gasPriceEth;
-
+		
 		this.usdExchangeRateBsc;
 		this.usdExchangeRateEth;
-
+		
 		BigNumber.config({ EXPONENTIAL_AT: [-100, 100] });
-
+		
 		this.slippageEth = new BigNumber(0.99); //default slippageEth
 		this.slippageBsc = new BigNumber(0.99); //default slippageBsc
+		
+		this.switchMaxSwapAmount = false; //boolean to get switched by the frontend
+
+		this.maxSwapAmountBsc; //value is set in the frontend
+		this.maxSwapAmountEth; //value is set in the frontend
 
 		this.stopCycle = false;
 		this.isRunning = false;
@@ -215,6 +221,8 @@ class ArbitrageService {
 		logger.info("Adjustment Value stable: " + this.adjustmentValueStable + " " + this.pancakeswapTokenNames.stableTokenName);
 		logger.info("Adjustment Value basic: " + this.adjustmentValueBasic + " " + this.uniswapTokenNames.basicTokenName);
 
+		this.setMaxSwapAmountEth(); //sets adjustmentValueStable & adjustmentValueBasic to the amount set in the frontend under certain conditions
+
 		if (this.adjustmentValueStable.gt(this.bscArbitrageBalance.stable)) { // validate if arbitrage contract has enough stable tokens for swap
 			logger.warn("BSC: Arbitrage contract stable balance is less than adjustment value.");
 			logger.warn("Stable balance: " + this.bscArbitrageBalance.stable);
@@ -297,6 +305,8 @@ class ArbitrageService {
 
 		logger.info("Adjustment Value stable: " + this.adjustmentValueStable + " " + this.uniswapTokenNames.stableTokenName);
 		logger.info("Adjustment Value basic: " + this.adjustmentValueBasic + " " + this.pancakeswapTokenNames.basicTokenName);
+
+		this.setMaxSwapAmountBsc();
 
 		if (this.adjustmentValueStable.gt(this.ethArbitrageBalance.stable)) { // validate if arbitrage contract has enough stable tokens for swap
 			logger.warn("ETH: Arbitrage contract stable balance is less than the adjustment value.");
@@ -540,6 +550,54 @@ class ArbitrageService {
 
 	fromEthersToBigNumber(value) {
 		return new BigNumber(ethers.utils.formatEther(value));
+	}
+
+	setMaxSwapAmountEth() { //when ETH is expensive
+	
+		if(this.switchMaxSwapAmount){
+			if(this.maxSwapAmountBsc < this.adjustmentValueStable){
+
+				this.adjustmentValueStable = this.maxSwapAmountBsc;
+
+				logger.info("Max swap amount BSC: " + this.maxSwapAmountBsc);
+				logger.info("Max swap amount BSC is less then adjustment value stable");
+				logger.info("Swap on BSC network will be executed with" + this.adjustmentValueStable);
+
+			}
+
+			if(this.maxSwapAmountEth < this.adjustmentValueBasic){
+
+				this.adjustmentValueBasic = this.maxSwapAmountEth;
+
+				logger.info("Max swap amount ETH: " + this.maxSwapAmountETH);
+				logger.info("Max swap amount ETH is less then adjustment value basic");
+				logger.info("Swap on BSC network will be executed with" + this.adjustmentValueBasic);
+			}
+		}
+	}
+
+	setMaxSwapAmountBsc() { //when Bsc is expensive
+	
+		if(this.switchMaxSwapAmount){
+			if(this.maxSwapAmountBsc < this.adjustmentValueBasic){
+
+				this.adjustmentValueBasic = this.maxSwapAmountBsc;
+
+				logger.info("Max swap amount BSC: " + this.maxSwapAmountBsc);
+				logger.info("Max swap amount BSC is less then adjustment value basic");
+				logger.info("Swap on BSC network will be executed with" + this.adjustmentValueBasic);
+
+			}
+
+			if(this.maxSwapAmountEth < this.adjustmentValueStable){
+
+				this.adjustmentValueStable = this.maxSwapAmountEth;
+
+				logger.info("Max swap amount ETH: " + this.maxSwapAmountETH);
+				logger.info("Max swap amount ETH is less then adjustment value stable");
+				logger.info("Swap on BSC network will be executed with" + this.adjustmentValueStable);
+			}
+		}
 	}
 }
 

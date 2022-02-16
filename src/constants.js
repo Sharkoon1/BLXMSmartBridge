@@ -1,8 +1,8 @@
 module.exports = Object.freeze({
-	PROVIDER_BSC_TEST: "https://bsc.getblock.io/testnet/?api_key=2cea88c6-0bf3-41a7-9fe7-1368697f3806" , //Testnet
-	PROVIDER_ETH_TEST: "https://eth.getblock.io/rinkeby/?api_key=2cea88c6-0bf3-41a7-9fe7-1368697f3806", //Testnet
-	PROVIDER_BSC: "https://bsc.getblock.io/mainnet/?api_key=2cea88c6-0bf3-41a7-9fe7-1368697f3806" , //Mainnet
-	PROVIDER_ETH: "https://eth.getblock.io/mainnet/?api_key=2cea88c6-0bf3-41a7-9fe7-1368697f3806", //Mainnet
+	PROVIDER_BSC_TEST: "https://bsc.getblock.io/testnet/?api_key=fa71d036-0d0b-40f5-877f-e9570fc4b6fa" , //Testnet
+	PROVIDER_ETH_TEST: "https://eth.getblock.io/rinkeby/?api_key=fa71d036-0d0b-40f5-877f-e9570fc4b6fa", //Testnet
+	PROVIDER_BSC: "https://bsc.getblock.io/mainnet/?api_key=fa71d036-0d0b-40f5-877f-e9570fc4b6fa" , //Mainnet
+	PROVIDER_ETH: "https://eth.getblock.io/mainnet/?api_key=fa71d036-0d0b-40f5-877f-e9570fc4b6fa", //Mainnet
 	
 	ARBITRAGE_CONTRACT_ADDRESS_ETH: "0xC50c71F6B2C454def7d7c7DB94952ae6d5Fae844", // * new deployed arbitrage contract ETH mainnet
 	ARBITRAGE_CONTRACT_ADDRESS_BSC: "0x5fB36e5A813b8F6fb8efb06f88526B0999D033C4", // * new deployed arbitrage contract BSC mainnet
@@ -11,7 +11,7 @@ module.exports = Object.freeze({
 	WRAPPED_TOKEN_ADDRESS_ETH: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", // * WETH address in ETH mainnet
 	
 	USD_TOKEN_ADDRESS_ETH: "0xdac17f958d2ee523a2206206994597c13d831ec7", // * USDT address in ETH mainnet
-	USD_TOKEN_ADDRESS_BSC: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56", // * BUSD address in BSC mainnet	
+	USD_TOKEN_ADDRESS_BSC: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56", // * BUSD address in BSC mainnet
 	
 	ROUTER_ETH: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D", // * Router address in ETH mainnet
 	ROUTER_BSC: "0x10ED43C718714eb63d5aA57B78B54704E256024E", // * Router address in BSC mainnet

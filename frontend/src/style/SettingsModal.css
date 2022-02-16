@@ -22,7 +22,7 @@
 
 .modalHeading{
     font-weight: 600;
-    font-size: 17px;
+    font-size: 25px; 
 }
 
 .modalButton{
@@ -56,7 +56,7 @@
 }
 
 .setMaxSwapAmount{
-    margin-top: 40px;
+    margin-top: 13px;
 }
 
 .modalInput::placeholder {
@@ -81,13 +81,38 @@
     float: right;
     display: inline-block;
     width: 245px;
-    height: 98px;
+    height: 40px;
 
 }
-.setMaxSwapAmountNetwork{
-    margin-top: 38px;
+
+
+
+#setttingsHr{
+    height: 2px;
+    width: 100%;
+    background: grey;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 15px;
 }
 
-.modalSubHeading.SwapAmount{
-    width: 20px;
+div.settingsSwapAmount {
+    display:grid;
+    grid-template-columns: max-content max-content;
+    grid-gap:5px;
+}
+
+div.settingsSwapAmount label       { text-align: left; width: 133px; }
+div.settingsSwapAmount label:after { content: ":"; }
+
+.changeSwapAmountText{
+    text-align: center;
+    margin-left: 14px;
+    width: 73px;
+    height: 40px;
+    border: 1px solid rgb(206, 208, 217);
+    outline: none;
+    background: rgb(247, 248, 250);
+    padding: 6px;
+    border-radius: 36px;
 }
