@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import Switch from "react-switch";
 import { post } from "./RequestHandler";
 import UrlHandler from "./UrlHandler";
@@ -82,18 +82,16 @@ export default class ToggleSwitch extends Component {
 				</div>
 				{
 					this.state.checked ?
-						<div className="setMaxSwapAmountNetwork">
-							<div>
-								<span className='modalSubHeading SwapAmount'>Max swap amount ETH network</span>
-								<input className='modalInput' type="number" onChange={this.onChangeEth} value={this.state.ethMaxSwapAmount} ></input>
-							</div>
+						<Fragment>
+							<div class="settingsSwapAmount">
+								<label>Max swap amount ETH network</label>
+								<input className="changeSwapAmountText" type="number" type="number" onChange={this.onChangeEth} value={this.state.ethMaxSwapAmount}/>
 
-							<div>
-								<span className='modalSubHeading SwapAmount'>Max swap amount BSC network</span>
-								<input className='modalInput' type="number" onChange={this.onChangeBsc} value={this.state.bscMaxSwapAmount}></input>
+								<label>Max swap amount BSC network</label>
+								<input className="changeSwapAmountText" type="number" onChange={this.onChangeBsc} value={this.state.bscMaxSwapAmount}/>
 							</div>
 							<button className='modalButton' onClick={this.apply}>Apply</button>
-						</div>
+						</Fragment>
 						: null
 				}
 			</div>
