@@ -1,3 +1,4 @@
+const { BigNumber } = require("ethers");
 const apiResponse = require("../helpers/apiResponse");
 const ArbitrageService = require("../service/arbitrageServiceV2");
 
@@ -39,8 +40,8 @@ const ArbitrageService = require("../service/arbitrageServiceV2");
 		
         try {
 			
-			let ethMaxSwapAmount = req.body.ethMaxSwapAmount;
-			let bscMaxSwapAmount = req.body.bscMaxSwapAmount;
+			let ethMaxSwapAmount = new BigNumber(req.body.ethMaxSwapAmount);
+			let bscMaxSwapAmount = new BigNumber(req.body.bscMaxSwapAmount);
 
             if(ethMaxSwapAmount || bscMaxSwapAmount > 0) {
 
