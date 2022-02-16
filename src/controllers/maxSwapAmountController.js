@@ -11,6 +11,9 @@ const ArbitrageService = require("../service/arbitrageServiceV2");
 	function (req, res) {
         try {
             if(req.body.checked) {
+
+				ArbitrageService.switchMaxSwapAmount = req.body.checked;
+
 				console.log(req.body.checked)
                 return apiResponse.successResponse(res, "Slippage window was set sucessfuly");
             }
@@ -33,10 +36,17 @@ const ArbitrageService = require("../service/arbitrageServiceV2");
  */
  exports.setMaxSwapAmountValues = [
 	function (req, res) {
+		
         try {
-            if(req.body.ETHMax || req.body.BSCMax > 0) {
-				console.log(req.body.ETHMax)
-				console.log(req.body.BSCMax)
+			
+			let ethMaxSwapAmount = req.body.ethMaxSwapAmount;
+			let bscMaxSwapAmount = req.body.bscMaxSwapAmount;
+
+            if(ethMaxSwapAmount || bscMaxSwapAmount > 0) {
+
+				ArbitrageService.maxSwapAmountBsc = bscMaxSwapAmount;
+				ArbitrageService.maxSwapAmountEth = ethMaxSwapAmount;
+
                 return apiResponse.successResponse(res, "Slippage window was set sucessfuly");
             }
 
