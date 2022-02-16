@@ -13,13 +13,13 @@ class ArbitrageContract extends BaseContract {
 		
 
 		if (process.env.NODE_ENV === "production") {  
-			provider = new ethers.providers.JsonRpcProvider(constants["PROVIDER_" + network]);
+			provider = new ethers.providers.StaticJsonRpcProvider (constants["PROVIDER_" + network]);
 			signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 
 			super(constants["ARBITRAGE_CONTRACT_ADDRESS_" + network], abi, signer);
 		}
 		else {
-			provider = new ethers.providers.JsonRpcProvider(constants["PROVIDER_" + network + "_TEST"]);
+			provider = new ethers.providers.StaticJsonRpcProvider(constants["PROVIDER_" + network + "_TEST"]);
 			signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 
 			super(constants["ARBITRAGE_CONTRACT_ADDRESS_" + network + "_TESTNET"], abi, signer);

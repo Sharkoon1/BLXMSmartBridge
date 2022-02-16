@@ -11,13 +11,13 @@ const ArbitrageService = require("../service/ArbitrageServicev2");
 class OracleContract {
 	constructor(network, basicTokenAddress, stableTokenAddress) {
 		if (process.env.NODE_ENV === "production") {
-			this.provider = new ethers.providers.JsonRpcProvider(constants["PROVIDER_" + network]);
+			this.provider = new ethers.providers.StaticJsonRpcProvider(constants["PROVIDER_" + network]);
 			this.signer = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
 			this.router = new ethers.Contract(constants["ROUTER_" + network], routerAbi, this.signer);
 			this.arbitrageContract = new ethers.Contract(constants["ARBITRAGE_CONTRACT_ADDRESS_" + network], arbitrageAbi, this.signer);
 		}
 		else {
-			this.provider = new ethers.providers.JsonRpcProvider(constants["PROVIDER_" + network + "_TEST"]);
+			this.provider = new ethers.providers.StaticJsonRpcProvider(constants["PROVIDER_" + network + "_TEST"]);
 			this.signer = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
 			this.router = new ethers.Contract(constants["ROUTER_" + network + "_TESTNET"], routerAbi, this.signer);
 			this.arbitrageContract = new ethers.Contract(constants["ARBITRAGE_CONTRACT_ADDRESS_" + network + "_TESTNET"], arbitrageAbi, this.signer);
@@ -84,7 +84,7 @@ class OracleContract {
 			// Workaround since wrapped bnb pools in testnet are not dynamic and prices are not accurate.
 			// So we also have to use production pools to get the price in the testnet
 			if (process.env.NODE_ENV !== "production") { 	
-				let provider = new ethers.providers.JsonRpcProvider(constants["PROVIDER_" + this.network]);
+				let provider = new ethers.providers.StaticJsonRpcProvider(constants["PROVIDER_" + this.network]);
 				let signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 				let router = new ethers.Contract(constants["ROUTER_" + this.network], routerAbi, signer);
 
@@ -112,7 +112,7 @@ class OracleContract {
 			// Workaround since wrapped bnb pools in testnet are not dynamic and prices are not accurate.
 			// So we also have to use production pools to get the price in the testnet
 			if (process.env.NODE_ENV !== "production") { 	
-				let provider = new ethers.providers.JsonRpcProvider(constants["PROVIDER_" + this.network]);
+				let provider = new ethers.providers.StaticJsonRpcProvider(constants["PROVIDER_" + this.network]);
 				let signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 				let router = new ethers.Contract(constants["ROUTER_" + this.network], routerAbi, signer);
 
