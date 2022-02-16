@@ -218,17 +218,35 @@ class ArbitrageService {
 		if (this.adjustmentValueStable.gt(this.bscArbitrageBalance.stable)) { // validate if arbitrage contract has enough stable tokens for swap
 			logger.warn("BSC: Arbitrage contract stable balance is less than adjustment value.");
 			logger.warn("Stable balance: " + this.bscArbitrageBalance.stable);
-			logger.info("Skipping swaps and current cycle...");
 
-			return false;
+			if(this.bscArbitrageBalance.stable.eq(ethers.constants.Zero)) {
+				logger.info("Stable balance is zero.");
+				logger.info("Skipping swaps and current cycle...");
+
+				return false;
+			}
+
+			this.adjustmentValueStable = this.bscArbitrageBalance.stable;
+
+			logger.warn("Set adjustment stable to stable balance, to swap what is left.");
+			logger.warn("New adjustment Value stable: " + this.adjustmentValueStable + " " + this.pancakeswapTokenNames.stableTokenName);
 		}
 
 		if (this.adjustmentValueBasic.gt(this.ethArbitrageBalance.basic)) { // validate if arbitrage contract has enough basic tokens for swap
 			logger.warn("ETH: Arbitrage contract basic balance is less than adjustment value.");
 			logger.warn("Basic balance: " + this.ethArbitrageBalance.basic);
-			logger.info("Skipping swaps and current cycle...");
 
-			return false;
+			if(this.ethArbitrageBalance.basic.eq(ethers.constants.Zero)) {
+				logger.info("Basic balance is zero.");
+				logger.info("Skipping swaps and current cycle...");
+
+				return false;
+			}
+
+			this.adjustmentValueBasic = this.ethArbitrageBalance.basic;
+
+			logger.warn("Set adjustment basic to basic balance, to swap what is left.");
+			logger.info("New adjustment Value basic: " + this.adjustmentValueBasic + " " + this.uniswapTokenNames.basicTokenName);
 		}
 
 		this.stableProfitAfterGas = await this.calculateSwapProfitEth();
@@ -283,17 +301,35 @@ class ArbitrageService {
 		if (this.adjustmentValueStable.gt(this.ethArbitrageBalance.stable)) { // validate if arbitrage contract has enough stable tokens for swap
 			logger.warn("ETH: Arbitrage contract stable balance is less than the adjustment value.");
 			logger.warn("Stable token balance: " + this.ethArbitrageBalance.stable);
-			logger.info("Skipping swaps and current cycle...");
 
-			return false;
+			if(this.ethArbitrageBalance.stable.eq(ethers.constants.Zero)) {
+				logger.warn("Stable balance is zero.");
+				logger.info("Skipping swaps and current cycle...");
+
+				return false;
+			}
+
+			this.adjustmentValueStable = this.ethArbitrageBalance.stable;
+
+			logger.warn("Set adjustment stable to stable balance, to swap what is left.");
+			logger.warn("New adjustment Value stable: " + this.adjustmentValueStable + " " + this.uniswapTokenNames.stableTokenName);
 		}
 
 		if (this.adjustmentValueBasic.gt(this.bscArbitrageBalance.basicBalance)) { // validate if arbitrage contract has enough basic tokens for swap
 			logger.warn("BSC: Arbitrage contract basic balance is less than the adjustment value.");
 			logger.warn("Basic token balance: " + this.bscArbitrageBalance.basicBalance);
-			logger.info("Skipping swaps and current cycle...");
 
-			return false;
+			if(this.bscArbitrageBalance.basic.eq(ethers.constants.Zero)) {
+				logger.warn("Basic balance is zero.");
+				logger.info("Skipping swaps and current cycle...");
+
+				return false;
+			}
+
+			this.adjustmentValueBasic = this.bscArbitrageBalance.basic;
+
+			logger.info("Set adjustment basic to basic balance, to swap what is left.");
+			logger.info("New adjustment Value basic: " + this.adjustmentValueBasic + " " + this.pancakeswapTokenNames.basicTokenName);
 		}
 
 		this.stableProfitAfterGas = await this.calculateSwapProfitBsc();
