@@ -53,6 +53,12 @@
 
 .alertInfo{
     text-align: center;
+    display: inline-block;
+    
+}
+
+.alert-error {
+    display: inline-block;
 }
 
 .setMaxSwapAmount{
@@ -115,4 +121,9 @@ div.settingsSwapAmount label:after { content: ":"; }
     background: rgb(247, 248, 250);
     padding: 6px;
     border-radius: 36px;
+}
+
+.changeSwapAmountText::placeholder{
+    font-size: 15px;
+    text-align: center;
 }
