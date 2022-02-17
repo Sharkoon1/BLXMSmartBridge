@@ -104,8 +104,8 @@ class ArbitrageService {
 
 				if (Number.parseFloat(this.poolPriceBsc.toString()).toFixed(4) === Number.parseFloat(this.poolPriceEth.toString()).toFixed(4)) {
 					logger.info("Prices are currently equal.");
-					logger.info("ETH network: Current price = " + this.poolPriceEth + " USD/BLXM");
-					logger.info("BSC network: Current price = " + this.poolPriceBsc + " USD/BLXM");
+					logger.info(`ETH network: Current price = ${this.poolPriceEth} USD/BLXM`);
+					logger.info(`BSC network: Current price = ${this.poolPriceBsc} USD/BLXM`);
 
 					logger.info("Skipping current arbitrage cycle.");
 					await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
@@ -113,8 +113,8 @@ class ArbitrageService {
 
 				else {
 					logger.info("Price difference found");
-					logger.info("ETH network: Current price = " + this.poolPriceEth + " USD/BLXM");
-					logger.info("BSC network: Current price = " + this.poolPriceBsc + " USD/BLXM");
+					logger.info(`ETH network: Current price = ${this.poolPriceEth} USD/BLXM`);
+					logger.info(`BSC network: Current price = ${this.poolPriceBsc} USD/BLXM`);
 
 					if (this.poolPriceEth.gt(this.poolPriceBsc)) {
 
@@ -140,7 +140,7 @@ class ArbitrageService {
 						}
 
 						else {
-							logger.info("ETH: Calculated profit after gas fees: " + this.stableProfitAfterGas + " is negative.");
+							logger.info(`ETH: Calculated profit after gas fees: ${this.stableProfitAfterGas} is negative.`);
 							logger.info("Skipping current arbitrage cycle...");
 
 							await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
@@ -170,7 +170,7 @@ class ArbitrageService {
 							await this.swapBsc();
 						}
 						else {
-							logger.info("BSC: Calculated profit after gas fees: " + this.stableProfitAfterGas + " is negative.");
+							logger.info(`BSC: Calculated profit after gas fees: ${this.stableProfitAfterGas} is negative.`);
 							logger.info("Skipping current arbitrage cycle...");
 
 							await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
@@ -218,8 +218,8 @@ class ArbitrageService {
 			await this.calculateSwapEth(this.tokenArrayBsc[1], this.tokenArrayBsc[0], this.tokenArrayEth[1], this.tokenArrayEth[0]);
 		}
 
-		logger.info("Adjustment Value stable: " + this.adjustmentValueStable + " " + this.pancakeswapTokenNames.stableTokenName);
-		logger.info("Adjustment Value basic: " + this.adjustmentValueBasic + " " + this.uniswapTokenNames.basicTokenName);
+		logger.info(`Adjustment Value stable: ${this.adjustmentValueStable} ${this.pancakeswapTokenNames.stableTokenName}`);
+		logger.info(`Adjustment Value basic: ${this.adjustmentValueBasis} ${this.uniswapTokenNames.basicTokenName}`);
 
 		this.setMaxSwapAmountEth(); //sets adjustmentValueStable & adjustmentValueBasic to the amount set in the frontend under certain conditions
 
