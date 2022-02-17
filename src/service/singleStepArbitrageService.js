@@ -44,15 +44,15 @@ class SingleStepArbitrageService{
                     
                     if(Number.parseFloat(ArbitrageService.poolPriceBsc.toString()).toFixed(4) === Number.parseFloat(ArbitrageService.poolPriceEth.toString()).toFixed(4)) {
                         logger.info("Prices are currently equal");
-                        logger.info("ETH network: Current price = " + ArbitrageService.poolPriceEth + " USD/BLXM");
-                        logger.info("BSC network: Current price = " + ArbitrageService.poolPriceBsc + " USD/BLXM");
+                        logger.info(`ETH network: Current price = ${ArbitrageService.poolPriceEth} USD/BLXM`);
+                        logger.info(`BSC network: Current price = ${ArbitrageService.poolPriceBsc} USD/BLXM`);
     
                         return this.resetSingleStepArbitrage();
                     }
                     else {
                         logger.info("Price difference found");
-                        logger.info("ETH network: Current price = " + ArbitrageService.poolPriceEth + " USD/BLXM");
-                        logger.info("BSC network: Current price = " + ArbitrageService.poolPriceBsc + " USD/BLXM");
+                        logger.info(`ETH network: Current price = ${ArbitrageService.poolPriceEth} USD/BLXM`);
+                        logger.info(`BSC network: Current price = ${ArbitrageService.poolPriceBsc} USD/BLXM`);
                         
                         logger.info("Next step: calculating aribtrage...");
                     }
@@ -107,7 +107,7 @@ class SingleStepArbitrageService{
                 await ArbitrageService.swapEth();
             }
             else {
-                logger.info("ETH: Calculated profit after slippage: " + ArbitrageService.stableProfitAfterGas + " is negative.");
+                logger.info(`ETH: Calculated profit after slippage: ${ArbitrageService.stableProfitAfterGas} is negative.`);
                 logger.info("Skipping current arbitrage cycle...");
             }
         }
@@ -116,7 +116,7 @@ class SingleStepArbitrageService{
                 await ArbitrageService.swapBsc();
             }
             else {
-                logger.info("BSC: Calculated profit after slippage: " + ArbitrageService.stableProfitAfterGas + " is negative.");
+                logger.info(`BSC: Calculated profit after slippage: ${ArbitrageService.stableProfitAfterGas} is negative.`);
                 logger.info("Skipping current arbitrage cycle...");
             }
         }
