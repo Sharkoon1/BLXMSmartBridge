@@ -38,17 +38,9 @@ const BigNumber = require("bignumber.js");
  exports.switchMaxSwapAmountOn = [
 	function (req, res) {
         try {
-            if(req.body.checked) {
+			ArbitrageService.switchMaxSwapAmount = req.body.checked;
 
-				ArbitrageService.switchMaxSwapAmount = req.body.checked;
-
-				console.log(req.body.checked)
-                return apiResponse.successResponse(res, "Switch max swap amount was set sucessfuly");
-            }
-
-            else {
-                return apiResponse.validationError(res, "Switch max swap amount request was invalid");
-            }
+			return apiResponse.successResponse(res, "Switch max swap amount was set sucessfuly");
 			
 		} catch (err) {
 			//throw error in json response with status 500. 

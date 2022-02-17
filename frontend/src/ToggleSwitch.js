@@ -24,7 +24,7 @@ export default class ToggleSwitch extends Component {
 	}
 
 	handleChange(checked) {
-		post(url + "api/maxSwapAmount/", { checked: this.state = checked }).then(response => {
+		post(url + "api/maxSwapAmount/", { checked: checked }).then(response => {
 			if (response.status === 1) {
 				this.setState(prevState => {
 					return {
