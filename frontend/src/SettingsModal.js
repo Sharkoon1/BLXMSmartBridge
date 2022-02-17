@@ -28,7 +28,7 @@ export default function SettingsModal() {
     function apply() {
         post(url+"api/slippage/", {slippageEth:parseInt(slippageEth), slippageBsc: parseInt(slippageBsc)}).then(response => {
             if(response.status === 1) {
-                setAlert("Success!");
+                setAlert("Successfully set slippage percentage!");
             } else {
                 setError("An error occured. Response code: " + response.status)
             }
@@ -76,7 +76,7 @@ export default function SettingsModal() {
                         <hr id='setttingsHr'></hr>
                         <div className='setMaxSwapAmount'>
                             <h1><i>Set Max Swap Amount</i></h1> 
-                            <ToggleSwitch />
+                            <ToggleSwitch setAlert={setAlert} setError={setError}/>
                         </div>  
                         
                         <AlertInfo className="alertInfo" message={alert}></AlertInfo>

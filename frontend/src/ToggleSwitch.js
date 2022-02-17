@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from "react";
 import Switch from "react-switch";
-import { post } from "./RequestHandler";
+import { post, get } from "./RequestHandler";
 import UrlHandler from "./UrlHandler";
 import AlertInfo from "./AlertInfo";
 import ErrorMessage from './ErrorMessage';
@@ -8,8 +8,8 @@ import "./style/SettingsModal.css"
 const url = UrlHandler();
 
 export default class ToggleSwitch extends Component {
-	constructor() {
-		super();
+	constructor(props) {
+		super(props);
 		this.state = { checked: false, ethMaxSwapAmount: 0, bscMaxSwapAmount: 0 };
 		this.handleChange = this.handleChange.bind(this);
 		this.onChangeBsc = this.onChangeBsc.bind(this);
@@ -17,8 +17,14 @@ export default class ToggleSwitch extends Component {
 		this.apply = this.apply.bind(this);
 	}
 
+	componentDidMount(){
+		get(url + "api/maxSwapAmount/").then(response => {
+			this.setState({checked: response.data.checked, bscMaxSwapAmount: response.data.bscMaxSwapAmount, ethMaxSwapAmount: response.data.ethMaxSwapAmount});
+		})
+	}
+
 	handleChange(checked) {
-		post(url + "api/maxSwapAmount/", { checked: this.state = checked.toString() }).then(response => {
+		post(url + "api/maxSwapAmount/", { checked: this.state = checked }).then(response => {
 			if (response.status === 1) {
 				this.setState(prevState => {
 					return {
@@ -62,11 +68,11 @@ export default class ToggleSwitch extends Component {
 	}
 
 	apply() {
-		post(url + "api/maxSwapAmount/values", { ethMaxSwapAmount: parseInt(this.state.ethMaxSwapAmount), bscMaxSwapAmount: parseInt(this.state.bscMaxSwapAmount) }).then(response => {
+		post(url + "api/maxSwapAmount/values", { ethMaxSwapAmount: parseFloat(this.state.ethMaxSwapAmount), bscMaxSwapAmount: parseFloat(this.state.bscMaxSwapAmount) }).then(response => {
 			if (response.status === 1) {
-				//setAlert("Success!");
+				this.props.setAlert("Successfully set max swap amount!");
 			} else {
-				//setError("An error occured. Response code: " + response.status)
+				this.props.setError("An error occured. Response code: " + response.status);
 			}
 		});
 	}
