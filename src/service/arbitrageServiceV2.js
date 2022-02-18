@@ -219,7 +219,7 @@ class ArbitrageService {
 		}
 
 		logger.info(`Adjustment Value stable: ${this.adjustmentValueStable} ${this.pancakeswapTokenNames.stableTokenName}`);
-		logger.info(`Adjustment Value basic: ${this.adjustmentValueBasis} ${this.uniswapTokenNames.basicTokenName}`);
+		logger.info(`Adjustment Value basic: ${this.adjustmentValueBasic} ${this.uniswapTokenNames.basicTokenName}`);
 
 		this.setMaxSwapAmountEth(); //sets adjustmentValueStable & adjustmentValueBasic to the amount set in the frontend under certain conditions
 

@@ -32,12 +32,9 @@ class SingleStepArbitrageService{
             await ArbitrageService.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
 
             switch(status){
-                case 1:                     
-                    logger.info("Starting AbitrageService");
-                    logger.info("Next step: collecting prices...");
-
-                    break;
-                case 2: 
+                case 1:
+					logger.info("Starting AbitrageService");
+					logger.info("Collecting prices..."); 
                     await ArbitrageService.getArbitrageBalances(); //overwrites this.bscArbitrageBalance and this.ethArbitrageBalance from the arbitrage contract 
                     await ArbitrageService.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
                     await ArbitrageService.getReserves(); //overwrites this.tokenArrayBsc and this.tokenArrayEth with the current reserves from the LPs
@@ -58,7 +55,7 @@ class SingleStepArbitrageService{
                     }
 
                     break;
-                case 3: 
+                case 2: 
                     logger.info("Calculating arbitrage ...");
                     
                     var liquidityAvaible = await this.calculateArbitrage();
@@ -69,7 +66,7 @@ class SingleStepArbitrageService{
                     
                     logger.info("Next step: Executing swaps...");
                     break;
-                case 4: 
+                case 3: 
                     await this.executeSwap();        
                     logger.info("Arbitrage cycle ended...");    
 
@@ -80,11 +77,11 @@ class SingleStepArbitrageService{
         catch(error) {
 			logger.error("Single step arbitrage service failed. Error: " +  error);
 			logger.error("Service stopped...");
-            logger.info("Resetting to step 1...");
+            logger.info("Resetting...");
 
             this.stepStatus = 1;
 		}
-        if(this.stepStatus === 4) {
+        if(this.stepStatus === 3) {
             this.stepStatus = 1;
         }
         else {
