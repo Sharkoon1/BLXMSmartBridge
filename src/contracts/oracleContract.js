@@ -91,6 +91,7 @@ class OracleContract {
 			// So we also have to use production pools to get the price in the testnet
 			if (process.env.NODE_ENV !== "production") { 	
 				let signer = this.getSigner();
+
 				let router = new ethers.Contract(constants["ROUTER_" + this.network], routerAbi, signer);
 
 				price = await router.getAmountsOut(ethers.utils.parseEther("1"), [this._wrappedTokenAddress, this._usdTokenAddress]);
