@@ -193,7 +193,7 @@ class ArbitrageService {
 			this.isRunning = false;
 		}
 		catch (error) {
-			if (error.error.code === -32016){
+			if (error.error && error.error.code === -32016){
 				logger.error("Arbitrage service failed due to a too small maximum swap amount value. Please enter a higher value.");
 			} else {
 				logger.error("Arbitrage service failed. Error: " + error);

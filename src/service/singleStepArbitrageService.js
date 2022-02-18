@@ -75,7 +75,7 @@ class SingleStepArbitrageService{
             }   
         
         catch(error) {
-			if (error.error.code === -32016){
+			if (error.error && error.error.code === -32016){
 				logger.error("Single step arbitrage service failed due to a too small maximum swap amount value. Please enter a higher value.");
 			} else {
 				logger.error("Single step arbitrage service failed. Error: " +  error);
