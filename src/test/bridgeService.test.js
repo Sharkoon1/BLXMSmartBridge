@@ -8,8 +8,8 @@ describe('IntegrationTests_Bridge_swaps', () => {
     beforeEach(() => {
         this.bridgeService = new BridgeService();
 
-        this.provider_eth = new ethers.providers.JsonRpcProvider(constants.PROVIDER_ETH);
-        this.provider_bsc = new ethers.providers.JsonRpcProvider(constants.PROVIDER_BSC);
+        this.provider_eth = new ethers.providers.StaticJsonRpcProvider(constants.PROVIDER_ETH);
+        this.provider_bsc = new ethers.providers.StaticJsonRpcProvider(constants.PROVIDER_BSC);
         this.erc20_abi = require(__path.join(__dirname, "../abi/erc20_abi.json"));
 
         this.wallet_one = new ethers.Wallet(process.env.PRIVATE_KEY, provider_eth);

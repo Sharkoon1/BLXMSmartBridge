@@ -156,7 +156,7 @@ function onListening() {
 var DataService = require("./service/dataService");
 
 (async () => {
-	const queryIntervalSeconds = 10;
+	const queryIntervalSeconds = 30;
 
 	setInterval(async () => { 
 		await DataService.getPoolData();

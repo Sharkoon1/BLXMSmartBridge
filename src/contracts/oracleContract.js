@@ -7,17 +7,18 @@ const { ethers } = require("ethers");
 const BigNumber = require("bignumber.js");
 const logger = require("../logger/logger");
 const ArbitrageService = require("../service/ArbitrageServicev2");
+const TokenContract = require("./TokenContract");
 
 class OracleContract {
 	constructor(network, basicTokenAddress, stableTokenAddress) {
 		if (process.env.NODE_ENV === "production") {
-			this.provider = new ethers.providers.JsonRpcProvider(constants["PROVIDER_" + network]);
+			this.provider = new ethers.providers.StaticJsonRpcProvider(constants["PROVIDER_" + network]);
 			this.signer = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
 			this.router = new ethers.Contract(constants["ROUTER_" + network], routerAbi, this.signer);
 			this.arbitrageContract = new ethers.Contract(constants["ARBITRAGE_CONTRACT_ADDRESS_" + network], arbitrageAbi, this.signer);
 		}
 		else {
-			this.provider = new ethers.providers.JsonRpcProvider(constants["PROVIDER_" + network + "_TEST"]);
+			this.provider = new ethers.providers.StaticJsonRpcProvider(constants["PROVIDER_" + network + "_TEST"]);
 			this.signer = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
 			this.router = new ethers.Contract(constants["ROUTER_" + network + "_TESTNET"], routerAbi, this.signer);
 			this.arbitrageContract = new ethers.Contract(constants["ARBITRAGE_CONTRACT_ADDRESS_" + network + "_TESTNET"], arbitrageAbi, this.signer);
@@ -25,6 +26,7 @@ class OracleContract {
 		
 		this._wrappedTokenAddress = constants["WRAPPED_TOKEN_ADDRESS_" + network];
 		this._usdTokenAddress = constants["USD_TOKEN_ADDRESS_" + network];
+		this._usdTokenDecimals = 18;
 
 		this.network = network;
 		this.basicTokenAddress = basicTokenAddress;
@@ -46,6 +48,10 @@ class OracleContract {
 									   + "and stable token address: " +  this.stableTokenAddress);
 		}
 		this.liquidityPool = new ethers.Contract(this.liquidityPoolAddress, liquidityPoolAbi, this.signer);
+
+		// get usd token decimals
+		let usdTokenContract = new TokenContract(this._usdTokenAddress,  this.getSigner());
+		this._usdTokenDecimals = await usdTokenContract.getDecimals();
 
 		this.arbitrageContract.on("changedBasic", (newBasicAddress) => {
 			this.factory.getPair(newBasicAddress, this.stableTokenAddress).then((poolAddress) => {
@@ -84,8 +90,7 @@ class OracleContract {
 			// Workaround since wrapped bnb pools in testnet are not dynamic and prices are not accurate.
 			// So we also have to use production pools to get the price in the testnet
 			if (process.env.NODE_ENV !== "production") { 	
-				let provider = new ethers.providers.JsonRpcProvider(constants["PROVIDER_" + this.network]);
-				let signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+				let signer = this.getSigner();
 				let router = new ethers.Contract(constants["ROUTER_" + this.network], routerAbi, signer);
 
 				price = await router.getAmountsOut(ethers.utils.parseEther("1"), [this._wrappedTokenAddress, this._usdTokenAddress]);
@@ -98,12 +103,7 @@ class OracleContract {
 			logger.error("Error: " + error);
 		}
 
-		if(this.network === "BSC") {
-			return new BigNumber(ethers.utils.formatEther(price[1]));
-		}
-		else {
-			return new BigNumber(price[1].toString()).dividedBy(10**6);
-		}
+		return new BigNumber(price[1].toString()).dividedBy(10**this._usdTokenDecimals);
 	}
 
 	async getWrappedPrice() {
@@ -112,8 +112,7 @@ class OracleContract {
 			// Workaround since wrapped bnb pools in testnet are not dynamic and prices are not accurate.
 			// So we also have to use production pools to get the price in the testnet
 			if (process.env.NODE_ENV !== "production") { 	
-				let provider = new ethers.providers.JsonRpcProvider(constants["PROVIDER_" + this.network]);
-				let signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+				let signer = this.getSigner();
 				let router = new ethers.Contract(constants["ROUTER_" + this.network], routerAbi, signer);
 
 				price = await router.getAmountsOut(ethers.utils.parseEther("1"), [this._wrappedTokenAddress, this._usdTokenAddress]);
@@ -126,12 +125,7 @@ class OracleContract {
 			logger.error("Error: " + error);
 		}
 
-		if(this.network === "BSC") {
-			return new BigNumber(ethers.utils.formatEther(price[1]));
-		}
-		else {
-			return new BigNumber(price[1].toString()).dividedBy(10**6);
-		}
+		return new BigNumber(price[1].toString()).dividedBy(10**this._usdTokenDecimals);
 	}
 
 	async getPrice() {
@@ -192,6 +186,18 @@ class OracleContract {
 			await this.init();
 		}
 		return this.liquidityPoolAddress;
+	}
+
+	getSigner() {
+		if (process.env.NODE_ENV !== "production") { 	
+			let provider = new ethers.providers.StaticJsonRpcProvider(constants["PROVIDER_" + this.network]);
+			let signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+
+			return signer;
+		}
+		else {
+			return this.signer;
+		}
 	}
 }
 

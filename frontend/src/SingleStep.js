@@ -16,6 +16,7 @@ export default function SingleStep() {
 	const [status, setStepStatus] = React.useState(1)
 	const [showResults, setShowResults] = React.useState(false)
 	const onClick = () => setShowResults(!showResults)
+	const [engaged, setEngagement] = React.useState(false)
 
 	useEffect(() => {
 		get(url + "api/arbitrage/stepStatus").then(result => {
@@ -27,6 +28,7 @@ export default function SingleStep() {
 
 	function onStop() {
 		setStopDisabled(true);
+		setEngagement(!engaged);
 		setStepStatus(1);
 
 		post(url + "api/arbitrage/stopStep").then(() => {
@@ -35,17 +37,23 @@ export default function SingleStep() {
 	}
 
 	function onNextStep() {
+		if (!engaged){
+			setEngagement(!engaged);
+		}
 		setStartDisabled(true);
 		post(url + "api/arbitrage/singleStep", { stepStatus: status })
 			.then((res) => {
 				setStepStatus(res.data.stepStatus)
 				setStartDisabled(false);
+				if (status===1 || status===3){
+					setEngagement(!engaged);
+				}
 			});
 	}
 
 	return (
 		<Fragment>
-			<ProgressOutline state={status} />
+			<ProgressOutline state={status} engaged={engaged} />
 			{showResults ? <SettingsModal /> : null}
 			<div className='logsBox'>
 				<div className='settings'>
@@ -57,7 +65,7 @@ export default function SingleStep() {
 				<div className='SingleStepButtons'>
 
 					<button disabled={startIsDisabled} className='button' id='nextStep' onClick={onNextStep}>
-					{!startIsDisabled ? "Next Step" : "Loading..."}
+					{!startIsDisabled ? (!engaged ? "Start Arbitrage" : "Next Step") : "Loading..."}
 					</button>
 					<button disabled={stopIsDisabled} className='button Stop' id='stop' onClick={onStop}>Stop</button>
 				</div>

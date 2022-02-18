@@ -22,7 +22,7 @@
 
 .modalHeading{
     font-weight: 600;
-    font-size: 17px;
+    font-size: 25px; 
 }
 
 .modalButton{
@@ -53,9 +53,81 @@
 
 .alertInfo{
     text-align: center;
+    display: inline-block;
+    
+}
+
+.alert-info {
+    display: inline-block;
+}
+
+.alert-error {
+    display: inline-block;
+}
+
+.setMaxSwapAmount{
+    margin-top: 13px;
 }
 
 .modalInput::placeholder {
     text-align: center;
     font-size: 17px
   }
+
+.toggleSwitchContent{
+    margin-top: 17px;
+}  
+.toggleSwitchSwitch{
+    margin-right: 20px;
+    margin-left: 2px;
+    margin-bottom: 20px; 
+    display: inline-block;
+    width: 52px;
+    height: 40px;
+}
+
+.toggleSwitchSwitchText {
+    vertical-align:top;
+    float: right;
+    display: inline-block;
+    width: 245px;
+    height: 40px;
+
+}
+
+
+
+#setttingsHr{
+    height: 2px;
+    width: 100%;
+    background: grey;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 15px;
+}
+
+div.settingsSwapAmount {
+    display:grid;
+    grid-template-columns: max-content max-content;
+    grid-gap:5px;
+}
+
+div.settingsSwapAmount label       { text-align: left; width: 133px; }
+div.settingsSwapAmount label:after { content: ":"; }
+
+.changeSwapAmountText{
+    text-align: center;
+    margin-left: 14px;
+    width: 73px;
+    height: 40px;
+    border: 1px solid rgb(206, 208, 217);
+    outline: none;
+    background: rgb(247, 248, 250);
+    padding: 6px;
+    border-radius: 36px;
+}
+
+.changeSwapAmountText::placeholder{
+    font-size: 15px;
+    text-align: center;
+}

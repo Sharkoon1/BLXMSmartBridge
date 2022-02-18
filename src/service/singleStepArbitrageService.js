@@ -32,33 +32,30 @@ class SingleStepArbitrageService{
             await ArbitrageService.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
 
             switch(status){
-                case 1:                     
-                    logger.info("Starting AbitrageService");
-                    logger.info("Next step: collecting prices...");
-
-                    break;
-                case 2: 
+                case 1:
+					logger.info("Starting AbitrageService");
+					logger.info("Collecting prices..."); 
                     await ArbitrageService.getArbitrageBalances(); //overwrites this.bscArbitrageBalance and this.ethArbitrageBalance from the arbitrage contract 
                     await ArbitrageService.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
                     await ArbitrageService.getReserves(); //overwrites this.tokenArrayBsc and this.tokenArrayEth with the current reserves from the LPs
                     
                     if(Number.parseFloat(ArbitrageService.poolPriceBsc.toString()).toFixed(4) === Number.parseFloat(ArbitrageService.poolPriceEth.toString()).toFixed(4)) {
                         logger.info("Prices are currently equal");
-                        logger.info("ETH network: Current price = " + ArbitrageService.poolPriceEth + " USD/BLXM");
-                        logger.info("BSC network: Current price = " + ArbitrageService.poolPriceBsc + " USD/BLXM");
+                        logger.info(`ETH network: Current price = ${ArbitrageService.poolPriceEth} USD/BLXM`);
+                        logger.info(`BSC network: Current price = ${ArbitrageService.poolPriceBsc} USD/BLXM`);
     
                         return this.resetSingleStepArbitrage();
                     }
                     else {
                         logger.info("Price difference found");
-                        logger.info("ETH network: Current price = " + ArbitrageService.poolPriceEth + " USD/BLXM");
-                        logger.info("BSC network: Current price = " + ArbitrageService.poolPriceBsc + " USD/BLXM");
+                        logger.info(`ETH network: Current price = ${ArbitrageService.poolPriceEth} USD/BLXM`);
+                        logger.info(`BSC network: Current price = ${ArbitrageService.poolPriceBsc} USD/BLXM`);
                         
                         logger.info("Next step: calculating aribtrage...");
                     }
 
                     break;
-                case 3: 
+                case 2: 
                     logger.info("Calculating arbitrage ...");
                     
                     var liquidityAvaible = await this.calculateArbitrage();
@@ -69,7 +66,7 @@ class SingleStepArbitrageService{
                     
                     logger.info("Next step: Executing swaps...");
                     break;
-                case 4: 
+                case 3: 
                     await this.executeSwap();        
                     logger.info("Arbitrage cycle ended...");    
 
@@ -78,13 +75,17 @@ class SingleStepArbitrageService{
             }   
         
         catch(error) {
-			logger.error("Single step arbitrage service failed. Error: " +  error);
+			if (error.error && error.error.code === -32016){
+				logger.error("Single step arbitrage service failed due to a too small maximum swap amount value. Please enter a higher value.");
+			} else {
+				logger.error("Single step arbitrage service failed. Error: " +  error);
+			}
 			logger.error("Service stopped...");
-            logger.info("Resetting to step 1...");
+            logger.info("Resetting...");
 
             this.stepStatus = 1;
 		}
-        if(this.stepStatus === 4) {
+        if(this.stepStatus === 3) {
             this.stepStatus = 1;
         }
         else {
@@ -107,7 +108,7 @@ class SingleStepArbitrageService{
                 await ArbitrageService.swapEth();
             }
             else {
-                logger.info("ETH: Calculated profit after slippage: " + ArbitrageService.stableProfitAfterGas + " is negative.");
+                logger.info(`ETH: Calculated profit after slippage: ${ArbitrageService.stableProfitAfterGas} is negative.`);
                 logger.info("Skipping current arbitrage cycle...");
             }
         }
@@ -116,7 +117,7 @@ class SingleStepArbitrageService{
                 await ArbitrageService.swapBsc();
             }
             else {
-                logger.info("BSC: Calculated profit after slippage: " + ArbitrageService.stableProfitAfterGas + " is negative.");
+                logger.info(`BSC: Calculated profit after slippage: ${ArbitrageService.stableProfitAfterGas} is negative.`);
                 logger.info("Skipping current arbitrage cycle...");
             }
         }
