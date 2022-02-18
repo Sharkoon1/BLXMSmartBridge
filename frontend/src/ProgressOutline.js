@@ -12,10 +12,10 @@ export default function ProgressOutline(props) {
            </div>
            <div className='content'>
                 <ul class="progressbar">
-                    <li id='progressbar1' className={props.state === 1 ? "active" : null}>Starting</li>
-                    <li id='progressbar2' className={props.state === 2 ? "active" : null}>Price Collection</li>
-                    <li id='progressbar2' className={props.state === 3 ? "active" : null}>Arbitrage Calculation</li>
-                    <li id='progressbar2' className={props.state === 4 ? "active" : null}>Execute Swap</li>
+                    {/* Step1 is when abitrage cycle isn't running*/}
+                    <li id='progressbar2' className={props.state === 1 && props.engaged ? "active" : null}>Price Collection</li>
+                    <li id='progressbar2' className={props.state === 2 && props.engaged ? "active" : null}>Arbitrage Calculation</li>
+                    <li id='progressbar2' className={props.state === 3 && props.engaged ? "active" : null}>Execute Swap</li>
                 </ul>
            </div>
         </div>

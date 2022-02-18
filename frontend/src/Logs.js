@@ -49,7 +49,7 @@ export default class Logs extends Component {
     
       <div className="window">
         <div className="terminal">
-          <p id="command" className="command">Arbitrage Console is ready.</p>  
+          <p id="command" className="command">Arbitrage Console is ready, click 'Start Arbitrage' to begin cycle.</p>  
             {this.state.logs.map((subItems, sIndex) => {
               return <p className="log"><span key={sIndex}> {subItems}</span></p>;
             })}
