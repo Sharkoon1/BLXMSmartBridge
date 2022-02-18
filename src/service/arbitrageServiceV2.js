@@ -378,10 +378,17 @@ class ArbitrageService {
 	async calculateSwapProfitEth() {
 
 		let basicAmountOut = await this._oracleContractBsc.getsAmountOutBasic(this.toEthersBigNumber(this.adjustmentValueStable));
-		this.basicAmountOut = basicAmountOut.mul(ethers.BigNumber.from((this.slippageBsc.multipliedBy(1000).toString()))).div(1000);
+		// Shift decimal separator to the right until no more decimal values are left
+		// since ethers.BigNumber values require as input numbers without decimal places
+		let power = 10**2;
+		let slippageBscSplitString = this.slippageBsc.toString().split(".");
+		if (slippageBscSplitString.length>1){
+			power *= 10**slippageBscSplitString[1].length;
+		}
+		this.basicAmountOut = basicAmountOut.mul(ethers.BigNumber.from((this.slippageBsc.multipliedBy(power).toString()))).div(power);
 
 		let stableAmountOut = await this._oracleContractEth.getsAmountOutStable(this.basicAmountOut);
-		this.stableAmountOut = stableAmountOut.mul(ethers.BigNumber.from((this.slippageEth.multipliedBy(1000).toString()))).div(1000);
+		this.stableAmountOut = stableAmountOut.mul(ethers.BigNumber.from((this.slippageEth.multipliedBy(power).toString()))).div(power);
 
 		this.gasLimitBsc = await this._arbitrageContractBsc.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable), this.basicAmountOut);
 		this.gasLimitEth = await this._arbitrageContractEth.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic), this.stableAmountOut);
@@ -418,10 +425,17 @@ class ArbitrageService {
 
 	async calculateSwapProfitBsc() {
 		let basicAmountOut = await this._oracleContractEth.getsAmountOutBasic(this.toEthersBigNumber(this.adjustmentValueStable));
-		this.basicAmountOut = basicAmountOut.mul(ethers.BigNumber.from((this.slippageEth.multipliedBy(1000).toString()))).div(1000);
+		// Shift decimal separator to the right until no more decimal values are left
+		// since ethers.BigNumber values require as input numbers without decimal places
+		let power = 10**2;
+		let slippageEthSplitString = this.slippageEth.toString().split(".");
+		if (slippageEthSplitString.length>1){
+			power *= 10**slippageEthSplitString[1].length;
+		}
+		this.basicAmountOut = basicAmountOut.mul(ethers.BigNumber.from((this.slippageEth.multipliedBy(power).toString()))).div(power);
 
 		let stableAmountOut = await this._oracleContractBsc.getsAmountOutStable(this.basicAmountOut);
-		this.stableAmountOut = stableAmountOut.mul(ethers.BigNumber.from((this.slippageBsc.multipliedBy(1000).toString()))).div(1000);
+		this.stableAmountOut = stableAmountOut.mul(ethers.BigNumber.from((this.slippageBsc.multipliedBy(power).toString()))).div(power);
 
 		this.gasLimitEth = await this._arbitrageContractEth.swapStableToBasicGasLimit(this.toEthersBigNumber(this.adjustmentValueStable), this.basicAmountOut);
 		this.gasLimitBsc = await this._arbitrageContractBsc.swapBasicToStableGasLimit(this.toEthersBigNumber(this.adjustmentValueBasic), this.stableAmountOut);
