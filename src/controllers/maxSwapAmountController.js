@@ -39,7 +39,10 @@ const BigNumber = require("bignumber.js");
 	function (req, res) {
         try {
 			ArbitrageService.switchMaxSwapAmount = req.body.checked;
-
+			if (!ArbitrageService.switchMaxSwapAmount){
+				ArbitrageService.maxSwapAmountBsc = null;
+				ArbitrageService.maxSwapAmountEth == null;
+			}
 			return apiResponse.successResponse(res, "Switch max swap amount was set sucessfuly");
 			
 		} catch (err) {
