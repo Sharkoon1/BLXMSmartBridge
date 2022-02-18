@@ -14,8 +14,8 @@ const BigNumber = require("bignumber.js");
 			let maxSwapAmountBsc;
 			let maxSwapAmountEth;
 			
-			if(ArbitrageService.maxSwapAmountBsc == null ) maxSwapAmountBsc = 0;
-			if(ArbitrageService.maxSwapAmountEth == null ) maxSwapAmountEth = 0;
+			if(ArbitrageService.maxSwapAmountBsc === null ) maxSwapAmountBsc = 0;
+			if(ArbitrageService.maxSwapAmountEth === null ) maxSwapAmountEth = 0;
 
 			maxSwapAmountBsc = ArbitrageService.maxSwapAmountBsc;
 			maxSwapAmountEth = ArbitrageService.maxSwapAmountEth;
@@ -41,7 +41,7 @@ const BigNumber = require("bignumber.js");
 			ArbitrageService.switchMaxSwapAmount = req.body.checked;
 			if (!ArbitrageService.switchMaxSwapAmount){
 				ArbitrageService.maxSwapAmountBsc = null;
-				ArbitrageService.maxSwapAmountEth == null;
+				ArbitrageService.maxSwapAmountEth = null;
 			}
 			return apiResponse.successResponse(res, "Switch max swap amount was set sucessfuly");
 			
