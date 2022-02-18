@@ -26,7 +26,7 @@ export default function SettingsModal() {
      }, []);
 
     function apply() {
-        post(url+"api/slippage/", {slippageEth:parseInt(slippageEth), slippageBsc: parseInt(slippageBsc)}).then(response => {
+        post(url+"api/slippage/", {slippageEth:parseFloat(slippageEth), slippageBsc: parseFloat(slippageBsc)}).then(response => {
             if(response.status === 1) {
                 setAlert("Successfully set slippage percentage!");
             } else {
@@ -37,7 +37,7 @@ export default function SettingsModal() {
 
     function onChangeBsc(e){
         // regex to only allow 1 to 100 percent slippage.
-        const re = /^[1-9][0-9]?$|^100$/;
+        const re = /^(?!0\d)\d{1,2}(\.\d{1,2})?$/;
         if (re.test(e.target.value)) {
             setSlippageBsc(e.target.value);
             setAlert(null);
@@ -46,7 +46,7 @@ export default function SettingsModal() {
 
     function onChangeEth(e){
         // regex to only allow 1 to 100 percent slippage.
-        const re = /^[1-9][0-9]?$|^100$/;
+        const re = /^(?!0\d)\d{1,2}(\.\d{1,2})?$/;
         if (re.test(e.target.value)) {
             setSlippageEth(e.target.value);
             setAlert(null);
