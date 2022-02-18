@@ -91,10 +91,10 @@ export default class ToggleSwitch extends Component {
 						<Fragment>
 							<div class="settingsSwapAmount">
 								<label>Max swap amount ETH network</label>
-								<input className="changeSwapAmountText" placeholder="BLXM" type="number" type="number" onChange={this.onChangeEth} value={this.state.ethMaxSwapAmount}/>
+								<input className="changeSwapAmountText" type="number" type="number" onChange={this.onChangeEth} value={this.state.ethMaxSwapAmount}/>
 
 								<label>Max swap amount BSC network</label>
-								<input className="changeSwapAmountText" placeholder="BLXM" type="number" onChange={this.onChangeBsc} value={this.state.bscMaxSwapAmount}/>
+								<input className="changeSwapAmountText" type="number" onChange={this.onChangeBsc} value={this.state.bscMaxSwapAmount}/>
 							</div>
 							<button className='modalButton' onClick={this.apply}>Apply</button>
 						</Fragment>
