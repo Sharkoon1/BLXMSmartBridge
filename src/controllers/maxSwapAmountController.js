@@ -11,16 +11,16 @@ const BigNumber = require("bignumber.js");
 	function (req, res) {
         try { 
 
-			let maxSwapAmountBsc;
-			let maxSwapAmountEth;
+			let maxSwapAmountBasic;
+			let maxSwapAmountStable;
 			
-			if(ArbitrageService.maxSwapAmountBsc === null ) maxSwapAmountBsc = 0;
-			if(ArbitrageService.maxSwapAmountEth === null ) maxSwapAmountEth = 0;
+			if(ArbitrageService.maxSwapAmountBasic === null ) maxSwapAmountBasic = 0;
+			if(ArbitrageService.maxSwapAmountStable === null ) maxSwapAmountStable = 0;
 
-			maxSwapAmountBsc = ArbitrageService.maxSwapAmountBsc;
-			maxSwapAmountEth = ArbitrageService.maxSwapAmountEth;
+			maxSwapAmountBasic = ArbitrageService.maxSwapAmountBasic;
+			maxSwapAmountStable = ArbitrageService.maxSwapAmountStable;
 
-			return apiResponse.successResponseWithData(res, "success", {checked: ArbitrageService.switchMaxSwapAmount, bscMaxSwapAmount: maxSwapAmountBsc, ethMaxSwapAmount: maxSwapAmountEth});
+			return apiResponse.successResponseWithData(res, "success", {checked: ArbitrageService.switchMaxSwapAmount, maxSwapAmountBasic: maxSwapAmountBasic, maxSwapAmountStable: maxSwapAmountStable});
             
 			
 		} catch (err) {
@@ -61,14 +61,13 @@ const BigNumber = require("bignumber.js");
 	function (req, res) {
 		
         try {
-			
-			let ethMaxSwapAmount = req.body.ethMaxSwapAmount;
-			let bscMaxSwapAmount = req.body.bscMaxSwapAmount;
+			let maxSwapAmountBasic = req.body.maxSwapAmountBasic;
+			let maxSwapAmountStable = req.body.maxSwapAmountStable;
 
-            if(ethMaxSwapAmount > 0 && bscMaxSwapAmount > 0) {
+            if(maxSwapAmountBasic && maxSwapAmountStable) {
 
-				ArbitrageService.maxSwapAmountBsc = new BigNumber(bscMaxSwapAmount);
-				ArbitrageService.maxSwapAmountEth = new BigNumber(ethMaxSwapAmount);
+				ArbitrageService.maxSwapAmountBasic = new BigNumber(maxSwapAmountBasic);
+				ArbitrageService.maxSwapAmountStable = new BigNumber(maxSwapAmountStable);
 
                 return apiResponse.successResponse(res, "Max swap amount was set sucessfuly");
             }

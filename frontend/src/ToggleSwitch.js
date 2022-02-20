@@ -10,16 +10,16 @@ const url = UrlHandler();
 export default class ToggleSwitch extends Component {
 	constructor(props) {
 		super(props);
-		this.state = { checked: false, ethMaxSwapAmount: 0, bscMaxSwapAmount: 0 };
+		this.state = { checked: false, maxSwapAmountBasic: 0, maxSwapAmountStable: 0 };
 		this.handleChange = this.handleChange.bind(this);
-		this.onChangeBsc = this.onChangeBsc.bind(this);
-		this.onChangeEth = this.onChangeEth.bind(this);
+		this.onChangeStable = this.onChangeStable.bind(this);
+		this.onChangeBasic = this.onChangeBasic.bind(this);
 		this.apply = this.apply.bind(this);
 	}
 
 	componentDidMount(){
 		get(url + "api/maxSwapAmount/").then(response => {
-			this.setState({checked: response.data.checked, bscMaxSwapAmount: response.data.bscMaxSwapAmount, ethMaxSwapAmount: response.data.ethMaxSwapAmount});
+			this.setState({checked: response.data.checked, maxSwapAmountStable: response.data.maxSwapAmountStable, maxSwapAmountBasic: response.data.maxSwapAmountBasic});
 		})
 	}
 
@@ -27,13 +27,13 @@ export default class ToggleSwitch extends Component {
 		post(url + "api/maxSwapAmount/", { checked: checked }).then(response => {
 			if (response.status === 1) {
 				get(url + "api/maxSwapAmount/").then(response => {
-					this.setState({checked: response.data.checked, bscMaxSwapAmount: response.data.bscMaxSwapAmount, ethMaxSwapAmount: response.data.ethMaxSwapAmount});
+					this.setState({checked: response.data.checked, maxSwapAmountStable: response.data.maxSwapAmountStable, maxSwapAmountBasic: response.data.maxSwapAmountBasic});
 				})
 				/*
 				this.setState(prevState => {
 					return {
-						bscMaxSwapAmount: prevState.bscMaxSwapAmount,
-						ethMaxSwapAmount: prevState.ethMaxSwapAmount,
+						maxSwapAmountStable: prevState.maxSwapAmountStable,
+						maxSwapAmountBasic: prevState.maxSwapAmountBasic,
 						checked: checked
 					};
 				});*/
@@ -43,28 +43,26 @@ export default class ToggleSwitch extends Component {
 		});
 	}
 
-	onChangeBsc(e) {
+	onChangeStable(e) {
 		const re = /^\d*(\.\d+)?$/;
 		if (re.test(e.target.value)) {
-			console.log(e.target.value)
 			this.setState(prevState => {
 				return {
-					bscMaxSwapAmount: e.target.value,
-					ethMaxSwapAmount: prevState.ethMaxSwapAmount,
+					maxSwapAmountStable: e.target.value,
+					maxSwapAmountBasic: prevState.maxSwapAmountBasic,
 					checked: prevState.checked
 				};
 			});
 		}
 	}
 
-	onChangeEth(e) {
+	onChangeBasic(e) {
 		const re = /^\d*(\.\d+)?$/;
 		if (re.test(e.target.value)) {
-			console.log(e.target.value)
 			this.setState(prevState => {
 				return {
-					ethMaxSwapAmount: e.target.value,
-					bscMaxSwapAmount: prevState.bscMaxSwapAmount,
+					maxSwapAmountBasic: e.target.value,
+					maxSwapAmountStable: prevState.maxSwapAmountStable,
 					checked: prevState.checked
 				};
 			});
@@ -72,7 +70,7 @@ export default class ToggleSwitch extends Component {
 	}
 
 	apply() {
-		post(url + "api/maxSwapAmount/values", { ethMaxSwapAmount: parseFloat(this.state.ethMaxSwapAmount), bscMaxSwapAmount: parseFloat(this.state.bscMaxSwapAmount) }).then(response => {
+		post(url + "api/maxSwapAmount/values", { maxSwapAmountBasic: parseFloat(this.state.maxSwapAmountBasic), maxSwapAmountStable: parseFloat(this.state.maxSwapAmountStable) }).then(response => {
 			if (response.status === 1) {
 				this.props.setAlert("Successfully set max swap amount!");
 			} else {
@@ -94,11 +92,11 @@ export default class ToggleSwitch extends Component {
 					this.state.checked ?
 						<Fragment>
 							<div class="settingsSwapAmount">
-								<label>Max swap amount ETH network</label>
-								<input className="changeSwapAmountText" type="number" type="number" onChange={this.onChangeEth} value={this.state.ethMaxSwapAmount}/>
+								<label>Max swap amount Basic</label>
+								<input className="changeSwapAmountText" type="number" type="number" onChange={this.onChangeBasic} value={this.state.maxSwapAmountBasic}/>
 
-								<label>Max swap amount BSC network</label>
-								<input className="changeSwapAmountText" type="number" onChange={this.onChangeBsc} value={this.state.bscMaxSwapAmount}/>
+								<label>Max swap amount Stable</label>
+								<input className="changeSwapAmountText" type="number" onChange={this.onChangeStable} value={this.state.maxSwapAmountStable}/>
 							</div>
 							<button className='modalButton' onClick={this.apply}>Apply</button>
 						</Fragment>
