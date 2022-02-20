@@ -483,6 +483,14 @@ class ArbitrageService {
 		return numerator.dividedBy(denominator);
 	}
 
+
+	amountIn(fees, output, inputReserve, outputReserve) {
+		let amountOutWithFees = output.multipliedBy(fees.multipliedBy(1000));
+		let numerator = output.multipliedBy(inputReserve);
+		let denominator = outputReserve.multipliedBy(fees.multipliedBy(1000)).minus(amountOutWithFees);
+		return numerator.dividedBy(denominator);
+	}
+
 	convertStableToUsdBsc(stable) {
 		// Convert stable reserves to usd prices for adjustment value
 		// leave it as usd, if it's already usd
