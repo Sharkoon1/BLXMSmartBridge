@@ -72,17 +72,6 @@ class ArbitrageService {
 	}
 
 	async init() {
-		if (this._oracleContractBsc === null || this._oracleContractEth === null) {
-			let basicTokenAddressEth = await this._arbitrageContractEth.getBasicAddress();
-			let stableTokenAddressEth = await this._arbitrageContractEth.getStableAddress();
-			this._oracleContractEth = new OracleContract("ETH", basicTokenAddressEth, stableTokenAddressEth);
-
-			let basicTokenAddressBsc = await this._arbitrageContractBsc.getBasicAddress();
-			let stableTokenAddressBsc = await this._arbitrageContractBsc.getStableAddress();
-			this._oracleContractBsc = new OracleContract("BSC", basicTokenAddressBsc, stableTokenAddressBsc);
-			this.uniswapTokenNames = await DataService.getTokenNamesLiquidity("ETH");
-			this.pancakeswapTokenNames = await DataService.getTokenNamesLiquidity("BSC");
-		}
 	}
 
 	async startArbitrage() {
@@ -96,12 +85,19 @@ class ArbitrageService {
 		try {
 			logger.info("Starting the abitrage service ...");
 
-			await this.getPoolPrices(); //overwrites this.poolPriceEth and this.poolPriceBsc with the current price from the LPs
+			do  {
+				let poolPriceBsc = await this._oracleContractBsc.getPrice();
+				let poolPriceEth = await this._oracleContractEth.getPrice();
 
-			while (!this.poolPriceBsc.eq(this.poolPriceEth)) {
+				adjustmentValueHandler = new adjustmentValueHandler();
+
+				adjustmentValueHandler.addHandler(adjustmentValue, new maxSwapHandler());
+				adjustmentValueHandler.addHandler(adjustmentValue, new liqudiityHandler());
+
+				let adjustmentValue = adjustmentValueHandler.getCorrectAdjustmentValue();
+
 				await this.getArbitrageBalances(); //overwrites this.bscArbitrageBalance and this.ethArbitrageBalance from the arbitrage contract
-				await this.getReserves();  //overwrites this.tokenArrayBsc and this.tokenArrayEth with the current reserves from the LPs
-
+			
 				if (Number.parseFloat(this.poolPriceBsc.toString()).toFixed(4) === Number.parseFloat(this.poolPriceEth.toString()).toFixed(4)) {
 					logger.info("Prices are currently equal");
 					logger.info(`ETH network: Current price = ${this.poolPriceEth} USD/BLXM`);
@@ -187,8 +183,9 @@ class ArbitrageService {
 					break;
 				}
 
-				await delay(2000);			
-			}
+				await delay(2000);		
+
+			} while(!this.stopCycle);
 
 			this.isRunning = false;
 		}
