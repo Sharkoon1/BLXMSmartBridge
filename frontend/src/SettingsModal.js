@@ -6,6 +6,7 @@ import ErrorMessage from './ErrorMessage';
 import ToggleSwitch from './ToggleSwitch';
 import { get } from "./RequestHandler";
 import { post } from "./RequestHandler";
+import { blockInvalidChar } from "./utils/BlockInvalidChar"; 
 
 export default function SettingsModal() {
     var url = UrlHandler();
@@ -40,25 +41,6 @@ export default function SettingsModal() {
         });
     }
 
-    function onChangeBsc(e){
-        // regex to only allow 1 to 100 percent slippage.
-        const re = /^(?!0\d)\d{1,2}(\.\d{1,2})?$/;
-        if (re.test(e.target.value)) {
-            setSlippageBsc(e.target.value);
-            setAlert(null);
-        }  
-    }
-
-    function onChangeEth(e){
-        // regex to only allow 1 to 100 percent slippage.
-        const re = /^(?!0\d)\d{1,2}(\.\d{1,2})?$/;
-        if (re.test(e.target.value)) {
-            setSlippageEth(e.target.value);
-            setAlert(null);
-        }    
-    }
-
-
     return (
         <div className='settingsModal' id='settingsModal'>
             <div className='modalContent'>
@@ -69,12 +51,12 @@ export default function SettingsModal() {
                             <div> 
                                 <div>
                                     <span className='modalSubHeading'>ETH</span>
-                                    <input className='modalInput' type="number"  onChange={onChangeEth} value={slippageEth}></input>
+                                    <input className='modalInput' type="number" pattern="[0-9]+([,.][0-9]+)?" onKeyDown={blockInvalidChar} onChange={e => setSlippageBsc(e.value)} value={slippageEth}></input>
                                 </div> 
 
                                 <div>
                                     <span className='modalSubHeading'>BSC</span>
-                                    <input className='modalInput' type="number" onChange={onChangeBsc} value={slippageBsc}></input>
+                                    <input className='modalInput' type="number" pattern="[0-9]+([,.][0-9]+)?" onKeyDown={blockInvalidChar} onChange={e => setSlippageEth(e.value)} value={slippageBsc}></input>
                                 </div> 
                                 <button className='modalButton' onClick={apply}>Apply</button>
                         </div>       
