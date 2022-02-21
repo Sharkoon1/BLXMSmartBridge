@@ -45,8 +45,10 @@ export default class ToggleSwitch extends Component {
 
 	onChangeBsc(e) {
 		const re = /^\d*(\.\d+)?$/;
+		console.log("input field bsc")
+		console.log(e.target.value)
 		if (re.test(e.target.value)) {
-			console.log(e.target.value)
+			if (e.target.value !== "e") {
 			this.setState(prevState => {
 				return {
 					bscMaxSwapAmount: e.target.value,
@@ -54,13 +56,27 @@ export default class ToggleSwitch extends Component {
 					checked: prevState.checked
 				};
 			});
+			} else {
+				e.target.value = ""
+			}
+		} else {
+			e.target.value = ""
 		}
 	}
 
+	keydown(event) {
+		return event.keyCode === 8 || event.keyCode === 46 ? true : !isNaN(Number(event.key));
+	}
+
+
+
 	onChangeEth(e) {
+		debugger
 		const re = /^\d*(\.\d+)?$/;
 		if (re.test(e.target.value)) {
+			console.log("input field eth")
 			console.log(e.target.value)
+			if (e.target.value !== "e") {
 			this.setState(prevState => {
 				return {
 					ethMaxSwapAmount: e.target.value,
@@ -68,6 +84,9 @@ export default class ToggleSwitch extends Component {
 					checked: prevState.checked
 				};
 			});
+			}
+		} else {
+			e.target.value = ""
 		}
 	}
 
@@ -95,10 +114,10 @@ export default class ToggleSwitch extends Component {
 						<Fragment>
 							<div class="settingsSwapAmount">
 								<label>Max swap amount ETH network</label>
-								<input className="changeSwapAmountText" type="number" type="number" onChange={this.onChangeEth} value={this.state.ethMaxSwapAmount}/>
+								<input className="changeSwapAmountText" type="number" onChange={this.onChangeEth} onKeyDown={this.keydown} value={this.state.ethMaxSwapAmount}/>
 
 								<label>Max swap amount BSC network</label>
-								<input className="changeSwapAmountText" type="number" onChange={this.onChangeBsc} value={this.state.bscMaxSwapAmount}/>
+								<input className="changeSwapAmountText" type="number" onChange={this.onChangeBsc} onKeyDown={this.keydown} value={this.state.bscMaxSwapAmount}/>
 							</div>
 							<button className='modalButton' onClick={this.apply}>Apply</button>
 						</Fragment>
