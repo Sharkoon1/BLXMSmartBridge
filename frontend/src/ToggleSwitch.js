@@ -6,6 +6,8 @@ import AlertInfo from "./AlertInfo";
 import ErrorMessage from './ErrorMessage';
 import "./style/SettingsModal.css"
 import { blockInvalidChar } from "./utils/BlockInvalidChar"; 
+import { decimalValidator } from "./utils/DecimalValidator"; 
+
 const url = UrlHandler();
 
 export default class ToggleSwitch extends Component {
@@ -82,10 +84,10 @@ export default class ToggleSwitch extends Component {
 						<Fragment>
 							<div class="settingsSwapAmount">
 								<label>Max swap amount Basic</label>
-								<input className="changeSwapAmountText" type="number" pattern="[0-9]+([,.][0-9]+)?" onKeyDown={blockInvalidChar} onChange={e => this.setState({maxSwapAmountBasic: e.value})} value={this.state.maxSwapAmountBasic}/>
+								<input className="changeSwapAmountText" onKeyDown={blockInvalidChar} onChange={e => { if(decimalValidator(e))  this.setState({maxSwapAmountBasic: e.target.value}) }} value={this.state.maxSwapAmountBasic}/>
 
 								<label>Max swap amount Stable</label>
-								<input className="changeSwapAmountText" type="number" pattern="[0-9]+([,.][0-9]+)?" onKeyDown={blockInvalidChar} onChange={e => this.setState({maxSwapAmountStable: e.value})} value={this.state.maxSwapAmountStable}/>
+								<input className="changeSwapAmountText" onKeyDown={blockInvalidChar} onChange={e => { if(decimalValidator(e)) this.setState({maxSwapAmountStable: e.target.value}) }} value={this.state.maxSwapAmountStable}/>
 							</div>
 							<button className='modalButton' onClick={this.apply}>Apply</button>
 						</Fragment>

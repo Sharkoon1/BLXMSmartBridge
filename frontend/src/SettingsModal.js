@@ -7,6 +7,7 @@ import ToggleSwitch from './ToggleSwitch';
 import { get } from "./RequestHandler";
 import { post } from "./RequestHandler";
 import { blockInvalidChar } from "./utils/BlockInvalidChar"; 
+import { decimalValidator } from "./utils/DecimalValidator"; 
 
 export default function SettingsModal() {
     var url = UrlHandler();
@@ -51,12 +52,12 @@ export default function SettingsModal() {
                             <div> 
                                 <div>
                                     <span className='modalSubHeading'>ETH</span>
-                                    <input className='modalInput' type="number" pattern="[0-9]+([,.][0-9]+)?" onKeyDown={blockInvalidChar} onChange={e => setSlippageEth(e.value)} value={slippageEth}></input>
+                                    <input className='modalInput' type="number" onKeyDown={blockInvalidChar} onChange={e => {  if(decimalValidator(e, 100)) setSlippageEth(e.target.value) }} value={slippageEth}></input>
                                 </div> 
-
+ 
                                 <div>
                                     <span className='modalSubHeading'>BSC</span>
-                                    <input className='modalInput' type="number" pattern="[0-9]+([,.][0-9]+)?" onKeyDown={blockInvalidChar} onChange={e => setSlippageBsc(e.value)} value={slippageBsc}></input>
+                                    <input className='modalInput' type="number" onKeyDown={blockInvalidChar} onChange={e => { if(decimalValidator(e, 100)) setSlippageBsc(e.target.value) }} value={slippageBsc}></input>
                                 </div> 
                                 <button className='modalButton' onClick={apply}>Apply</button>
                         </div>       
