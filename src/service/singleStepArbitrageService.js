@@ -67,7 +67,16 @@ class SingleStepArbitrageService{
                     logger.info("Next step: Executing swaps...");
                     break;
                 case 3: 
-                    await this.executeSwap();        
+                    if (ArbitrageService.stableProfitAfterGas.gt(0)) {
+                        await this.executeSwap();        
+                    }
+                    else {
+                        logger.info(`Calculated profit after gas fees: ${ArbitrageService.stableProfitAfterGas} is negative.`);
+                        logger.info("Skipping current arbitrage cycle...");
+
+                        return this.resetSingleStepArbitrage();
+                    }
+
                     logger.info("Arbitrage cycle ended...");    
 
                     break;
