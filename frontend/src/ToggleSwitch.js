@@ -5,6 +5,9 @@ import UrlHandler from "./UrlHandler";
 import AlertInfo from "./AlertInfo";
 import ErrorMessage from './ErrorMessage';
 import "./style/SettingsModal.css"
+import { blockInvalidChar } from "./utils/BlockInvalidChar"; 
+import { decimalValidator } from "./utils/DecimalValidator"; 
+
 const url = UrlHandler();
 
 export default class ToggleSwitch extends Component {
@@ -12,8 +15,6 @@ export default class ToggleSwitch extends Component {
 		super(props);
 		this.state = { checked: false, maxSwapAmountBasic: 0, maxSwapAmountStable: 0 };
 		this.handleChange = this.handleChange.bind(this);
-		this.onChangeStable = this.onChangeStable.bind(this);
-		this.onChangeBasic = this.onChangeBasic.bind(this);
 		this.apply = this.apply.bind(this);
 	}
 
@@ -35,54 +36,6 @@ export default class ToggleSwitch extends Component {
 		});
 	}
 
-	onChangeStable(e) {
-		const re = /^\d*(\.\d+)?$/;
-		console.log("input field bsc")
-		console.log(e.target.value)
-		if (re.test(e.target.value)) {
-			if (e.target.value !== "e") {
-			this.setState(prevState => {
-				return {
-					maxSwapAmountStable: e.target.value,
-					maxSwapAmountBasic: prevState.maxSwapAmountBasic,
-					checked: prevState.checked
-				};
-			});
-			} else {
-				e.target.value = ""
-			}
-		} else {
-			e.target.value = ""
-		}
-	}
-
-	keydown(event) {
-		debugger
-		let state = event.keyCode === 69 
-		return event.keyCode === 69 ? false : true; // || event.keyCode === 46 ? true : !isNaN(Number(event.key));
-	}
-
-
-
-	onChangeBasic(e) {
-		debugger
-		const re = /^\d*(\.\d+)?$/;
-		if (re.test(e.target.value)) {
-			console.log("input field eth")
-			console.log(e.target.value)
-			if (e.target.value !== "e") {
-			this.setState(prevState => {
-				return {
-					maxSwapAmountBasic: e.target.value,
-					maxSwapAmountStable: prevState.maxSwapAmountStable,
-					checked: prevState.checked
-				};
-			});
-			}
-		} else {
-			e.target.value = ""
-		}
-	}
 
 	apply() {
 		let maxSwapAmountBasic = parseFloat(this.state.maxSwapAmountBasic);
@@ -122,11 +75,11 @@ export default class ToggleSwitch extends Component {
 					this.state.checked ?
 						<Fragment>
 							<div class="settingsSwapAmount">
-								<label>Max swap amount ETH network</label>
-								<input className="changeSwapAmountText" type="number" onChange={this.onChangeEth} onKeyDown={this.keydown} value={this.state.ethMaxSwapAmount}/>
+								<label>Max swap amount Basic</label>
+								<input className="changeSwapAmountText" type="number" onKeyDown={blockInvalidChar} onChange={e => { if(decimalValidator(e))  this.setState({maxSwapAmountBasic: e.target.value}) }} value={this.state.maxSwapAmountBasic}/>
 
-								<label>Max swap amount BSC network</label>
-								<input className="changeSwapAmountText" type="number" onChange={this.onChangeBsc} onKeyDown={this.keydown} value={this.state.bscMaxSwapAmount}/>
+								<label>Max swap amount Stable</label>
+								<input className="changeSwapAmountText" type="number" onKeyDown={blockInvalidChar} onChange={e => { if(decimalValidator(e)) this.setState({maxSwapAmountStable: e.target.value}) }} value={this.state.maxSwapAmountStable}/>
 							</div>
 							<button className='modalButton' onClick={this.apply}>Apply</button>
 						</Fragment>
