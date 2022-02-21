@@ -51,12 +51,12 @@ export default function SettingsModal() {
                             <div> 
                                 <div>
                                     <span className='modalSubHeading'>ETH</span>
-                                    <input className='modalInput' type="number" pattern="[0-9]+([,.][0-9]+)?" onKeyDown={blockInvalidChar} onChange={e => setSlippageBsc(e.value)} value={slippageEth}></input>
+                                    <input className='modalInput' type="number" pattern="[0-9]+([,.][0-9]+)?" onKeyDown={blockInvalidChar} onChange={e => setSlippageEth(e.value)} value={slippageEth}></input>
                                 </div> 
 
                                 <div>
                                     <span className='modalSubHeading'>BSC</span>
-                                    <input className='modalInput' type="number" pattern="[0-9]+([,.][0-9]+)?" onKeyDown={blockInvalidChar} onChange={e => setSlippageEth(e.value)} value={slippageBsc}></input>
+                                    <input className='modalInput' type="number" pattern="[0-9]+([,.][0-9]+)?" onKeyDown={blockInvalidChar} onChange={e => setSlippageBsc(e.value)} value={slippageBsc}></input>
                                 </div> 
                                 <button className='modalButton' onClick={apply}>Apply</button>
                         </div>       
