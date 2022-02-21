@@ -45,7 +45,13 @@ export default class ToggleSwitch extends Component {
 
 	onChangeStable(e) {
 		const re = /^\d*(\.\d+)?$/;
+		console.log("input field bsc")
+		console.log(e.target.value)
 		if (re.test(e.target.value)) {
+<<<<<<< HEAD
+=======
+			if (e.target.value !== "e") {
+>>>>>>> 1c6933f327854ff76e66f06224c3bffad6ccf7de
 			this.setState(prevState => {
 				return {
 					maxSwapAmountStable: e.target.value,
@@ -53,12 +59,33 @@ export default class ToggleSwitch extends Component {
 					checked: prevState.checked
 				};
 			});
+			} else {
+				e.target.value = ""
+			}
+		} else {
+			e.target.value = ""
 		}
 	}
 
+<<<<<<< HEAD
 	onChangeBasic(e) {
 		const re = /^\d*(\.\d+)?$/;
 		if (re.test(e.target.value)) {
+=======
+	keydown(event) {
+		return event.keyCode === 8 || event.keyCode === 46 ? true : !isNaN(Number(event.key));
+	}
+
+
+
+	onChangeEth(e) {
+		debugger
+		const re = /^\d*(\.\d+)?$/;
+		if (re.test(e.target.value)) {
+			console.log("input field eth")
+			console.log(e.target.value)
+			if (e.target.value !== "e") {
+>>>>>>> 1c6933f327854ff76e66f06224c3bffad6ccf7de
 			this.setState(prevState => {
 				return {
 					maxSwapAmountBasic: e.target.value,
@@ -66,6 +93,9 @@ export default class ToggleSwitch extends Component {
 					checked: prevState.checked
 				};
 			});
+			}
+		} else {
+			e.target.value = ""
 		}
 	}
 
@@ -107,11 +137,19 @@ export default class ToggleSwitch extends Component {
 					this.state.checked ?
 						<Fragment>
 							<div class="settingsSwapAmount">
+<<<<<<< HEAD
 								<label>Max swap amount Basic</label>
 								<input className="changeSwapAmountText" type="number" type="number" onChange={this.onChangeBasic} value={this.state.maxSwapAmountBasic}/>
 
 								<label>Max swap amount Stable</label>
 								<input className="changeSwapAmountText" type="number" onChange={this.onChangeStable} value={this.state.maxSwapAmountStable}/>
+=======
+								<label>Max swap amount ETH network</label>
+								<input className="changeSwapAmountText" type="number" onChange={this.onChangeEth} onKeyDown={this.keydown} value={this.state.ethMaxSwapAmount}/>
+
+								<label>Max swap amount BSC network</label>
+								<input className="changeSwapAmountText" type="number" onChange={this.onChangeBsc} onKeyDown={this.keydown} value={this.state.bscMaxSwapAmount}/>
+>>>>>>> 1c6933f327854ff76e66f06224c3bffad6ccf7de
 							</div>
 							<button className='modalButton' onClick={this.apply}>Apply</button>
 						</Fragment>
