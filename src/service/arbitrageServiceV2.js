@@ -332,10 +332,7 @@ class ArbitrageService {
 			logger.warn("Set adjustment stable to stable balance, to swap what is left.");
 			logger.warn(`New adjustment Value stable: ${this.adjustmentValueStable} ${this.uniswapTokenNames.stableTokenName}`);
 		}
-		let adjustbasic = this.adjustmentValueBasic.toString()
-		let basicBalance = his.bscArbitrageBalance.basic.toString()
-		console.log(adjustbasic)
-		console.log(basicBalance)
+
 		if (this.adjustmentValueBasic.gt(this.bscArbitrageBalance.basic)) { // validate if arbitrage contract has enough basic tokens for swap
 			logger.warn("BSC: Arbitrage contract basic balance is less than the adjustment value.");
 			logger.warn(`Basic token balance: ${this.bscArbitrageBalance.basic}`);
@@ -485,18 +482,17 @@ class ArbitrageService {
 	}
 
 	amountOut(fees, input, inputReserve, outputReserve) {
-		let amountInWithFees = input.multipliedBy(fees.multipliedBy(this.decimalShift(fees)));
+		let amountInWithFees = input.multipliedBy(fees.multipliedBy(1000));
 		let numerator = amountInWithFees.multipliedBy(outputReserve);
-		let denominator = inputReserve.multipliedBy(this.decimalShift(inputReserve)).plus(amountInWithFees);
+		let denominator = inputReserve.multipliedBy(1000).plus(amountInWithFees);
 
 		return numerator.dividedBy(denominator);
 	}
 	
 	amountIn(fees, output, inputReserve, outputReserve) {
-		let power = this.decimalShift(fees)
-		let amountOutWithFees = output.multipliedBy(fees.multipliedBy(power));
+		let amountOutWithFees = output.multipliedBy(fees.multipliedBy(1000));
 		let numerator = output.multipliedBy(inputReserve);
-		let denominator = outputReserve.multipliedBy(fees.multipliedBy(power)).minus(amountOutWithFees);
+		let denominator = outputReserve.multipliedBy(fees.multipliedBy(1000)).minus(amountOutWithFees);
 		return (numerator.dividedBy(denominator)).multipliedBy(1000);
 	}
 
