@@ -64,17 +64,10 @@ const BigNumber = require("bignumber.js");
 			let maxSwapAmountBasic = req.body.maxSwapAmountBasic;
 			let maxSwapAmountStable = req.body.maxSwapAmountStable;
 
-            if(maxSwapAmountBasic && maxSwapAmountStable) {
-
-				ArbitrageService.maxSwapAmountBasic = new BigNumber(maxSwapAmountBasic);
-				ArbitrageService.maxSwapAmountStable = new BigNumber(maxSwapAmountStable);
-
-                return apiResponse.successResponse(res, "Max swap amount was set sucessfuly");
-            }
-
-            else {
-                return apiResponse.validationError(res, "Max swap amount request was invalid");
-            }
+			ArbitrageService.maxSwapAmountBasic = new BigNumber(maxSwapAmountBasic !== null ? maxSwapAmountBasic : 0);
+			ArbitrageService.maxSwapAmountStable = new BigNumber(maxSwapAmountStable !== null ? maxSwapAmountStable : 0);
+ 
+			return apiResponse.successResponse(res, "Max swap amount was set sucessfuly");
 			
 		} catch (err) {
 			//throw error in json response with status 500. 

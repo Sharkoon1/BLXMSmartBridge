@@ -29,8 +29,13 @@ export default function SettingsModal() {
         post(url+"api/slippage/", {slippageEth:parseFloat(slippageEth), slippageBsc: parseFloat(slippageBsc)}).then(response => {
             if(response.status === 1) {
                 setAlert("Successfully set slippage percentage!");
+
+                setTimeout(() => { setAlert(null); }, 3000);
+
             } else {
                 setError("An error occured. Response code: " + response.status)
+
+                setTimeout(() => { setError(null); }, 3000);
             }
         });
     }

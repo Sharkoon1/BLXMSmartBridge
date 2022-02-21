@@ -70,13 +70,28 @@ export default class ToggleSwitch extends Component {
 	}
 
 	apply() {
-		post(url + "api/maxSwapAmount/values", { maxSwapAmountBasic: parseFloat(this.state.maxSwapAmountBasic), maxSwapAmountStable: parseFloat(this.state.maxSwapAmountStable) }).then(response => {
-			if (response.status === 1) {
-				this.props.setAlert("Successfully set max swap amount!");
-			} else {
-				this.props.setError("An error occured. Response code: " + response.status);
-			}
-		});
+		let maxSwapAmountBasic = parseFloat(this.state.maxSwapAmountBasic);
+		let maxSwapAmountStable = parseFloat(this.state.maxSwapAmountStable);
+
+		if(maxSwapAmountBasic < 0 ||  maxSwapAmountStable < 0) {
+			this.props.setError("Max basic or stable swap amount can not be a negative value.");
+
+			setTimeout(() => { this.props.setError(null); }, 3000);
+		}
+
+		else {
+			post(url + "api/maxSwapAmount/values", { maxSwapAmountBasic: maxSwapAmountBasic, maxSwapAmountStable: maxSwapAmountStable }).then(response => {
+				if (response.status === 1) {
+					this.props.setAlert("Successfully set max swap amount!");
+	
+					setTimeout(() => { this.props.setAlert(null); }, 3000);
+				} else {
+					this.props.setError("An error occured. Response code: " + response.status);
+	
+					setTimeout(() => { this.props.setError(null); }, 3000);
+				}
+			});
+		}
 	}
 
 	render() {

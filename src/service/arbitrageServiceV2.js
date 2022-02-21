@@ -52,8 +52,8 @@ class ArbitrageService {
 		
 		this.switchMaxSwapAmount = false; //boolean to get switched by the frontend
 
-		this.maxSwapAmountStable = null; //value is set in the frontend
-		this.maxSwapAmountBasic = null; //value is set in the frontend
+		this.maxSwapAmountStable = new BigNumber(0); //value is set in the frontend
+		this.maxSwapAmountBasic = new BigNumber(0); //value is set in the frontend
 
 		this.stopCycle = false;
 		this.isRunning = false;
@@ -486,7 +486,7 @@ class ArbitrageService {
 		let amountOutWithFees = output.multipliedBy(fees.multipliedBy(1000));
 		let numerator = output.multipliedBy(inputReserve);
 		let denominator = outputReserve.multipliedBy(fees.multipliedBy(1000)).minus(amountOutWithFees);
-		return numerator.dividedBy(denominator);
+		return (numerator.dividedBy(denominator)).multipliedBy(1000);
 	}
 
 	convertStableToUsdBsc(stable) {
@@ -578,47 +578,64 @@ class ArbitrageService {
 	}
 
 	setMaxSwapAmount(fees, stableReserve, basicReserve, stableTokenName, basicTokenName) {
+		let maxSwapAmountIsLessThanAdjustmentValue = false;
+
 		if(this.switchMaxSwapAmount && this.maxSwapAmountStable !== null && this.maxSwapAmountBasic !== null){
 
 			let stableMaxSwapAmountAsBasic = this.amountOut(fees, this.maxSwapAmountStable, stableReserve, basicReserve);
 			let basicMaxSwapAmountAsStable = this.amountIn(fees, this.maxSwapAmountBasic, stableReserve, basicReserve);
 
-			if(this.maxSwapAmountStable !== 0 && this.maxSwapAmountBasic === 0) {
-				this.setAdjustmentValuesToMaxValues(this.maxSwapAmountStable, stableMaxSwapAmountAsBasic);
+			if(!this.maxSwapAmountStable.isEqualTo(0) && this.maxSwapAmountBasic.isEqualTo(0)) {
+				if(this.maxSwapAmountStable.lt(this.adjustmentValueStable)) {
+					this.setAdjustmentValuesToMaxValues(this.maxSwapAmountStable, stableMaxSwapAmountAsBasic, stableTokenName, basicTokenName);
+				}
+				else {
+					maxSwapAmountIsLessThanAdjustmentValue = true;
+				}
 			}
 
-			else if(this.maxSwapAmountStable === 0 && this.maxSwapAmountBasic !== 0){
-				this.setAdjustmentValuesToMaxValues(basicMaxSwapAmountAsStable, this.maxSwapAmountBasic);
+			else if(this.maxSwapAmountStable.isEqualTo(0) && !this.maxSwapAmountBasic.isEqualTo(0)){
+				if(this.maxSwapAmountBasic.lt(this.adjustmentValueBasic)) {
+					this.setAdjustmentValuesToMaxValues(basicMaxSwapAmountAsStable, this.maxSwapAmountBasic, stableTokenName, basicTokenName);
+				}
+				else {
+					maxSwapAmountIsLessThanAdjustmentValue = true;
+				}
 			}
 
-			else if(this.maxSwapAmountStable !== 0 && this.maxSwapAmountBasic !== 0){
+			else if(!this.maxSwapAmountStable.isEqualTo(0) && !this.maxSwapAmountBasic.isEqualTo(0)){
 				if(stableMaxSwapAmountAsBasic.lt(this.maxSwapAmountBasic) && this.maxSwapAmountStable.lt(this.adjustmentValueStable)) {
-					this.setAdjustmentValuesToMaxValues(this.maxSwapAmountStable, stableMaxSwapAmountAsBasic);
+					this.setAdjustmentValuesToMaxValues(this.maxSwapAmountStable, stableMaxSwapAmountAsBasic, stableTokenName, basicTokenName);
 	
-					logger.info(`Swap will be executed based on max adjustment value stable: Adjustment value stable: ${this.adjustmentValueStable.toString()} ${stableTokenName}`);
-					logger.info(`Adjustment value stable: ${this.adjustmentValueBasic.toString()} ${basicTokenName}`);			
+					logger.info("Swap will be executed based on max adjustment value stable");		
 				}
 	
 				else if(stableMaxSwapAmountAsBasic.gt(this.maxSwapAmountBasic) && this.maxSwapAmountBasic.lt(this.adjustmentValueBasic)) {		
-					this.setAdjustmentValuesToMaxValues(basicMaxSwapAmountAsStable, this.maxSwapAmountBasic);
+					this.setAdjustmentValuesToMaxValues(basicMaxSwapAmountAsStable, this.maxSwapAmountBasic, stableTokenName, basicTokenName);
 
-					logger.info(`Swap will be executed based on max adjustment value basic: Adjustment value basic: ${this.adjustmentValueBasic.toString()} ${basicTokenName}`);
-					logger.info(`Adjustment value stable: ${this.adjustmentValueStable.toString()} ${stableTokenName}`);				
+					logger.info("Swap will be executed based on max adjustment value basic.");
 				}
 
 				else {
-					logger.info("Max swap amount is bigger than the current adjustment value. The adjustment values remain the same.");
+					maxSwapAmountIsLessThanAdjustmentValue = true;
 				}
 			}
 			else {
-				logger.info("Both values for the maximum swap amount are 0. The adjustment values remain the same.");
+				logger.info("Both values for the maximum swap amount are 0 or not set. The adjustment values remain the same.");
 			}
+		}
+
+		if(maxSwapAmountIsLessThanAdjustmentValue) {
+			logger.info("Max swap amount is bigger than the current adjustment value. The adjustment values remain the same.");
 		}
 	}
 
-	setAdjustmentValuesToMaxValues(maxSwapAmountStable, maxSwapAmountBasic) {
+	setAdjustmentValuesToMaxValues(maxSwapAmountStable, maxSwapAmountBasic, stableTokenName, basicTokenName) {
 		this.adjustmentValueStable = maxSwapAmountStable;
 		this.adjustmentValueBasic = maxSwapAmountBasic;
+
+		logger.info(`New Adjustment value stable: ${this.adjustmentValueStable.toString()} ${stableTokenName}`);
+		logger.info(`New Adjustment value basic: ${this.adjustmentValueBasic.toString()} ${basicTokenName}`);	
 	}
 }
 
