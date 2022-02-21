@@ -4,7 +4,7 @@ const count = (str) => {
 }
 
 export const decimalValidator = (e, max) => { 
-    if(count(e.target.value) <= 1 && (!max || !e.target.value || parseFloat(e.target.value) < max && parseFloat(e.target.value) > 0  )) {
+    if(count(e.target.value) <= 1 && (!max || !e.target.value || parseFloat(e.target.value) < max) && (!e.target.value || parseFloat(e.target.value) >= 0)) {
             return true;
     } 
 

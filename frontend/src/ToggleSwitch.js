@@ -84,10 +84,10 @@ export default class ToggleSwitch extends Component {
 						<Fragment>
 							<div class="settingsSwapAmount">
 								<label>Max swap amount Basic</label>
-								<input className="changeSwapAmountText" onKeyDown={blockInvalidChar} onChange={e => { if(decimalValidator(e))  this.setState({maxSwapAmountBasic: e.target.value}) }} value={this.state.maxSwapAmountBasic}/>
+								<input className="changeSwapAmountText" type="number" onKeyDown={blockInvalidChar} onChange={e => { if(decimalValidator(e))  this.setState({maxSwapAmountBasic: e.target.value}) }} value={this.state.maxSwapAmountBasic}/>
 
 								<label>Max swap amount Stable</label>
-								<input className="changeSwapAmountText" onKeyDown={blockInvalidChar} onChange={e => { if(decimalValidator(e)) this.setState({maxSwapAmountStable: e.target.value}) }} value={this.state.maxSwapAmountStable}/>
+								<input className="changeSwapAmountText" type="number" onKeyDown={blockInvalidChar} onChange={e => { if(decimalValidator(e)) this.setState({maxSwapAmountStable: e.target.value}) }} value={this.state.maxSwapAmountStable}/>
 							</div>
 							<button className='modalButton' onClick={this.apply}>Apply</button>
 						</Fragment>
