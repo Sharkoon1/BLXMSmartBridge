@@ -231,8 +231,8 @@ class ArbitrageService {
 		if (this.adjustmentValueStable.gt(this.bscArbitrageBalance.stable)) { // validate if arbitrage contract has enough stable tokens for swap
 			logger.warn("BSC: Arbitrage contract stable balance is less than adjustment value.");
 			logger.warn(`Stable balance: ${this.bscArbitrageBalance.stable}`);
-
-			if(this.bscArbitrageBalance.stable.eq(ethers.constants.Zero)) {
+			// Comparison with ethers.constants.Zero does not work
+			if(this.bscArbitrageBalance.stable.isZero()) {
 				logger.info("Stable balance is zero.");
 				logger.info("Skipping swaps and current cycle...");
 
@@ -240,16 +240,18 @@ class ArbitrageService {
 			}
 
 			this.adjustmentValueStable = this.bscArbitrageBalance.stable;
+			this.adjustmentValueBasic = this.amountOut(this.pancakeswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
 
 			logger.warn("Set adjustment stable to stable balance, to swap what is left.");
-			logger.warn(`New adjustment Value stable: ${this.adjustmentValueStable} ${this.pancakeswapTokenNames.stableTokenName} `);
+			logger.warn(`New adjustment Value stable: ${this.adjustmentValueStable} ${this.pancakeswapTokenNames.stableTokenName}`);
+			logger.warn(`New adjustment Value basic: ${this.adjustmentValueBasic} ${this.uniswapTokenNames.basicTokenName}`);
 		}
 
 		if (this.adjustmentValueBasic.gt(this.ethArbitrageBalance.basic)) { // validate if arbitrage contract has enough basic tokens for swap
 			logger.warn("ETH: Arbitrage contract basic balance is less than adjustment value.");
 			logger.warn(`Basic balance: ${this.ethArbitrageBalance.basic}`);
-
-			if(this.ethArbitrageBalance.basic.eq(ethers.constants.Zero)) {
+			// Comparison with ethers.constants.Zero does not work
+			if(this.ethArbitrageBalance.basic.isZero()) {
 				logger.info("Basic balance is zero.");
 				logger.info("Skipping swaps and current cycle...");
 
@@ -257,9 +259,11 @@ class ArbitrageService {
 			}
 
 			this.adjustmentValueBasic = this.ethArbitrageBalance.basic;
+			this.adjustmentValueStable = this.amountIn(this.pancakeswapFees, this.adjustmentValueBasic, stableCheap, basicCheap);
 
 			logger.warn("Set adjustment basic to basic balance, to swap what is left.");
 			logger.info(`New adjustment Value basic: ${this.adjustmentValueBasic} ${this.uniswapTokenNames.basicTokenName}`);
+			logger.info(`New adjustment Value stable: ${this.adjustmentValueStable} ${this.pancakeswapTokenNames.stableTokenName}`);
 		}
 
 		this.stableProfitAfterGas = await this.calculateSwapProfitEth();
@@ -316,8 +320,8 @@ class ArbitrageService {
 		if (this.adjustmentValueStable.gt(this.ethArbitrageBalance.stable)) { // validate if arbitrage contract has enough stable tokens for swap
 			logger.warn("ETH: Arbitrage contract stable balance is less than the adjustment value.");
 			logger.warn(`Stable token balance: ${this.ethArbitrageBalance.stable}`);
-
-			if(this.ethArbitrageBalance.stable.eq(ethers.constants.Zero)) {
+			// Comparison with ethers.constants.Zero does not work
+			if(this.ethArbitrageBalance.stable.isZero()) {
 				logger.warn("Stable balance is zero.");
 				logger.info("Skipping swaps and current cycle...");
 
@@ -325,16 +329,18 @@ class ArbitrageService {
 			}
 
 			this.adjustmentValueStable = this.ethArbitrageBalance.stable;
+			this.adjustmentValueBasic = this.amountOut(this.uniswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
 
 			logger.warn("Set adjustment stable to stable balance, to swap what is left.");
 			logger.warn(`New adjustment Value stable: ${this.adjustmentValueStable} ${this.uniswapTokenNames.stableTokenName}`);
+			logger.warn(`New adjustment Value basic: ${this.adjustmentValueBasic} ${this.pancakeswapTokenNames.basicTokenName}`);
 		}
 
 		if (this.adjustmentValueBasic.gt(this.bscArbitrageBalance.basic)) { // validate if arbitrage contract has enough basic tokens for swap
 			logger.warn("BSC: Arbitrage contract basic balance is less than the adjustment value.");
 			logger.warn(`Basic token balance: ${this.bscArbitrageBalance.basic}`);
-
-			if(this.bscArbitrageBalance.basic.eq(ethers.constants.Zero)) {
+			// Comparison with ethers.constants.Zero does not work
+			if(this.bscArbitrageBalance.basic.isZero()) {
 				logger.warn("Basic balance is zero.");
 				logger.info("Skipping swaps and current cycle...");
 
@@ -342,9 +348,11 @@ class ArbitrageService {
 			}
 
 			this.adjustmentValueBasic = this.bscArbitrageBalance.basic;
+			this.adjustmentValueStable = this.amountIn(this.uniswapFees, this.adjustmentValueBasic, stableCheap, basicCheap);
 
 			logger.info("Set adjustment basic to basic balance, to swap what is left.");
 			logger.info(`New adjustment Value basic: ${this.adjustmentValueBasic} ${this.pancakeswapTokenNames.basicTokenName}`);
+			logger.info(`New adjustment Value stable: ${this.adjustmentValueStable} ${this.uniswapTokenNames.stableTokenName}`);
 		}
 
 		this.stableProfitAfterGas = await this.calculateSwapProfitBsc();
@@ -377,13 +385,9 @@ class ArbitrageService {
 
 	async calculateSwapProfitEth() {
 		let basicAmountOut = await this._oracleContractBsc.getsAmountOutBasic(this.toEthersBigNumber(this.adjustmentValueStable));
-		// Shift decimal separator to the right until no more decimal values are left
-		// since ethers.BigNumber values require as input numbers without decimal places
-		let power = 10**2;
-		let slippageBscSplitString = this.slippageBsc.toString().split(".");
-		if (slippageBscSplitString.length>1){
-			power *= 10**slippageBscSplitString[1].length;
-		}
+
+		let power = this.decimalShift(this.slippageBsc);
+
 		this.basicAmountOut = basicAmountOut.mul(ethers.BigNumber.from((this.slippageBsc.multipliedBy(power).toString()))).div(power);
 
 		let stableAmountOut = await this._oracleContractEth.getsAmountOutStable(this.basicAmountOut);
@@ -422,15 +426,22 @@ class ArbitrageService {
 		return swapProfit;
 	}
 
-	async calculateSwapProfitBsc() {
-		let basicAmountOut = await this._oracleContractEth.getsAmountOutBasic(this.toEthersBigNumber(this.adjustmentValueStable));
+	decimalShift(rawBigNumber){
 		// Shift decimal separator to the right until no more decimal values are left
 		// since ethers.BigNumber values require as input numbers without decimal places
 		let power = 10**2;
-		let slippageEthSplitString = this.slippageEth.toString().split(".");
-		if (slippageEthSplitString.length>1){
-			power *= 10**slippageEthSplitString[1].length;
+		let rawSplitString = rawBigNumber.toString().split(".");
+		if (rawSplitString.length>1){
+			power *= 10**rawSplitString[1].length;
 		}
+		return power
+	}
+
+	async calculateSwapProfitBsc() {
+		let basicAmountOut = await this._oracleContractEth.getsAmountOutBasic(this.toEthersBigNumber(this.adjustmentValueStable));
+
+		let power = this.decimalShift(this.slippageEth);
+
 		this.basicAmountOut = basicAmountOut.mul(ethers.BigNumber.from((this.slippageEth.multipliedBy(power).toString()))).div(power);
 
 		let stableAmountOut = await this._oracleContractBsc.getsAmountOutStable(this.basicAmountOut);

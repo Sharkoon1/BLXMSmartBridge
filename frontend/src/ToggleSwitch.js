@@ -30,14 +30,6 @@ export default class ToggleSwitch extends Component {
 				get(url + "api/maxSwapAmount/").then(response => {
 					this.setState({checked: response.data.checked, maxSwapAmountStable: response.data.maxSwapAmountStable, maxSwapAmountBasic: response.data.maxSwapAmountBasic});
 				})
-				/*
-				this.setState(prevState => {
-					return {
-						maxSwapAmountStable: prevState.maxSwapAmountStable,
-						maxSwapAmountBasic: prevState.maxSwapAmountBasic,
-						checked: checked
-					};
-				});*/
 			} else {
 				// Failure
 			}
