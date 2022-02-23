@@ -6,6 +6,8 @@ import ErrorMessage from './ErrorMessage';
 import ToggleSwitch from './ToggleSwitch';
 import { get } from "./RequestHandler";
 import { post } from "./RequestHandler";
+import { blockInvalidChar } from "./utils/BlockInvalidChar"; 
+import { decimalValidator } from "./utils/DecimalValidator"; 
 
 export default function SettingsModal() {
     var url = UrlHandler();
@@ -29,30 +31,16 @@ export default function SettingsModal() {
         post(url+"api/slippage/", {slippageEth:parseFloat(slippageEth), slippageBsc: parseFloat(slippageBsc)}).then(response => {
             if(response.status === 1) {
                 setAlert("Successfully set slippage percentage!");
+
+                setTimeout(() => { setAlert(null); }, 3000);
+
             } else {
                 setError("An error occured. Response code: " + response.status)
+
+                setTimeout(() => { setError(null); }, 3000);
             }
         });
     }
-
-    function onChangeBsc(e){
-        // regex to only allow 1 to 100 percent slippage.
-        const re = /^(?!0\d)\d{1,2}(\.\d{1,2})?$/;
-        if (re.test(e.target.value)) {
-            setSlippageBsc(e.target.value);
-            setAlert(null);
-        }  
-    }
-
-    function onChangeEth(e){
-        // regex to only allow 1 to 100 percent slippage.
-        const re = /^(?!0\d)\d{1,2}(\.\d{1,2})?$/;
-        if (re.test(e.target.value)) {
-            setSlippageEth(e.target.value);
-            setAlert(null);
-        }    
-    }
-
 
     return (
         <div className='settingsModal' id='settingsModal'>
@@ -64,12 +52,12 @@ export default function SettingsModal() {
                             <div> 
                                 <div>
                                     <span className='modalSubHeading'>ETH</span>
-                                    <input className='modalInput' type="number"  onChange={onChangeEth} value={slippageEth}></input>
+                                    <input className='modalInput' type="number" onKeyDown={blockInvalidChar} onChange={e => {  if(decimalValidator(e, 100)) setSlippageEth(e.target.value) }} value={slippageEth}></input>
                                 </div> 
-
+ 
                                 <div>
                                     <span className='modalSubHeading'>BSC</span>
-                                    <input className='modalInput' type="number" onChange={onChangeBsc} value={slippageBsc}></input>
+                                    <input className='modalInput' type="number" onKeyDown={blockInvalidChar} onChange={e => { if(decimalValidator(e, 100)) setSlippageBsc(e.target.value) }} value={slippageBsc}></input>
                                 </div> 
                                 <button className='modalButton' onClick={apply}>Apply</button>
                         </div>       

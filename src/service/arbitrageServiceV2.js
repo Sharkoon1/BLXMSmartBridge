@@ -52,8 +52,8 @@ class ArbitrageService {
 		
 		this.switchMaxSwapAmount = false; //boolean to get switched by the frontend
 
-		this.maxSwapAmountStable = null; //value is set in the frontend
-		this.maxSwapAmountBasic = null; //value is set in the frontend
+		this.maxSwapAmountStable = new BigNumber(0); //value is set in the frontend
+		this.maxSwapAmountBasic = new BigNumber(0); //value is set in the frontend
 
 		this.stopCycle = false;
 		this.isRunning = false;
@@ -228,8 +228,8 @@ class ArbitrageService {
 		if (this.adjustmentValueStable.gt(this.bscArbitrageBalance.stable)) { // validate if arbitrage contract has enough stable tokens for swap
 			logger.warn("BSC: Arbitrage contract stable balance is less than adjustment value.");
 			logger.warn(`Stable balance: ${this.bscArbitrageBalance.stable}`);
-
-			if(this.bscArbitrageBalance.stable.eq(ethers.constants.Zero)) {
+			// Comparison with ethers.constants.Zero does not work
+			if(this.bscArbitrageBalance.stable.isZero()) {
 				logger.info("Stable balance is zero.");
 				logger.info("Skipping swaps and current cycle...");
 
@@ -237,16 +237,18 @@ class ArbitrageService {
 			}
 
 			this.adjustmentValueStable = this.bscArbitrageBalance.stable;
+			this.adjustmentValueBasic = this.amountOut(this.pancakeswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
 
 			logger.warn("Set adjustment stable to stable balance, to swap what is left.");
-			logger.warn(`New adjustment Value stable: ${this.adjustmentValueStable} ${this.pancakeswapTokenNames.stableTokenName} `);
+			logger.warn(`New adjustment Value stable: ${this.adjustmentValueStable} ${this.pancakeswapTokenNames.stableTokenName}`);
+			logger.warn(`New adjustment Value basic: ${this.adjustmentValueBasic} ${this.uniswapTokenNames.basicTokenName}`);
 		}
 
 		if (this.adjustmentValueBasic.gt(this.ethArbitrageBalance.basic)) { // validate if arbitrage contract has enough basic tokens for swap
 			logger.warn("ETH: Arbitrage contract basic balance is less than adjustment value.");
 			logger.warn(`Basic balance: ${this.ethArbitrageBalance.basic}`);
-
-			if(this.ethArbitrageBalance.basic.eq(ethers.constants.Zero)) {
+			// Comparison with ethers.constants.Zero does not work
+			if(this.ethArbitrageBalance.basic.isZero()) {
 				logger.info("Basic balance is zero.");
 				logger.info("Skipping swaps and current cycle...");
 
@@ -254,9 +256,11 @@ class ArbitrageService {
 			}
 
 			this.adjustmentValueBasic = this.ethArbitrageBalance.basic;
+			this.adjustmentValueStable = this.amountIn(this.pancakeswapFees, this.adjustmentValueBasic, stableCheap, basicCheap);
 
 			logger.warn("Set adjustment basic to basic balance, to swap what is left.");
 			logger.info(`New adjustment Value basic: ${this.adjustmentValueBasic} ${this.uniswapTokenNames.basicTokenName}`);
+			logger.info(`New adjustment Value stable: ${this.adjustmentValueStable} ${this.pancakeswapTokenNames.stableTokenName}`);
 		}
 
 		this.stableProfitAfterGas = await this.calculateSwapProfitEth();
@@ -313,8 +317,8 @@ class ArbitrageService {
 		if (this.adjustmentValueStable.gt(this.ethArbitrageBalance.stable)) { // validate if arbitrage contract has enough stable tokens for swap
 			logger.warn("ETH: Arbitrage contract stable balance is less than the adjustment value.");
 			logger.warn(`Stable token balance: ${this.ethArbitrageBalance.stable}`);
-
-			if(this.ethArbitrageBalance.stable.eq(ethers.constants.Zero)) {
+			// Comparison with ethers.constants.Zero does not work
+			if(this.ethArbitrageBalance.stable.isZero()) {
 				logger.warn("Stable balance is zero.");
 				logger.info("Skipping swaps and current cycle...");
 
@@ -322,16 +326,18 @@ class ArbitrageService {
 			}
 
 			this.adjustmentValueStable = this.ethArbitrageBalance.stable;
+			this.adjustmentValueBasic = this.amountOut(this.uniswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
 
 			logger.warn("Set adjustment stable to stable balance, to swap what is left.");
 			logger.warn(`New adjustment Value stable: ${this.adjustmentValueStable} ${this.uniswapTokenNames.stableTokenName}`);
+			logger.warn(`New adjustment Value basic: ${this.adjustmentValueBasic} ${this.pancakeswapTokenNames.basicTokenName}`);
 		}
 
 		if (this.adjustmentValueBasic.gt(this.bscArbitrageBalance.basic)) { // validate if arbitrage contract has enough basic tokens for swap
 			logger.warn("BSC: Arbitrage contract basic balance is less than the adjustment value.");
 			logger.warn(`Basic token balance: ${this.bscArbitrageBalance.basic}`);
-
-			if(this.bscArbitrageBalance.basic.eq(ethers.constants.Zero)) {
+			// Comparison with ethers.constants.Zero does not work
+			if(this.bscArbitrageBalance.basic.isZero()) {
 				logger.warn("Basic balance is zero.");
 				logger.info("Skipping swaps and current cycle...");
 
@@ -339,9 +345,11 @@ class ArbitrageService {
 			}
 
 			this.adjustmentValueBasic = this.bscArbitrageBalance.basic;
+			this.adjustmentValueStable = this.amountIn(this.uniswapFees, this.adjustmentValueBasic, stableCheap, basicCheap);
 
 			logger.info("Set adjustment basic to basic balance, to swap what is left.");
 			logger.info(`New adjustment Value basic: ${this.adjustmentValueBasic} ${this.pancakeswapTokenNames.basicTokenName}`);
+			logger.info(`New adjustment Value stable: ${this.adjustmentValueStable} ${this.uniswapTokenNames.stableTokenName}`);
 		}
 
 		this.stableProfitAfterGas = await this.calculateSwapProfitBsc();
@@ -374,13 +382,9 @@ class ArbitrageService {
 
 	async calculateSwapProfitEth() {
 		let basicAmountOut = await this._oracleContractBsc.getsAmountOutBasic(this.toEthersBigNumber(this.adjustmentValueStable));
-		// Shift decimal separator to the right until no more decimal values are left
-		// since ethers.BigNumber values require as input numbers without decimal places
-		let power = 10**2;
-		let slippageBscSplitString = this.slippageBsc.toString().split(".");
-		if (slippageBscSplitString.length>1){
-			power *= 10**slippageBscSplitString[1].length;
-		}
+
+		let power = this.decimalShift(this.slippageBsc);
+
 		this.basicAmountOut = basicAmountOut.mul(ethers.BigNumber.from((this.slippageBsc.multipliedBy(power).toString()))).div(power);
 
 		let stableAmountOut = await this._oracleContractEth.getsAmountOutStable(this.basicAmountOut);
@@ -419,15 +423,22 @@ class ArbitrageService {
 		return swapProfit;
 	}
 
-	async calculateSwapProfitBsc() {
-		let basicAmountOut = await this._oracleContractEth.getsAmountOutBasic(this.toEthersBigNumber(this.adjustmentValueStable));
+	decimalShift(rawBigNumber){
 		// Shift decimal separator to the right until no more decimal values are left
 		// since ethers.BigNumber values require as input numbers without decimal places
 		let power = 10**2;
-		let slippageEthSplitString = this.slippageEth.toString().split(".");
-		if (slippageEthSplitString.length>1){
-			power *= 10**slippageEthSplitString[1].length;
+		let rawSplitString = rawBigNumber.toString().split(".");
+		if (rawSplitString.length>1){
+			power *= 10**rawSplitString[1].length;
 		}
+		return power
+	}
+
+	async calculateSwapProfitBsc() {
+		let basicAmountOut = await this._oracleContractEth.getsAmountOutBasic(this.toEthersBigNumber(this.adjustmentValueStable));
+
+		let power = this.decimalShift(this.slippageEth);
+
 		this.basicAmountOut = basicAmountOut.mul(ethers.BigNumber.from((this.slippageEth.multipliedBy(power).toString()))).div(power);
 
 		let stableAmountOut = await this._oracleContractBsc.getsAmountOutStable(this.basicAmountOut);
@@ -483,7 +494,7 @@ class ArbitrageService {
 		let amountOutWithFees = output.multipliedBy(fees.multipliedBy(1000));
 		let numerator = output.multipliedBy(inputReserve);
 		let denominator = outputReserve.multipliedBy(fees.multipliedBy(1000)).minus(amountOutWithFees);
-		return numerator.dividedBy(denominator);
+		return (numerator.dividedBy(denominator)).multipliedBy(1000);
 	}
 
 	convertStableToUsdBsc(stable) {
@@ -575,47 +586,64 @@ class ArbitrageService {
 	}
 
 	setMaxSwapAmount(fees, stableReserve, basicReserve, stableTokenName, basicTokenName) {
+		let maxSwapAmountIsLessThanAdjustmentValue = false;
+
 		if(this.switchMaxSwapAmount && this.maxSwapAmountStable !== null && this.maxSwapAmountBasic !== null){
 
 			let stableMaxSwapAmountAsBasic = this.amountOut(fees, this.maxSwapAmountStable, stableReserve, basicReserve);
 			let basicMaxSwapAmountAsStable = this.amountIn(fees, this.maxSwapAmountBasic, stableReserve, basicReserve);
 
-			if(this.maxSwapAmountStable !== 0 && this.maxSwapAmountBasic === 0) {
-				this.setAdjustmentValuesToMaxValues(this.maxSwapAmountStable, stableMaxSwapAmountAsBasic);
+			if(!this.maxSwapAmountStable.isEqualTo(0) && this.maxSwapAmountBasic.isEqualTo(0)) {
+				if(this.maxSwapAmountStable.lt(this.adjustmentValueStable)) {
+					this.setAdjustmentValuesToMaxValues(this.maxSwapAmountStable, stableMaxSwapAmountAsBasic, stableTokenName, basicTokenName);
+				}
+				else {
+					maxSwapAmountIsLessThanAdjustmentValue = true;
+				}
 			}
 
-			else if(this.maxSwapAmountStable === 0 && this.maxSwapAmountBasic !== 0){
-				this.setAdjustmentValuesToMaxValues(basicMaxSwapAmountAsStable, this.maxSwapAmountBasic);
+			else if(this.maxSwapAmountStable.isEqualTo(0) && !this.maxSwapAmountBasic.isEqualTo(0)){
+				if(this.maxSwapAmountBasic.lt(this.adjustmentValueBasic)) {
+					this.setAdjustmentValuesToMaxValues(basicMaxSwapAmountAsStable, this.maxSwapAmountBasic, stableTokenName, basicTokenName);
+				}
+				else {
+					maxSwapAmountIsLessThanAdjustmentValue = true;
+				}
 			}
 
-			else if(this.maxSwapAmountStable !== 0 && this.maxSwapAmountBasic !== 0){
+			else if(!this.maxSwapAmountStable.isEqualTo(0) && !this.maxSwapAmountBasic.isEqualTo(0)){
 				if(stableMaxSwapAmountAsBasic.lt(this.maxSwapAmountBasic) && this.maxSwapAmountStable.lt(this.adjustmentValueStable)) {
-					this.setAdjustmentValuesToMaxValues(this.maxSwapAmountStable, stableMaxSwapAmountAsBasic);
+					this.setAdjustmentValuesToMaxValues(this.maxSwapAmountStable, stableMaxSwapAmountAsBasic, stableTokenName, basicTokenName);
 	
-					logger.info(`Swap will be executed based on max adjustment value stable: Adjustment value stable: ${this.adjustmentValueStable.toString()} ${stableTokenName}`);
-					logger.info(`Adjustment value stable: ${this.adjustmentValueBasic.toString()} ${basicTokenName}`);			
+					logger.info("Swap will be executed based on max adjustment value stable");		
 				}
 	
 				else if(stableMaxSwapAmountAsBasic.gt(this.maxSwapAmountBasic) && this.maxSwapAmountBasic.lt(this.adjustmentValueBasic)) {		
-					this.setAdjustmentValuesToMaxValues(basicMaxSwapAmountAsStable, this.maxSwapAmountBasic);
+					this.setAdjustmentValuesToMaxValues(basicMaxSwapAmountAsStable, this.maxSwapAmountBasic, stableTokenName, basicTokenName);
 
-					logger.info(`Swap will be executed based on max adjustment value basic: Adjustment value basic: ${this.adjustmentValueBasic.toString()} ${basicTokenName}`);
-					logger.info(`Adjustment value stable: ${this.adjustmentValueStable.toString()} ${stableTokenName}`);				
+					logger.info("Swap will be executed based on max adjustment value basic.");
 				}
 
 				else {
-					logger.info("Max swap amount is bigger than the current adjustment value. The adjustment values remain the same.");
+					maxSwapAmountIsLessThanAdjustmentValue = true;
 				}
 			}
 			else {
-				logger.info("Both values for the maximum swap amount are 0. The adjustment values remain the same.");
+				logger.info("Both values for the maximum swap amount are 0 or not set. The adjustment values remain the same.");
 			}
+		}
+
+		if(maxSwapAmountIsLessThanAdjustmentValue) {
+			logger.info("Max swap amount is bigger than the current adjustment value. The adjustment values remain the same.");
 		}
 	}
 
-	setAdjustmentValuesToMaxValues(maxSwapAmountStable, maxSwapAmountBasic) {
+	setAdjustmentValuesToMaxValues(maxSwapAmountStable, maxSwapAmountBasic, stableTokenName, basicTokenName) {
 		this.adjustmentValueStable = maxSwapAmountStable;
 		this.adjustmentValueBasic = maxSwapAmountBasic;
+
+		logger.info(`New Adjustment value stable: ${this.adjustmentValueStable.toString()} ${stableTokenName}`);
+		logger.info(`New Adjustment value basic: ${this.adjustmentValueBasic.toString()} ${basicTokenName}`);	
 	}
 }
 
