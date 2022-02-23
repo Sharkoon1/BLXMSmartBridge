@@ -6,6 +6,7 @@ import { PoolReserve } from "../container/poolReserve";
 import { ArbitrageTokenName } from "../container/arbitrageTokenNames";
 import { ArbitrageContract } from "../contracts/ArbitrageContract";
 import { OracleContract } from "../contracts/OracleContract";
+import { NetworkDataBuilder } from "../builder/networkDataBuilder";
 
 class ArbitrageFactory {
     tokenAddressEth: TokenAddress
@@ -60,7 +61,14 @@ class ArbitrageFactory {
 
         let arbitrageTokenName: ArbitrageTokenName = new ArbitrageTokenName(stableName, basicName);
 
-        return new NetworkData(arbitrageContract, oracleContract, arbitrageContractBalance, poolReserve, arbitrageTokenName);
+        let networkData:NetworkData = new NetworkDataBuilder().withArbitrageContract(arbitrageContract)
+                                                            .withOracleContract(oracleContract)
+                                                            .withArbitrageContractBalance(arbitrageContractBalance)
+                                                            .withPoolReserve(poolReserve)
+                                                            .withTokenName(arbitrageTokenName)
+                                                            .build();
+
+        return networkData;
     }
 
     async init() {

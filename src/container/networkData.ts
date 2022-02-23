@@ -1,3 +1,4 @@
+import { NetworkDataBuilder } from "../builder/networkDataBuilder";
 import { ArbitrageContract } from "../contracts/ArbitrageContract";
 import { OracleContract } from "../contracts/OracleContract";
 import { PoolReserve } from "./poolReserve";
@@ -14,13 +15,18 @@ class NetworkData {
   
     tokenNames:ArbitrageTokenName;
 
-    constructor(arbitrageContract: ArbitrageContract, oracleContract: OracleContract, arbitrageContractBalance: ArbitrageContractBalance, poolReserve:PoolReserve, tokenNames:ArbitrageTokenName) {
-        this.arbitrageContract = arbitrageContract;
-        this.oracleContract = oracleContract;
-        this.arbitrageContractBalance = arbitrageContractBalance;
-        this.arbitrageContractBalance = arbitrageContractBalance;
-        this.poolReserve = poolReserve;
-        this.tokenNames = tokenNames;
+    constructor(builder: NetworkDataBuilder) {
+        if(builder.arbitrageContract) throw new TypeError("arbitrageContract not defined");
+        if(builder.oracleContract) throw new TypeError("oracleContract not defined");
+        if(builder.arbitrageContractBalance) throw new TypeError("arbitrageContractBalance not defined");
+        if(builder.poolReserve) throw new TypeError("poolReserve not defined");
+        if(builder.tokenNames) throw new TypeError("tokenNames not defined");
+
+        this.arbitrageContract = builder.arbitrageContract;
+        this.oracleContract = builder.oracleContract;
+        this.arbitrageContractBalance = builder.arbitrageContractBalance;
+        this.poolReserve = builder.poolReserve;
+        this.tokenNames = builder.tokenNames;
     }
 }
 
