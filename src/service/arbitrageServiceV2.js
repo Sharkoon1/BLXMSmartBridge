@@ -435,7 +435,7 @@ class ArbitrageService {
 		if (rawSplitString.length>1){
 			power *= 10**rawSplitString[1].length;
 		}
-		return power
+		return power;
 	}
 
 	async calculateSwapProfitBsc() {
