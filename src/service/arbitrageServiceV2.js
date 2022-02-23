@@ -33,6 +33,7 @@ class ArbitrageService {
 
 		this.adjustmentValueStable;
 		this.adjustmentValueBasic;
+		this.adjustmentValueStableUsd;
 
 		this.stableProfitAfterGas;
 		
@@ -213,9 +214,9 @@ class ArbitrageService {
 		let stableBsc = this.convertStableToUsdBsc(stableCheap);
 		let stableEth = this.convertStableToUsdEth(stableExpensive);
 
-		let adjustmentValueStableUsd = await this.getAdjustmentValueUsdWithFees(basicCheap, stableBsc, basicExpensive, stableEth, this.uniswapFees, this.pancakeswapFees);
+		this.adjustmentValueStableUsd = await this.getAdjustmentValueUsdWithFees(basicCheap, stableBsc, basicExpensive, stableEth, this.uniswapFees, this.pancakeswapFees);
 
-		this.adjustmentValueStable = await this.convertUsdToStableBsc(adjustmentValueStableUsd);
+		this.adjustmentValueStable = await this.convertUsdToStableBsc(this.adjustmentValueStableUsd);
 		this.adjustmentValueBasic = this.amountOut(this.pancakeswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
 
 		if(this.adjustmentValueStable.lt(ethers.constants.Zero) || this.adjustmentValueBasic.lt(ethers.constants.Zero)) { // in case wrong reserves 
@@ -289,7 +290,7 @@ class ArbitrageService {
 		let realProfit = postStableBalance.minus(this.ethArbitrageBalance.stable);
 
 		// get usd profit
-		let profitUsd = await this.convertStableToUsdEth(realProfit);
+		let profitUsd = await this.convertStableToUsdEth(realProfit).minus(this.adjustmentValueStableUsd);
 
 		logger.info(`Absolute profit after arbitrage: ${profitUsd.toString()} USD`);
 	}
@@ -301,9 +302,9 @@ class ArbitrageService {
 		let stableBsc = this.convertStableToUsdBsc(stableExpensive);
 		let stableEth = this.convertStableToUsdEth(stableCheap);
 
-		let adjustmentValueStableUsd = await this.getAdjustmentValueUsdWithFees(basicCheap, stableEth, basicExpensive, stableBsc, this.pancakeswapFees, this.uniswapFees);
+		this.adjustmentValueStableUsd = await this.getAdjustmentValueUsdWithFees(basicCheap, stableEth, basicExpensive, stableBsc, this.pancakeswapFees, this.uniswapFees);
 
-		this.adjustmentValueStable = await this.convertUsdToStableEth(adjustmentValueStableUsd);
+		this.adjustmentValueStable = await this.convertUsdToStableEth(this.adjustmentValueStableUsd);
 
 		this.adjustmentValueBasic = this.amountOut(this.uniswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
 
@@ -378,7 +379,7 @@ class ArbitrageService {
 		let realProfit = postStableBalance.minus(this.bscArbitrageBalance.stable);
 
 		// get usd profit
-		let profitUsd = await this.convertStableToUsdBsc(realProfit);
+		let profitUsd = await this.convertStableToUsdBsc(realProfit).minus(this.adjustmentValueStableUsd);
 
 		logger.info(`Absolute profit after arbitrage: ${profitUsd.toString()} USD`);
 	}
@@ -418,7 +419,7 @@ class ArbitrageService {
 
 		// convert stable to usd in case stable token is not usd
 		let stableUsdOut = this.convertStableToUsdEth(this.fromEthersToBigNumber(this.stableAmountOut));
-		let swapProfit = stableUsdOut.minus(transactionFees);
+		let swapProfit = stableUsdOut.minus(this.adjustmentValueStableUsd).minus(transactionFees);
 
 		logger.info(`Maximum sum of transaction fees: ${transactionFees} USD`);
 		logger.info(`Worst case profit after slippage: ${swapProfit} USD`);
@@ -471,7 +472,7 @@ class ArbitrageService {
 
 		// convert stable to usd in case stable token is not usd	
 		let stableUsdOut = this.convertStableToUsdBsc(this.fromEthersToBigNumber(this.stableAmountOut));
-		let swapProfit = stableUsdOut.minus(transactionFees);
+		let swapProfit = stableUsdOut.minus(this.adjustmentValueStableUsd).minus(transactionFees);
 
 		logger.info(`Maximum sum of transaction fees: ${transactionFees} USD`);
 		logger.info(`Worst case profit after slippage: ${swapProfit} USD`);
