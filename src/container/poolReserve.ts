@@ -1,8 +1,13 @@
-class ArbitrageBalance {
+import BigNumber from 'bignumber.js';
+
+class PoolReserve {
+    stableBalance: BigNumber
+    basicBalance: BigNumber
+
     constructor(stableBalance, basicBalance) {
         this.stableBalance = stableBalance;
         this.basicBalance = basicBalance;
     }
 }
 
-module.exports = ArbitrageBalance;
+export { PoolReserve };
