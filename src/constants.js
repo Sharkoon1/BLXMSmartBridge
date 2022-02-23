@@ -1,6 +1,6 @@
 module.exports = Object.freeze({
-    PROVIDER_BSC_TEST: `https://bsc.getblock.io/testnet/?api_key=${process.env.JSON_RPC_API_KEY}` , //Testnet
-    PROVIDER_ETH_TEST: `https://eth.getblock.io/rinkeby/?api_key=${process.env.JSON_RPC_API_KEY}`, //Testnet
+    PROVIDER_BSC_TEST: `https://bsc.getblock.io/testnet/?api_key=${process.env.JSON_RPC_API_KEY_TESTNET}` , //Testnet
+    PROVIDER_ETH_TEST: `https://eth.getblock.io/rinkeby/?api_key=${process.env.JSON_RPC_API_KEY_TESTNET}`, //Testnet
     PROVIDER_BSC: `https://bsc.getblock.io/mainnet/?api_key=${process.env.JSON_RPC_API_KEY}` , //Mainnet
     PROVIDER_ETH: `https://eth.getblock.io/mainnet/?api_key=${process.env.JSON_RPC_API_KEY}`, //Mainnet
     
