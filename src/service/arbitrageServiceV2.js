@@ -71,12 +71,7 @@ class ArbitrageService {
 		}
 	}
 
-	async init() {
-	}
-
 	async startArbitrage() {
-		await this.init();
-
 		this.stopCycle = false;
 		this.isRunning = true;
 
