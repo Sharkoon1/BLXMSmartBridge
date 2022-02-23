@@ -10,6 +10,30 @@ var cors = require("cors");
 
 var EventEmitter = require("events").EventEmitter;
 var app = express();
+const constants = require("./constants");
+const { ethers } = require("ethers");
+
+if(!process.env.JSON_RPC_API_KEY) { 
+	throw new Error("JSON RPC node provider api key is not set in the enviroment file. Please set the api key.");
+}
+
+else {
+	let ethProvider = new ethers.providers.StaticJsonRpcProvider(constants["PROVIDER_ETH"]);
+		ethProvider.getNetwork().catch(error => {
+			if(error.event === "noNetwork") {
+				throw new Error("ETH JSON RPC node could not detect network. Api key could be invalid or node ran out of requests.");
+			}
+
+		});
+
+	let bscProvider = new ethers.providers.StaticJsonRpcProvider(constants["PROVIDER_BSC"]);
+		bscProvider.getNetwork().catch(error => {
+			if(error.event === "noNetwork") {
+				throw new Error("BSC JSON RPC node could not detect network. Api key could be invalid or node ran out of requests.");
+			}
+ 
+		});
+}
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
