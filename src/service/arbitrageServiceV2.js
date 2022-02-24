@@ -116,8 +116,10 @@ class ArbitrageService {
 					logger.info("Price difference found");
 					logger.info(`ETH network: Current price = ${this.poolPriceEth} USD/BLXM`);
 					logger.info(`BSC network: Current price = ${this.poolPriceBsc} USD/BLXM`);
+					this.getPriceDifference();
 
 					if (this.poolPriceEth.gt(this.poolPriceBsc)) {
+
 
 						let liquidityAvaible = await this.calculateSwapEth(this.tokenArrayBsc[1], this.tokenArrayBsc[0], this.tokenArrayEth[1], this.tokenArrayEth[0]);
 
@@ -226,6 +228,8 @@ class ArbitrageService {
 
 		logger.info(`Adjustment Value stable: ${this.adjustmentValueStable} ${this.pancakeswapTokenNames.stableTokenName}`);
 		logger.info(`Adjustment Value basic: ${this.adjustmentValueBasic} ${this.uniswapTokenNames.basicTokenName}`);
+		logger.info(`AmountIn BSC: ${(this.convertStableToUsdBsc(this.adjustmentValueStable)).toFixed(20)} USD`);
+		logger.info(`AmountOut ETH: ${(this.convertStableToUsdEth(this.amountOut(this.uniswapFees, this.adjustmentValueBasic, basicExpensive, stableExpensive))).toFixed(20)} USD (without slippage)`);
 
 		this.setMaxSwapAmount(this.pancakeswapFees, stableCheap, basicCheap, this.pancakeswapTokenNames.stableTokenName, this.uniswapTokenNames.basicTokenName); //sets adjustmentValueStable & adjustmentValueBasic to the max amount set in the frontend under certain conditions
 
@@ -315,6 +319,8 @@ class ArbitrageService {
 
 		logger.info(`Adjustment Value stable: ${this.adjustmentValueStable} ${this.uniswapTokenNames.stableTokenName}`);
 		logger.info(`Adjustment Value basic: ${this.adjustmentValueBasic}  ${this.pancakeswapTokenNames.basicTokenName}`);
+		logger.info(`AmountIn ETH: ${(this.convertStableToUsdEth(this.adjustmentValueStable)).toFixed(20)} USD`);
+		logger.info(`AmountOut BSC: ${(this.convertStableToUsdBsc(this.amountOut(this.pancakeswapFees, this.adjustmentValueBasic, basicExpensive, stableExpensive))).toFixed(20)} USD (without slippage)`);
 
 		this.setMaxSwapAmount(this.uniswapFees, stableCheap, basicCheap, this.uniswapTokenNames.stableTokenName, this.pancakeswapTokenNames.basicTokenName); //sets adjustmentValueStable & adjustmentValueBasic to the max amount set in the frontend under certain conditions
 		
@@ -648,6 +654,18 @@ class ArbitrageService {
 
 		logger.info(`New Adjustment value stable: ${this.adjustmentValueStable.toString()} ${stableTokenName}`);
 		logger.info(`New Adjustment value basic: ${this.adjustmentValueBasic.toString()} ${basicTokenName}`);	
+	}
+
+	getPriceDifference(){
+		if (this.poolPriceEth.gt(this.poolPriceBsc)) {
+
+			let priceDifference = this.poolPriceEth.minus(this.poolPriceBsc);
+			logger.info(`Price difference = ${priceDifference} USD/BLXM`);
+
+		}else if(this.poolPriceBsc.gt(this.poolPriceEth)){
+			let priceDifference = this.poolPriceBsc.minus(this.poolPriceEth);
+			logger.info(`Price difference = ${priceDifference} USD/BLXM`);
+		}
 	}
 }
 
