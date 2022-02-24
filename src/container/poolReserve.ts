@@ -1,12 +1,12 @@
 import BigNumber from 'bignumber.js';
 
 class PoolReserve {
-    stableBalance: BigNumber
-    basicBalance: BigNumber
+    stable: BigNumber
+    basic: BigNumber
 
-    constructor(stableBalance, basicBalance) {
-        this.stableBalance = stableBalance;
-        this.basicBalance = basicBalance;
+    constructor(stable, basic) {
+        this.stable = stable;
+        this.basic = basic;
     }
 }
 

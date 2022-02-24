@@ -4,8 +4,10 @@ import { OracleContract } from "../contracts/OracleContract";
 import { PoolReserve } from "./poolReserve";
 import { ArbitrageContractBalance } from "./arbitrageContractBalance";
 import { ArbitrageTokenName } from "./arbitrageTokenNames";
+import BigNumber from "bignumber.js";
 
 class NetworkData {
+    poolFee:BigNumber;
     arbitrageContract:ArbitrageContract;
     oracleContract:OracleContract;
     
@@ -21,7 +23,9 @@ class NetworkData {
         if(builder.arbitrageContractBalance) throw new TypeError("arbitrageContractBalance not defined");
         if(builder.poolReserve) throw new TypeError("poolReserve not defined");
         if(builder.tokenNames) throw new TypeError("tokenNames not defined");
+        if(builder.poolFee) throw new TypeError("poolFee not defined");
 
+        this.poolFee = builder.poolFee;
         this.arbitrageContract = builder.arbitrageContract;
         this.oracleContract = builder.oracleContract;
         this.arbitrageContractBalance = builder.arbitrageContractBalance;

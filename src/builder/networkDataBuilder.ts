@@ -4,8 +4,10 @@ import { PoolReserve } from "../container/poolReserve";
 import { ArbitrageContractBalance } from "../container/arbitrageContractBalance";
 import { ArbitrageTokenName } from "../container/arbitrageTokenNames";
 import { NetworkData } from "../container/networkData";
+import BigNumber from "bignumber.js";
 
 class NetworkDataBuilder {
+    poolFee:BigNumber;
     arbitrageContract:ArbitrageContract;
     oracleContract:OracleContract;
     arbitrageContractBalance:ArbitrageContractBalance;
@@ -28,6 +30,11 @@ class NetworkDataBuilder {
 
     withArbitrageContractBalance(arbitrageContractBalance:ArbitrageContractBalance) {
         this.arbitrageContractBalance = arbitrageContractBalance;
+        return this;
+    }
+
+    withPoolFee(poolFee:BigNumber) {
+        this.poolFee = poolFee;
         return this;
     }
 

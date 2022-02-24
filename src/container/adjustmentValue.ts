@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 
-class AdjustmentValues {
+class AdjustmentValue {
     stable: BigNumber
     basic: BigNumber
 
@@ -10,4 +10,4 @@ class AdjustmentValues {
     }
 }
 
-export { AdjustmentValues };
+export { AdjustmentValue };

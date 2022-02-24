@@ -96,6 +96,15 @@ class ArbitrageFactory {
         return networkName === constants.BSC_NETWORK_NAME ? this.oracleContractBsc : this.oracleContractEth;
     }   
 
+    private getNetworkPoolFee(networkName:string) : BigNumber {
+		if (process.env.NODE_ENV === "production") {
+            return networkName === constants.BSC_NETWORK_NAME ? new BigNumber(constants.PANCAKESWAP_FEES): new BigNumber(constants.UNISWAP_FEES);
+        }
+        else {
+            return networkName === constants.BSC_NETWORK_NAME ? new BigNumber(constants.PANCAKESWAP_FEES_TESTNET) : new BigNumber(constants.UNISWAP_FEES_TESTNET);
+        }
+    }
+
     private async createNetworkData(networkName:string, oracleContract:OracleContract) : Promise<NetworkData> {
         let arbitrageContract:ArbitrageContract = new ArbitrageContract(networkName);
 
@@ -112,11 +121,14 @@ class ArbitrageFactory {
 
         let arbitrageTokenName: ArbitrageTokenName = new ArbitrageTokenName(stableName, basicName);
 
+        let poolFee: BigNumber = this.getNetworkPoolFee(networkName);
+
         let networkData:NetworkData = new NetworkDataBuilder().withArbitrageContract(arbitrageContract)
                                                             .withOracleContract(oracleContract)
                                                             .withArbitrageContractBalance(arbitrageContractBalance)
                                                             .withPoolReserve(poolReserve)
                                                             .withTokenName(arbitrageTokenName)
+                                                            .withPoolFee(poolFee)
                                                             .build();
 
         return networkData;
