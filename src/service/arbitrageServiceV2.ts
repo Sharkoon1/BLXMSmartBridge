@@ -4,6 +4,8 @@ import { constants } from "../constants/constants";
 import { ArbitrageContractContainer } from "../container/arbitrageContractContainer";
 import { ArbitrageFactory } from "../factory/arbitrageFactory";
 import { logger } from "../logger/logger";
+import { AdjustmentValueService } from "./adjustmentValueService";
+import { AdjustmentValue } from "../container/adjustmentValue";
 
 class ArbitrageService implements AbstractArbitrageService {
     ethOracleContract:OracleContract;
@@ -28,6 +30,9 @@ class ArbitrageService implements AbstractArbitrageService {
         logger.info("Skipping current arbitrage cycle.");
       }
 
+      let adjustmentValueService:AdjustmentValueService = new AdjustmentValueService();
+
+      let adjustmentValues:AdjustmentValue = await adjustmentValueService.calculateAdjustmentValues(arbitrageContractContainer.cheapNetworkData, arbitrageContractContainer.expensiveNetworkData);
     }
 
     executeSwaps() {
