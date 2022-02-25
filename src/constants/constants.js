@@ -1,6 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.constants = void 0;
+const bignumber_js_1 = __importDefault(require("bignumber.js"));
 class Constants {
     constructor() {
         this.ARBITRAGE_CONTRACT_ADDRESS_ETH = "0xC50c71F6B2C454def7d7c7DB94952ae6d5Fae844"; // * new deployed arbitrage contract ETH mainnet
@@ -18,10 +22,10 @@ class Constants {
         this.HUSD_BSC_TESTNET = "0x42db14A9f863F12A9265365C1901A36e58c862fC"; // * HUSD Address BSC testnet
         this.HUSD_ETH_TESTNET = "0x22853d67597b47Fb11c7569Ab507530216cA56a4"; // * HUSD Address ETH testnet
         this.ARBITRAGE_WALLET_ADDRESS = "0x626FB960A26681F7B0FD3E0c19D09fC440d2FF74"; // * current testnet wallet with testnet ETH & BNB
-        this.UNISWAP_FEES = "0.997";
-        this.PANCAKESWAP_FEES = "0.9975";
-        this.UNISWAP_FEES_TESTNET = "0.997";
-        this.PANCAKESWAP_FEES_TESTNET = "0.998";
+        this.UNISWAP_FEES = new bignumber_js_1.default("0.997");
+        this.PANCAKESWAP_FEES = new bignumber_js_1.default("0.9975");
+        this.UNISWAP_FEES_TESTNET = new bignumber_js_1.default("0.997");
+        this.PANCAKESWAP_FEES_TESTNET = new bignumber_js_1.default("0.998");
         this.ETH_NETWORK_NAME = "ETH";
         this.BSC_NETWORK_NAME = "BSC";
         this.PROVIDER_BSC_TEST = `https://bsc.getblock.io/testnet/?api_key=${process.env.JSON_RPC_API_KEY}`;

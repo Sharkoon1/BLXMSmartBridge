@@ -15,6 +15,9 @@ class NetworkData {
             throw new TypeError("tokenNames not defined");
         if (builder.poolFee)
             throw new TypeError("poolFee not defined");
+        if (builder.usdConversionRate)
+            throw new TypeError("usdConversionRate not defined");
+        this.usdConversionRate = builder.usdConversionRate;
         this.poolFee = builder.poolFee;
         this.arbitrageContract = builder.arbitrageContract;
         this.oracleContract = builder.oracleContract;

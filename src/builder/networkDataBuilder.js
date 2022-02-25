@@ -30,6 +30,10 @@ class NetworkDataBuilder {
         this.tokenNames = tokenNames;
         return this;
     }
+    withUsdConversionRate(usdConversionRate) {
+        this.usdConversionRate = usdConversionRate;
+        return this;
+    }
     build() {
         return new networkData_1.NetworkData(this);
     }

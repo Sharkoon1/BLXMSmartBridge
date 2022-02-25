@@ -8,9 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ArbitrageFactory = void 0;
 const arbitrageContractContainer_1 = require("../container/arbitrageContractContainer");
@@ -21,7 +18,6 @@ const ArbitrageContract_1 = require("../contracts/ArbitrageContract");
 const OracleContract_1 = require("../contracts/OracleContract");
 const networkDataBuilder_1 = require("../builder/networkDataBuilder");
 const constants_1 = require("../constants/constants");
-const bignumber_js_1 = __importDefault(require("bignumber.js"));
 const utility_1 = require("../helpers/utility");
 const logger_1 = require("../logger/logger");
 class ArbitrageFactory {
@@ -93,10 +89,10 @@ class ArbitrageFactory {
     }
     getNetworkPoolFee(networkName) {
         if (process.env.NODE_ENV === "production") {
-            return networkName === constants_1.constants.BSC_NETWORK_NAME ? new bignumber_js_1.default(constants_1.constants.PANCAKESWAP_FEES) : new bignumber_js_1.default(constants_1.constants.UNISWAP_FEES);
+            return networkName === constants_1.constants.BSC_NETWORK_NAME ? constants_1.constants.PANCAKESWAP_FEES : constants_1.constants.UNISWAP_FEES;
         }
         else {
-            return networkName === constants_1.constants.BSC_NETWORK_NAME ? new bignumber_js_1.default(constants_1.constants.PANCAKESWAP_FEES_TESTNET) : new bignumber_js_1.default(constants_1.constants.UNISWAP_FEES_TESTNET);
+            return networkName === constants_1.constants.BSC_NETWORK_NAME ? constants_1.constants.PANCAKESWAP_FEES_TESTNET : constants_1.constants.UNISWAP_FEES_TESTNET;
         }
     }
     createNetworkData(networkName, oracleContract) {
@@ -110,12 +106,14 @@ class ArbitrageFactory {
             let stableName = yield arbitrageContract.getStableName();
             let arbitrageTokenName = new arbitrageTokenNames_1.ArbitrageTokenName(stableName, basicName);
             let poolFee = this.getNetworkPoolFee(networkName);
+            let usdConversionRate = yield oracleContract.getStableUsdPrice();
             let networkData = new networkDataBuilder_1.NetworkDataBuilder().withArbitrageContract(arbitrageContract)
                 .withOracleContract(oracleContract)
                 .withArbitrageContractBalance(arbitrageContractBalance)
                 .withPoolReserve(poolReserve)
                 .withTokenName(arbitrageTokenName)
                 .withPoolFee(poolFee)
+                .withUsdConversionRate(usdConversionRate)
                 .build();
             return networkData;
         });
