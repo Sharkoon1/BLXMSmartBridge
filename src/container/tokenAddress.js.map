@@ -1,0 +1,1 @@
+{"version":3,"file":"tokenAddress.js","sourceRoot":"","sources":["tokenAddress.ts"],"names":[],"mappings":";;;AAAA,MAAM,YAAY;IAId,YAAY,kBAAkB,EAAE,iBAAiB;QAC7C,IAAI,CAAC,kBAAkB,GAAG,kBAAkB,CAAC;QAC7C,IAAI,CAAC,iBAAiB,GAAG,iBAAiB,CAAC;IAC/C,CAAC;CACJ;AAEQ,oCAAY"}

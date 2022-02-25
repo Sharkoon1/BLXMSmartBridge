@@ -1,40 +1,48 @@
+import BigNumber from "bignumber.js";
 
 class Constants {
-    public readonly PROVIDER_BSC_TEST: `https://bsc.getblock.io/testnet/?api_key=${process.env.JSON_RPC_API_KEY}` ; //Testnet
-    public readonly PROVIDER_ETH_TEST: `https://eth.getblock.io/rinkeby/?api_key=${process.env.JSON_RPC_API_KEY}`; //Testnet
-    public readonly PROVIDER_BSC: `https://bsc.getblock.io/mainnet/?api_key=${process.env.JSON_RPC_API_KEY}` ; //Mainnet
-    public readonly PROVIDER_ETH: `https://eth.getblock.io/mainnet/?api_key=${process.env.JSON_RPC_API_KEY}`; //Mainnet
+    public readonly PROVIDER_BSC_TEST: string; //Testnet
+    public readonly PROVIDER_ETH_TEST: string; //Testnet
+    public readonly PROVIDER_BSC: string; //Mainnet
+    public readonly PROVIDER_ETH: string; //Mainnet
     
-    public readonly ARBITRAGE_CONTRACT_ADDRESS_ETH: "0xC50c71F6B2C454def7d7c7DB94952ae6d5Fae844"; // * new deployed arbitrage contract ETH mainnet
-    public readonly ARBITRAGE_CONTRACT_ADDRESS_BSC: "0x5fB36e5A813b8F6fb8efb06f88526B0999D033C4"; // * new deployed arbitrage contract BSC mainnet
+    public readonly ARBITRAGE_CONTRACT_ADDRESS_ETH: string = "0xC50c71F6B2C454def7d7c7DB94952ae6d5Fae844"; // * new deployed arbitrage contract ETH mainnet
+    public readonly ARBITRAGE_CONTRACT_ADDRESS_BSC: string = "0x5fB36e5A813b8F6fb8efb06f88526B0999D033C4"; // * new deployed arbitrage contract BSC mainnet
     
-    public readonly WRAPPED_TOKEN_ADDRESS_BSC: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"; // * WBNB address in BSC mainnet
-    public readonly WRAPPED_TOKEN_ADDRESS_ETH: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"; // * WETH address in ETH mainnet
+    public readonly WRAPPED_TOKEN_ADDRESS_BSC: string = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"; // * WBNB address in BSC mainnet
+    public readonly WRAPPED_TOKEN_ADDRESS_ETH: string = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"; // * WETH address in ETH mainnet
     
-    public readonly USD_TOKEN_ADDRESS_ETH: "0xdac17f958d2ee523a2206206994597c13d831ec7"; // * USDT address in ETH mainnet
-    public readonly USD_TOKEN_ADDRESS_BSC: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"; // * BUSD address in BSC mainnet
+    public readonly USD_TOKEN_ADDRESS_ETH: string = "0xdac17f958d2ee523a2206206994597c13d831ec7"; // * USDT address in ETH mainnet
+    public readonly USD_TOKEN_ADDRESS_BSC: string = "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"; // * BUSD address in BSC mainnet
     
-    public readonly ROUTER_ETH: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"; // * Router address in ETH mainnet
-    public readonly ROUTER_BSC: "0x10ED43C718714eb63d5aA57B78B54704E256024E"; // * Router address in BSC mainnet
+    public readonly ROUTER_ETH: string = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"; // * Router address in ETH mainnet
+    public readonly ROUTER_BSC: string = "0x10ED43C718714eb63d5aA57B78B54704E256024E"; // * Router address in BSC mainnet
 
-    public readonly ROUTER_ETH_TESTNET: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"; // * Router address in BSC testnet
-    public readonly ROUTER_BSC_TESTNET: "0xD99D1c33F9fC3444f8101754aBC46c52416550D1"; // * Router address in ETH testnet
+    public readonly ROUTER_ETH_TESTNET: string = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"; // * Router address in BSC testnet
+    public readonly ROUTER_BSC_TESTNET: string = "0xD99D1c33F9fC3444f8101754aBC46c52416550D1"; // * Router address in ETH testnet
     
-    public readonly ARBITRAGE_CONTRACT_ADDRESS_ETH_TESTNET: "0xeC0BB4a9159F9878cE4adA5BD3F0B1e7cF729C56"; // * arbitrage contract ETH testnet
-    public readonly ARBITRAGE_CONTRACT_ADDRESS_BSC_TESTNET: "0x6ea9ddf184C1481F3E8Cc10A3427998649fFD680"; // * arbitrage contract BSC testnet
+    public readonly ARBITRAGE_CONTRACT_ADDRESS_ETH_TESTNET: string = "0xeC0BB4a9159F9878cE4adA5BD3F0B1e7cF729C56"; // * arbitrage contract ETH testnet
+    public readonly ARBITRAGE_CONTRACT_ADDRESS_BSC_TESTNET: string = "0x6ea9ddf184C1481F3E8Cc10A3427998649fFD680"; // * arbitrage contract BSC testnet
     
-    public readonly HUSD_BSC_TESTNET: "0x42db14A9f863F12A9265365C1901A36e58c862fC"; // * HUSD Address BSC testnet
-    public readonly HUSD_ETH_TESTNET: "0x22853d67597b47Fb11c7569Ab507530216cA56a4"; // * HUSD Address ETH testnet
+    public readonly HUSD_BSC_TESTNET: string = "0x42db14A9f863F12A9265365C1901A36e58c862fC"; // * HUSD Address BSC testnet
+    public readonly HUSD_ETH_TESTNET: string = "0x22853d67597b47Fb11c7569Ab507530216cA56a4"; // * HUSD Address ETH testnet
     
-    public readonly ARBITRAGE_WALLET_ADDRESS: "0x626FB960A26681F7B0FD3E0c19D09fC440d2FF74"; // * current testnet wallet with testnet ETH & BNB
+    public readonly ARBITRAGE_WALLET_ADDRESS: string = "0x626FB960A26681F7B0FD3E0c19D09fC440d2FF74"; // * current testnet wallet with testnet ETH & BNB
     
-    public readonly UNISWAP_FEES: "0.997";
-    public readonly PANCAKESWAP_FEES: "0.9975";
-    public readonly UNISWAP_FEES_TESTNET: "0.997";
-    public readonly PANCAKESWAP_FEES_TESTNET: "0.998";
+    public readonly UNISWAP_FEES: BigNumber = new BigNumber("0.997");
+    public readonly PANCAKESWAP_FEES: BigNumber = new BigNumber("0.9975");
+    public readonly UNISWAP_FEES_TESTNET: BigNumber = new BigNumber("0.997");
+    public readonly PANCAKESWAP_FEES_TESTNET: BigNumber = new BigNumber("0.998");
 
-    public readonly ETH_NETWORK_NAME:"ETH";
-    public readonly BSC_NETWORK_NAME:"BSC";
+    public readonly ETH_NETWORK_NAME: string = "ETH";
+    public readonly BSC_NETWORK_NAME: string = "BSC";
+
+    constructor() {
+      this.PROVIDER_BSC_TEST = `https://bsc.getblock.io/testnet/?api_key=${process.env.JSON_RPC_API_KEY}`;
+      this.PROVIDER_ETH_TEST = `https://eth.getblock.io/rinkeby/?api_key=${process.env.JSON_RPC_API_KEY}`;
+      this.PROVIDER_BSC = `https://bsc.getblock.io/mainnet/?api_key=${process.env.JSON_RPC_API_KEY}`;
+      this.PROVIDER_ETH = `https://eth.getblock.io/mainnet/?api_key=${process.env.JSON_RPC_API_KEY}`;
+    }
   }
 
   const constants = new Constants();

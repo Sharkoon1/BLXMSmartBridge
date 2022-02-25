@@ -1,4 +1,3 @@
-import { TokenAddress } from "../container/tokenAddress";
 import { NetworkData } from "../container/networkData";
 import { ArbitrageContractContainer } from "../container/arbitrageContractContainer";
 import { ArbitrageContractBalance } from "../container/arbitrageContractBalance";
@@ -98,10 +97,10 @@ class ArbitrageFactory {
 
     private getNetworkPoolFee(networkName:string) : BigNumber {
 		if (process.env.NODE_ENV === "production") {
-            return networkName === constants.BSC_NETWORK_NAME ? new BigNumber(constants.PANCAKESWAP_FEES): new BigNumber(constants.UNISWAP_FEES);
+            return networkName === constants.BSC_NETWORK_NAME ? constants.PANCAKESWAP_FEES: constants.UNISWAP_FEES;
         }
         else {
-            return networkName === constants.BSC_NETWORK_NAME ? new BigNumber(constants.PANCAKESWAP_FEES_TESTNET) : new BigNumber(constants.UNISWAP_FEES_TESTNET);
+            return networkName === constants.BSC_NETWORK_NAME ? constants.PANCAKESWAP_FEES_TESTNET : constants.UNISWAP_FEES_TESTNET;
         }
     }
 
@@ -123,12 +122,15 @@ class ArbitrageFactory {
 
         let poolFee: BigNumber = this.getNetworkPoolFee(networkName);
 
+        let usdConversionRate = await oracleContract.getStableUsdPrice();
+
         let networkData:NetworkData = new NetworkDataBuilder().withArbitrageContract(arbitrageContract)
                                                             .withOracleContract(oracleContract)
                                                             .withArbitrageContractBalance(arbitrageContractBalance)
                                                             .withPoolReserve(poolReserve)
                                                             .withTokenName(arbitrageTokenName)
                                                             .withPoolFee(poolFee)
+                                                            .withUsdConversionRate(usdConversionRate)
                                                             .build();
 
         return networkData;

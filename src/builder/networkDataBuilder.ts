@@ -7,6 +7,7 @@ import { NetworkData } from "../container/networkData";
 import BigNumber from "bignumber.js";
 
 class NetworkDataBuilder {
+    usdConversionRate:BigNumber;
     poolFee:BigNumber;
     arbitrageContract:ArbitrageContract;
     oracleContract:OracleContract;
@@ -45,6 +46,11 @@ class NetworkDataBuilder {
 
     withTokenName(tokenNames:ArbitrageTokenName) {
         this.tokenNames = tokenNames;
+        return this;
+    }
+
+    withUsdConversionRate(usdConversionRate:BigNumber) {
+        this.usdConversionRate = usdConversionRate;
         return this;
     }
 
