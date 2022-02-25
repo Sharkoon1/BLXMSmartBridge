@@ -10,17 +10,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ArbitrageService = void 0;
-const OracleContract_1 = require("../contracts/OracleContract");
-const constants_1 = require("../constants/constants");
 const arbitrageFactory_1 = require("../factory/arbitrageFactory");
 const logger_1 = require("../logger/logger");
+const adjustmentValueService_1 = require("./adjustmentValueService");
 class ArbitrageService {
     constructor() {
-        this.ethOracleContract = new OracleContract_1.OracleContract(constants_1.constants.ETH_NETWORK_NAME);
-        this.bscOracleContract = new OracleContract_1.OracleContract(constants_1.constants.BSC_NETWORK_NAME);
         this.arbitrageFactory = new arbitrageFactory_1.ArbitrageFactory();
     }
-    startArbitrage() {
+    startArbitrageCycle() {
         return __awaiter(this, void 0, void 0, function* () {
             logger_1.logger.info("Starting the abitrage service ...");
             let arbitrageContractContainer;
@@ -30,6 +27,8 @@ class ArbitrageService {
             else {
                 logger_1.logger.info("Skipping current arbitrage cycle.");
             }
+            let adjustmentValueService = new adjustmentValueService_1.AdjustmentValueService();
+            let adjustmentValues = yield adjustmentValueService.calculateAdjustmentValues(arbitrageContractContainer.cheapNetworkData, arbitrageContractContainer.expensiveNetworkData);
         });
     }
     executeSwaps() {

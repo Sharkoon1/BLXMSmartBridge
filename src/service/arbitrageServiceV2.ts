@@ -8,12 +8,8 @@ import { AdjustmentValueService } from "./adjustmentValueService";
 import { AdjustmentValue } from "../container/adjustmentValue";
 
 class ArbitrageService implements AbstractArbitrageService {
-    ethOracleContract:OracleContract;
-    bscOracleContract:OracleContract;
     arbitrageFactory:ArbitrageFactory;
     constructor() {
-      this.ethOracleContract = new OracleContract(constants.ETH_NETWORK_NAME);
-      this.bscOracleContract = new OracleContract(constants.BSC_NETWORK_NAME);
       this.arbitrageFactory = new ArbitrageFactory();
     }
 

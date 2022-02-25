@@ -12,8 +12,8 @@ import { compareUpTo, bigNumberToFloat } from "../helpers/utility"
 import { logger } from "../logger/logger";
 
 class ArbitrageFactory {
-    oracleContractEth: OracleContract
-    oracleContractBsc: OracleContract
+    oracleContractEth:OracleContract
+    oracleContractBsc:OracleContract
     private isInitialized:boolean
     private readonly PRICE_DECIMAL_COMPARE_VALUE;
 
@@ -31,10 +31,10 @@ class ArbitrageFactory {
         }
 
         let expensiveNetworkName:string = await this.getExpensiveNetwork();
-        let cheapNetworkName :string = await this.getExpensiveNetwork();
+        let cheapNetworkName:string = await this.getExpensiveNetwork();
 
-        let cheapOracleContract: OracleContract = this.getOracleContractByNetworkName(cheapNetworkName);
-        let expensiveOracleContract: OracleContract = this.getOracleContractByNetworkName(expensiveNetworkName);
+        let cheapOracleContract:OracleContract = this.getOracleContractByNetworkName(cheapNetworkName);
+        let expensiveOracleContract:OracleContract = this.getOracleContractByNetworkName(expensiveNetworkName);
 
         let cheapNetworkData:NetworkData;
         let expensiveNetworkData:NetworkData;
