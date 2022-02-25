@@ -17,7 +17,7 @@ class ArbitrageService implements AbstractArbitrageService {
       this.arbitrageFactory = new ArbitrageFactory();
     }
 
-    async startArbitrage() {
+    async startArbitrageCycle() {
 			logger.info("Starting the abitrage service ...");
 
       let arbitrageContractContainer:ArbitrageContractContainer;
