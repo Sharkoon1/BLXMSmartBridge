@@ -7,10 +7,8 @@ import BigNumber from "bignumber.js";
  class ArbitrageConfigurationStore implements ArbitrageConfigurationStore {
     private static instance: ArbitrageConfigurationStore;
 
-    private maxSwapAmountStable:BigNumber;
-    private maxSwapAmountBasic :BigNumber;
-
-    private constructor() { }
+    private maxSwapAmountStable:BigNumber = new BigNumber(0);
+    private maxSwapAmountBasic :BigNumber = new BigNumber(0);
 
     public static getInstance(): ArbitrageConfigurationStore {
         if (!ArbitrageConfigurationStore.instance) {
