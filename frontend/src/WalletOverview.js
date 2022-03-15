@@ -104,26 +104,60 @@ export default class WalletOverview extends Component {
 	}
 	render() {
 		return (
+				
+
 			<div className="displayPoolsizes">
-				<h1 className='headingPoolsize'>Abitrage Liquidity Overview</h1>
-				<div className="abitrageWallet">
+			{/*  Display information about the Abitrage Wallet - pays fees  */}
+				<h1 className='headingPoolsize'>Abitrage Wallet Overview</h1>
+
+				<div className="abitrageWalletBsc">
 					<div className="contentPoolsize">
-						<h1 className="poolsizeSubHeading">Abitrage Wallet</h1>
+						<h1> 
+							<span className="poolsizeSubHeading">Abitrage Wallet BSC </span>
+							<span className="displayPoolAddress">{this.state.BSCArbitrageContractAddress}</span>
+							<span>
+								<button onClick={this.visitPageBsc} type="button" title="Link to testnet.bscscan.com" className="poolsizeButton"><img className="poolsizeButtonPicture" src="../copy2.png"></img></button>
+							</span>
+						
+						</h1>
 						<div>
-							<span>{this.state.AbitrageETH} ETH </span>
-							<span className="and"> | </span>
 							<span>{this.state.AbitrageBNB} BNB</span>
 						</div>
+
 					</div>
+					
 				</div>
+
+				<div className="abitrageWalletEth">
+					<div className="contentPoolsize">
+					<h1>
+						<span className="poolsizeSubHeading">Abitrage Wallet ETH </span>
+							<span className="displayPoolAddress">{this.state.ETHArbitrageContractAddress}</span>
+							<span>
+								<button onClick={this.visitPageEth} type="button" title="Link to testnet.bscscan.com" className="poolsizeButton"><img className="poolsizeButtonPicture" src="../copy2.png"></img></button>
+							</span>
+					</h1>
+						<div>
+							<span>{this.state.AbitrageETH} ETH </span>
+						</div>
+
+					</div>
+					
+				</div>
+
+				{/* Display Information about the abitrage smart contract */}
+
+				<h1 className='headingPoolsize'>Abitrage Contract Liquidity Overview</h1>
 
 				<div className="displayPoolsizeBSC">
 					<div className="contentPoolsize">
 						<h1>
 							<span className="poolsizeSubHeading">BSC Arbitrage Contract </span>
 							<span className="displayPoolAddress">{this.state.BSCArbitrageContractAddress}</span>
-							<span><button onClick={this.visitPageBsc} type="button" title="Link to testnet.bscscan.com" className="poolsizeButton"><img className="poolsizeButtonPicture" src="../copy2.png"></img></button>
-							</span></h1>
+							<span>
+								<button onClick={this.visitPageBsc} type="button" title="Link to testnet.bscscan.com" className="poolsizeButton"><img className="poolsizeButtonPicture" src="../copy2.png"></img></button>
+							</span>
+						</h1>
 						<div>
 							<span>{this.state.BinanceBNB} {this.state.NameBSCStable}</span>
 							<span className="and"> | </span>
@@ -138,8 +172,10 @@ export default class WalletOverview extends Component {
 						<h1>
 							<span className="poolsizeSubHeading">ETH Arbitrage Contract </span>
 							<span className="displayPoolAddress">{this.state.ETHArbitrageContractAddress}</span>
-							<span><button onClick={this.visitPageEth} type="button" title="Link to testnet.bscscan.com" className="poolsizeButton"><img className="poolsizeButtonPicture" src="../copy2.png"></img></button>
-							</span></h1>
+							<span>
+								<button onClick={this.visitPageEth} type="button" title="Link to testnet.bscscan.com" className="poolsizeButton"><img className="poolsizeButtonPicture" src="../copy2.png"></img></button>
+							</span>
+						</h1>
 						<div>
 							<span>{this.state.EthereumETH} {this.state.NameETHStable}</span>
 							<span className="and"> | </span>
