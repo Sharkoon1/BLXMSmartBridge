@@ -108,8 +108,13 @@ export default class WalletOverview extends Component {
 
 			<div className="displayPoolsizes">
 			{/*  Display information about the Abitrage Wallet - pays fees  */}
-				<h1 className='headingPoolsize'>Abitrage Wallet Overview</h1>
+				<span className="tooltipdashboard">
+					<h1 className='headingPoolsize'>Abitrage Wallet Overview
+						<span class="tooltiptext">Pays the transaction fees</span>
+					</h1> 
+				</span>
 
+				{/*  Abitrage Wallet BSC (left)  */}
 				<div className="abitrageWalletBsc">
 					<div className="contentPoolsize">
 						<h1> 
@@ -128,6 +133,7 @@ export default class WalletOverview extends Component {
 					
 				</div>
 
+				{/*  Abitrage Wallet ETH (right) */}
 				<div className="abitrageWalletEth">
 					<div className="contentPoolsize">
 					<h1>
@@ -146,9 +152,12 @@ export default class WalletOverview extends Component {
 				</div>
 
 				{/* Display Information about the abitrage smart contract */}
-
-				<h1 className='headingPoolsize'>Abitrage Contract Liquidity Overview</h1>
-
+				<span className="tooltipdashboard">
+					<h1 className='headingPoolsize'>Abitrage Contract Liquidity Overview
+						<span class="tooltiptext">Liquidity to trade with</span>
+					</h1> 
+				</span>
+			
 				<div className="displayPoolsizeBSC">
 					<div className="contentPoolsize">
 						<h1>
