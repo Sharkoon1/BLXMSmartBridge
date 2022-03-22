@@ -33,7 +33,9 @@ export default class WalletOverview extends Component {
 			NameETHStable: "",
 			NameETHBasic: "",
 			BSCArbitrageContractAddress: "0x0000000000000000000000000000000000000000",
-			ETHArbitrageContractAddress: "0x0000000000000000000000000000000000000000"
+			ETHArbitrageContractAddress: "0x0000000000000000000000000000000000000000",
+			BSCWalletAddress: "0x0000000000000000000000000000000000000000",
+			ETHWalletAddress: "0x0000000000000000000000000000000000000000",
 		}
 	}
 
@@ -42,6 +44,8 @@ export default class WalletOverview extends Component {
 			if (result.status === 1) {
 				this.setState(prevState => {
 					return {
+						BSCWalletAddress: result.data.BSCWalletAddress,
+						ETHWalletAddress: result.data.ETHWalletAddress,
 						AbitrageETH: result.data.ETHBalance,
 						AbitrageBNB: result.data.BSCBalance,
 						BinanceBNB: result.data.BSCStable,
@@ -119,7 +123,7 @@ export default class WalletOverview extends Component {
 					<div className="contentPoolsize">
 						<h1> 
 							<span className="poolsizeSubHeading">Abitrage Wallet BSC </span>
-							<span className="displayPoolAddress">{this.state.BSCArbitrageContractAddress}</span>
+							<span className="displayPoolAddress">{this.state.BSCWalletAddress}</span>
 							<span>
 								<button onClick={this.visitPageBsc} type="button" title="Link to testnet.bscscan.com" className="poolsizeButton"><img className="poolsizeButtonPicture" src="../copy2.png"></img></button>
 							</span>
@@ -138,7 +142,7 @@ export default class WalletOverview extends Component {
 					<div className="contentPoolsize">
 					<h1>
 						<span className="poolsizeSubHeading">Abitrage Wallet ETH </span>
-							<span className="displayPoolAddress">{this.state.ETHArbitrageContractAddress}</span>
+							<span className="displayPoolAddress">{this.state.ETHWalletAddress}</span>
 							<span>
 								<button onClick={this.visitPageEth} type="button" title="Link to testnet.bscscan.com" className="poolsizeButton"><img className="poolsizeButtonPicture" src="../copy2.png"></img></button>
 							</span>
