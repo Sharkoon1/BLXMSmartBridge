@@ -74,16 +74,16 @@ export default class WalletOverview extends Component {
 		}
 	}
 
-	visitPageBsc() {
+	visitPageBsc(adress) {
 		this.getChainId().then((network) => {
 
 			let urlBsc;
 
 			if (network === "Testnet") {
-				urlBsc = 'https://testnet.bscscan.com/address/' + this.state.BSCArbitrageContractAddress;
+				urlBsc = 'https://testnet.bscscan.com/address/' + adress;
 			}
 			else if (network === "Mainnet") {
-				urlBsc = 'https://bscscan.com/address/' + this.state.BSCArbitrageContractAddress;
+				urlBsc = 'https://bscscan.com/address/' + adress;
 			}
 			console.log(urlBsc)
 			window.open(urlBsc, "_blank")
@@ -91,21 +91,23 @@ export default class WalletOverview extends Component {
 	}
 
 
-	visitPageEth() {
+	visitPageEth(adress) {
 		this.getChainId().then((network) => {
 
 			let urlEth;
 
 			if (network === "Testnet") {
-				urlEth = 'https://rinkeby.etherscan.io/address/' + this.state.ETHArbitrageContractAddress;
+				urlEth = 'https://rinkeby.etherscan.io/address/' + adress;
 			}
 			else if (network === "Mainnet") {
-				urlEth = 'https://etherscan.io/address/' + this.state.ETHArbitrageContractAddress;
+				urlEth = 'https://etherscan.io/address/' + adress;
 			}
 
 			window.open(urlEth, "_blank")
 		})
 	}
+
+
 	render() {
 		return (
 				
@@ -125,7 +127,7 @@ export default class WalletOverview extends Component {
 							<span className="poolsizeSubHeading">Abitrage Wallet BSC </span>
 							<span className="displayPoolAddress">{this.state.BSCWalletAddress}</span>
 							<span>
-								<button onClick={this.visitPageBsc} type="button" title="Link to testnet.bscscan.com" className="poolsizeButton"><img className="poolsizeButtonPicture" src="../copy2.png"></img></button>
+								<button onClick={()=>{this.visitPageBsc(this.state.BSCWalletAddress)}} type="button" title="Link to testnet.bscscan.com" className="poolsizeButton"><img className="poolsizeButtonPicture" src="../copy2.png"></img></button>
 							</span>
 						
 						</h1>
@@ -144,7 +146,7 @@ export default class WalletOverview extends Component {
 						<span className="poolsizeSubHeading">Abitrage Wallet ETH </span>
 							<span className="displayPoolAddress">{this.state.ETHWalletAddress}</span>
 							<span>
-								<button onClick={this.visitPageEth} type="button" title="Link to testnet.bscscan.com" className="poolsizeButton"><img className="poolsizeButtonPicture" src="../copy2.png"></img></button>
+								<button onClick={()=>{this.visitPageEth(this.state.ETHWalletAddress)}} type="button" title="Link to testnet.bscscan.com" className="poolsizeButton"><img className="poolsizeButtonPicture" src="../copy2.png"></img></button>
 							</span>
 					</h1>
 						<div>
@@ -168,7 +170,7 @@ export default class WalletOverview extends Component {
 							<span className="poolsizeSubHeading">BSC Arbitrage Contract </span>
 							<span className="displayPoolAddress">{this.state.BSCArbitrageContractAddress}</span>
 							<span>
-								<button onClick={this.visitPageBsc} type="button" title="Link to testnet.bscscan.com" className="poolsizeButton"><img className="poolsizeButtonPicture" src="../copy2.png"></img></button>
+								<button onClick={()=>{this.visitPageBsc(this.state.BSCArbitrageContractAddress)}} type="button" title="Link to testnet.bscscan.com" className="poolsizeButton"><img className="poolsizeButtonPicture" src="../copy2.png"></img></button>
 							</span>
 						</h1>
 						<div>
@@ -186,7 +188,7 @@ export default class WalletOverview extends Component {
 							<span className="poolsizeSubHeading">ETH Arbitrage Contract </span>
 							<span className="displayPoolAddress">{this.state.ETHArbitrageContractAddress}</span>
 							<span>
-								<button onClick={this.visitPageEth} type="button" title="Link to testnet.bscscan.com" className="poolsizeButton"><img className="poolsizeButtonPicture" src="../copy2.png"></img></button>
+								<button onClick={()=>{this.visitPageEth(this.state.ETHArbitrageContractAddress)}} type="button" title="Link to testnet.bscscan.com" className="poolsizeButton"><img className="poolsizeButtonPicture" src="../copy2.png"></img></button>
 							</span>
 						</h1>
 						<div>
