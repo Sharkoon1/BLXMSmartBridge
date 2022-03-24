@@ -158,11 +158,9 @@ export default class WalletOverview extends Component {
 				</div>
 
 				{/* Display Information about the abitrage smart contract */}
-				<span className="tooltipdashboard">
-					<h1 className='headingPoolsize'>Abitrage Contract Liquidity Overview
-						<span class="tooltiptext">Liquidity to trade with</span>
-					</h1> 
-				</span>
+		
+				<h1 className='headingPoolsize'>Abitrage Contract Liquidity Overview</h1> 
+			
 			
 				<div className="displayPoolsizeBSC">
 					<div className="contentPoolsize">
