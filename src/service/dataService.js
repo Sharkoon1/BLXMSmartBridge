@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const PoolPrice = require("../models/PoolPrice");
+const PoolPrice = require("../models/poolPrice");
 const DataBaseService = require("../service/dataBaseService");
 const BigNumber = require("bignumber.js");
 const OracleContract = require("../contracts/oracleContract");

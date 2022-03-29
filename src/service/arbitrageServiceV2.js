@@ -6,7 +6,7 @@ const BigNumber = require("bignumber.js");
 const app = require("../app");
 const ArbitrageContract = require("../contracts/arbitrageContract");
 const OracleContract = require("../contracts/oracleContract");
-const DataService = require("./DataService");
+const DataService = require("./dataService");
 const equationSolver = require("../math/equationSolver");
 
 class ArbitrageService {

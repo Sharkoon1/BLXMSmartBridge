@@ -1,5 +1,5 @@
-const BaseContract = require("./BaseContract");
-const TokenContract = require("./TokenContract");
+const BaseContract = require("./baseContract");
+const TokenContract = require("./tokenContract");
 const __path = require("path");
 const { ethers } = require("ethers");
 const constants = require("../constants");
@@ -7,12 +7,12 @@ const BigNumber = require("bignumber.js");
 
 class ArbitrageContract extends BaseContract {
 	constructor(network) {
-		const abi = require(__path.join(__dirname, "../abi/arbitrage_abi.json"));		
+		const abi = require(__path.join(__dirname, "../abi/arbitrage_abi.json"));
 		let provider;
 		let signer;
-		
 
-		if (process.env.NODE_ENV === "production") {  
+
+		if (process.env.NODE_ENV === "production") {
 			provider = new ethers.providers.StaticJsonRpcProvider(constants["PROVIDER_" + network]);
 			signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 
@@ -30,9 +30,9 @@ class ArbitrageContract extends BaseContract {
 
 	async getStableBalance() {
 		let stableAddress = await this.getStableAddress();
-		let stableContract = new TokenContract(stableAddress, this._signer);	
+		let stableContract = new TokenContract(stableAddress, this._signer);
 
-		let balance = await stableContract.getTokenBalance(this._contractAddress); 
+		let balance = await stableContract.getTokenBalance(this._contractAddress);
 
 		return new BigNumber(ethers.utils.formatEther(balance));
 	}
@@ -40,8 +40,8 @@ class ArbitrageContract extends BaseContract {
 	async getBasicBalance() {
 		let basicAddress = await this.getBasicAddress();
 		let basicContract = new TokenContract(basicAddress, this._signer);
-		
-		let balance =  await basicContract.getTokenBalance(this._contractAddress); 
+
+		let balance =  await basicContract.getTokenBalance(this._contractAddress);
 
 		return new BigNumber(ethers.utils.formatEther(balance));
 	}
@@ -51,7 +51,7 @@ class ArbitrageContract extends BaseContract {
 
 		let basicContract = new TokenContract(basicAddress, this._signer);
 
-		return await basicContract.getName(); 
+		return await basicContract.getName();
 	}
 
 	async getStableName() {
@@ -59,9 +59,9 @@ class ArbitrageContract extends BaseContract {
 
 		let stableContract = new TokenContract(stableAddress, this._signer);
 
-		return await stableContract.getName(); 
+		return await stableContract.getName();
 	}
-	
+
 	async getWalletBalance() {
 		return await this._signer.getBalance();
 	}
@@ -75,15 +75,11 @@ class ArbitrageContract extends BaseContract {
 	}
 
 	async swapBasicToStableGasLimit(amount, minAmountOut) {
-		let gasLimit = await this._contract.estimateGas.swapBasicToStable(amount, minAmountOut);
-
-		return gasLimit;
+		return await this._contract.estimateGas.swapBasicToStable(amount, minAmountOut);
 	}
-	
-	async swapStableToBasicGasLimit(amount, minAmountOut) {
-		let gasLimit = await this._contract.estimateGas.swapStableToBasic(amount, minAmountOut);
 
-		return gasLimit;
+	async swapStableToBasicGasLimit(amount, minAmountOut) {
+		return await this._contract.estimateGas.swapStableToBasic(amount, minAmountOut);
 	}
 
 	async swapBasicToStable(amount, minAmountOut, gasLimit, gasPrice) {

@@ -1,4 +1,4 @@
-const BaseContract = require("./BaseContract");
+const BaseContract = require("./baseContract");
 const __path = require("path");
 
 class TokenContract extends BaseContract {
@@ -16,8 +16,8 @@ class TokenContract extends BaseContract {
 	async transferTokens(address, amount) {
 		let tx = await this._contract.transfer(address, amount);
 		await tx.wait();
-		
-		return tx; 
+
+		return tx;
 	}
 
 	async getName(){

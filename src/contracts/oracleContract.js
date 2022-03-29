@@ -7,7 +7,7 @@ const { ethers } = require("ethers");
 const BigNumber = require("bignumber.js");
 const logger = require("../logger/logger");
 const ArbitrageService = require("../service/arbitrageServiceV2");
-const TokenContract = require("./TokenContract");
+const TokenContract = require("./tokenContract");
 
 class OracleContract {
 	constructor(network, basicTokenAddress, stableTokenAddress) {
