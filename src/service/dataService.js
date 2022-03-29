@@ -52,7 +52,7 @@ class DataService {
 		};
 	}
 
-	async getWalletBalance(network) {
+	async getWalletBalance(network) { 
 		let arbitrageContract = new ArbitrageContract(network);
 		let walletBalance = await arbitrageContract.getWalletBalance();
 		return ethers.utils.formatEther(walletBalance);
@@ -71,6 +71,13 @@ class DataService {
 		let stableTokenName = await arbitrageContract.getStableName();
 		let basicTokenName = await arbitrageContract.getBasicName();
 		return { stableTokenName: stableTokenName, basicTokenName: basicTokenName };
+	}
+
+	async getWalletAddress(network) {
+		let arbitrageContract = new ArbitrageContract(network);
+		let walletAddress = await arbitrageContract.getSignerAddress();
+
+		return walletAddress;
 	}
 
 	async getTokenNamesLiquidity(network) {
