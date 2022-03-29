@@ -4,8 +4,8 @@ const logger = require("../logger/logger");
 const constants = require("../constants");
 const BigNumber = require("bignumber.js");
 const app = require("../app");
-const ArbitrageContract = require("../contracts/ArbitrageContract");
-const OracleContract = require("../contracts/OracleContract");
+const ArbitrageContract = require("../contracts/arbitrageContract");
+const OracleContract = require("../contracts/oracleContract");
 const DataService = require("./DataService");
 const equationSolver = require("../math/equationSolver");
 
