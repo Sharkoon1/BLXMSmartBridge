@@ -1,5 +1,5 @@
 let express = require("express");
-const ArbitrageController = require("../controllers/ArbitrageController");
+const ArbitrageController = require("../controllers/arbitrageController");
 const authentication = require("../middleware/authentication");
 let router = express.Router();
 

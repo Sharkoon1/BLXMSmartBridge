@@ -1,10 +1,14 @@
 const apiResponse = require("../helpers/apiResponse");
-const ArbitrageService = require("../service/ArbitrageServicev2");
-const SingleStepArbitrageService = require("../service/SingleStepArbitrageService");
+const ArbitrageService = require("../service/arbitrageServiceV2");
+const {
+	resetSingleStepArbitrage,
+	startSingleStepArbitrage,
+	stepStatus
+} = require("../service/singleStepArbitrageService");
 
 /**
  * Start single arbitrage.
- *  
+ *
  * @returns {Object}
  */
 exports.startSingleArbitrage = [
@@ -12,7 +16,7 @@ exports.startSingleArbitrage = [
         try {
 			res.sendStatus(200);
 		} catch (err) {
-			//throw error in json response with status 500. 
+			//throw error in json response with status 500.
 			return apiResponse.ErrorResponse(res, err);
 		}
 	}
@@ -21,7 +25,7 @@ exports.startSingleArbitrage = [
 
 /**
  * Toggle arbitrage cycle.
- *  
+ *
  * @returns {Object}
  */
  exports.toggleArbitrage = [
@@ -33,13 +37,13 @@ exports.startSingleArbitrage = [
 				return apiResponse.successResponseWithData(res, "stopping the cycle", { "ArbitrageCycleStatus": ArbitrageService.isRunning });
 			}
 
-			else { 
+			else {
 				ArbitrageService.startArbitrage();
 
 				return apiResponse.successResponseWithData(res, "started the arbitrage service", { "ArbitrageCycleStatus": ArbitrageService.isRunning });
 			}
 		} catch (err) {
-			//throw error in json response with status 500. 
+			//throw error in json response with status 500.
 			return apiResponse.ErrorResponse(res, err);
 		}
 	}
@@ -47,7 +51,7 @@ exports.startSingleArbitrage = [
 
 /**
  * Gets the current Arbitrage status.
- *  
+ *
  * @returns {Object}
  */
  exports.currentArbitrageStatus = [
@@ -55,7 +59,7 @@ exports.startSingleArbitrage = [
         try {
 			return apiResponse.successResponseWithData(res, "success", { "ArbitrageCycleStatus": ArbitrageService.isRunning });
 		} catch (err) {
-			//throw error in json response with status 500. 
+			//throw error in json response with status 500.
 			return apiResponse.ErrorResponse(res, err);
 		}
 	}
@@ -63,8 +67,8 @@ exports.startSingleArbitrage = [
 
 /**
  * Single step arbitrage mode.
- *  
- * @returns {Object} 
+ *
+ * @returns {Object}
  */
  exports.singleStep = [
 	function (req, res) {
@@ -72,16 +76,16 @@ exports.startSingleArbitrage = [
 			let stepStatus = req.body.stepStatus;
 
             if(stepStatus) {
-                SingleStepArbitrageService.startSingleStepArbitrage(stepStatus).then( () => {
-					return apiResponse.successResponseWithData(res, "Arbitrage step status: " + stepStatus + " has been successful.", {stepStatus: SingleStepArbitrageService.stepStatus});
+                startSingleStepArbitrage(stepStatus).then( () => {
+					return apiResponse.successResponseWithData(res, "Arbitrage step status: " + stepStatus + " has been successful.", {stepStatus: stepStatus});
 				});
             }
             else {
                 return apiResponse.validationError(res, "Arbitrage step status was missing.", {stepStatus: stepStatus});
             }
-			
+
 		} catch (err) {
-			//throw error in json response with status 500. 
+			//throw error in json response with status 500.
 			return apiResponse.ErrorResponse(res, err);
 		}
 	}
@@ -89,18 +93,17 @@ exports.startSingleArbitrage = [
 
 /**
  * Sets the single step status.
- *  
+ *
  * @returns {Object}
  */
  exports.stopStep = [
 	function (req, res) {
-        try {	
-				SingleStepArbitrageService.resetSingleStepArbitrage().then(() => {
-					return apiResponse.successResponse(res, "Arbitrage step status has been stopped.");
-				});
-	
+        try {
+			resetSingleStepArbitrage().then(() => {
+				return apiResponse.successResponse(res, "Arbitrage step status has been stopped.");
+			});
 		} catch (err) {
-			//throw error in json response with status 500. 
+			//throw error in json response with status 500.
 			return apiResponse.ErrorResponse(res, err);
 		}
 	}
@@ -108,15 +111,15 @@ exports.startSingleArbitrage = [
 
 /**
  * Gets the arbitrage single step status.
- *  
+ *
  * @returns {Object}
  */
  exports.getStepStatus = [
 	function (req, res) {
         try {
-			return apiResponse.successResponseWithData(res, "success", { stepStatus: SingleStepArbitrageService.stepStatus });
+			return apiResponse.successResponseWithData(res, "success", { stepStatus: stepStatus });
 		} catch (err) {
-			//throw error in json response with status 500. 
+			//throw error in json response with status 500.
 			return apiResponse.ErrorResponse(res, err);
 		}
 	}

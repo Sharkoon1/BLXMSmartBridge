@@ -1,9 +1,9 @@
-var express = require("express");
-const MonitoringController = require("../controllers/MonitoringController");
+const express = require("express");
+const MonitoringController = require("../controllers/monitoringController");
 const authentication = require("../middleware/authentication");
 
-var router = express.Router();
+const router = express.Router();
 
 router.get("/", authentication.authenticateToken, MonitoringController.profitDetail);
 
-module.exports = router;    
+module.exports = router;

@@ -1,7 +1,6 @@
 FROM node:16.13.2
-WORKDIR /src
-COPY package.json .
-RUN npm install
+WORKDIR /app
 COPY . .
+RUN npm install
 EXPOSE 8080
-CMD ["node", "app.js"]
+CMD ["npm", "run", "start"]
