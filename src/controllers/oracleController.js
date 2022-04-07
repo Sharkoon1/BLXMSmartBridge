@@ -24,6 +24,10 @@ exports.price = [
 exports.liquidity = [
 	async function (req, res) {
 		try {
+
+			let ethWalletAddress = await dataService.getWalletAddress("ETH");
+			let bscWalletAddress = await dataService.getWalletAddress("BSC");
+
 			let BSCBalance = await dataService.getTokenBalance("BSC");
 			let BSCStableBalance = BSCBalance[0];
 			let BSCBasicBalance = BSCBalance[1];
@@ -38,9 +42,11 @@ exports.liquidity = [
 			let ETHBasicName = ETHTokenNames.basicTokenName;
 			let BSCWalletBalance = await dataService.getWalletBalance("BSC");
 			let ETHWalletBalance = await dataService.getWalletBalance("ETH");
-			let BSCArbitrageContractAddress = constants.ARBITRAGE_CONTRACT_ADDRESS_BSC_TESTNET;
-			let ETHArbitrageContractAddress = constants.ARBITRAGE_CONTRACT_ADDRESS_ETH_TESTNET;
+			let BSCArbitrageContractAddress = await dataService.getArbitrageContractAddress("BSC");
+			let ETHArbitrageContractAddress = await dataService.getArbitrageContractAddress("ETH");
 			return await apiResponse.successResponseWithData(res, "Operation success", {
+				ETHWalletAddress: ethWalletAddress,
+				BSCWalletAddress: bscWalletAddress,
 				BSCStable: BSCStableBalance,
 				BSCBasic: BSCBasicBalance,
 				ETHStable: ETHStableBalance,

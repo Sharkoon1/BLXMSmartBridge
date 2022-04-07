@@ -1,11 +1,28 @@
-BLXM Smart Bridge
+Running the BLXM Smartbridge
 ===========================================
 
 
-Installing and Importing
+
+### 1. Create .env file at /src
+---------------------------
+An .env file is needed otherwise the application won’t start. The .env file is placed in /src (in the backend). The logic and structure of the .env file is described in the following:
+
+```
+PRIVATE_KEY_BSC=<PrivateKeyForBSCAdress>
+PRIVATE_KEY_ETH=<PrivateKeyForETHAdress>
+PRIVATE_KEY_BRIDGE=<BridgePrivateKey>
+MONGODB_URL=<DatabaseURL>
+TOKEN_SECRET=<JWTTokenSecret>
+JSON_RPC_API_KEY=<JSONRPCKeyMainnet>
+JSON_RPC_API_KEY_TESTNET=<JSONRPCKeyTestnet>
+#NODE_ENV=production
+```
+When NODE_ENV=production is set the Smartbridge operates in BSC/ETH mainnet. 
+
+### 2. Installing and Importing
 ------------------------
 
-### Installing npm dependencies
+Install npm dependencies:
 
 ```bash
 cd src
@@ -15,7 +32,8 @@ cd frontend
 npm install
 ```
 
-### Running the api and frontend locally
+### 3. Start the api and frontend locally
+---------------------------
 
 Two different processes
 

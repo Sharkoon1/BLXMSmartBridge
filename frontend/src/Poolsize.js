@@ -92,7 +92,9 @@ export default class Poolsize extends Component {
 	render() {
 		return (
 			<div className="displayPoolsizes">
-				<h1 className='headingPoolsize'>Liquidity Pool Overview</h1>
+			
+				<h1 className='headingPoolsize'>Liquidity Pool Overview</h1> 
+			
 				<div className="displayPoolsizeBSC">
 					<div className="contentPoolsize">
 					<h1 className="textPoolsize">

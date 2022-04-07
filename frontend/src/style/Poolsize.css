@@ -30,7 +30,7 @@
     font-weight: 600;
 }
 
-.displayPoolsizeBSC, .displayPoolsizeETH, .abitrageWallet{
+.displayPoolsizeBSC, .displayPoolsizeETH, .abitrageWalletBsc, .abitrageWalletEth{
     color: black !important;
     background: rgb(255, 255, 255);
     box-shadow: rgb(0 0 0 / 1%) 0px 0px 1px, rgb(0 0 0 / 4%) 0px 4px 8px, rgb(0 0 0 / 4%) 0px 16px 24px, rgb(0 0 0 / 1%) 0px 24px 32px;
@@ -42,17 +42,6 @@
     padding-top: 8px;
     padding-bottom: 8px;
 
-}
-.displayPoolsizeBSC, .displayPoolsizeETH{
-    display: inline-block;
-}
-
-.displayPoolsizeBSC{
-    margin-right: 1%;
-}
-
-.displayPoolsizeETH{
-    margin-left: 1%;
 }
 
 .poolsizeSubHeading{
@@ -71,3 +60,54 @@
     font-style: italic;
 }
 
+@media only screen and (min-width: 1700px) {
+    .displayPoolsizeBSC, .displayPoolsizeETH, .abitrageWalletBsc, .abitrageWalletEth{
+        display: inline-block;
+    }
+
+    .displayPoolsizeBSC, .abitrageWalletBsc{
+    margin-right: 1%;
+    }
+
+    .displayPoolsizeETH, .abitrageWalletEth{
+    margin-left: 1%;
+    }   
+}
+
+
+/* Tolltips to the dashboard */
+.tooltipdashboard {
+    position: relative;
+ 
+  }
+  
+  .tooltipdashboard .tooltiptext {
+
+    visibility: hidden;
+    width: 300px;
+    background-color: #203a4b;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    top: -5px;
+ 
+    
+  }
+  
+  .tooltipdashboard:hover .tooltiptext {
+    visibility: visible;
+  }
+
+  .tooltipdashboard .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent #203a4b transparent transparent;
+  }

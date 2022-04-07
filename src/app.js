@@ -11,6 +11,19 @@ var cors = require("cors");
 var EventEmitter = require("events").EventEmitter;
 var app = express();
 
+const {validateMainNetProvider,  validateTestNetProvider} = require("./helpers/providerValidator");
+
+// Testnet
+if(process.env.NODE_ENV !== "production" ) {
+	validateMainNetProvider();
+	validateTestNetProvider();
+}
+
+// Mainnet
+else {
+	validateMainNetProvider();
+}
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());

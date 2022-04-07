@@ -13,8 +13,11 @@ class Dashboad extends Component {
     render() {
         return (
             <Fragment>
+                {/* Displays Abitrage Wallet Overview and Abitrage Contract Liquidity Overview */}
                 <WalletOverview />
+                {/* Displays Liquidity Pool Overwiew */}
                 <Poolsize />
+                {/* Displays Price Overview */}
                 <DashboardGraph />
             </Fragment>
         );

@@ -50,7 +50,8 @@ class SingleStepArbitrageService{
                         logger.info("Price difference found");
                         logger.info(`ETH network: Current price = ${ArbitrageService.poolPriceEth} USD/BLXM`);
                         logger.info(`BSC network: Current price = ${ArbitrageService.poolPriceBsc} USD/BLXM`);
-                        
+                        ArbitrageService.getPriceDifference();
+
                         logger.info("Next step: calculating aribtrage...");
                     }
 
