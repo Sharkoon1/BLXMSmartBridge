@@ -15,7 +15,7 @@ export default function App() {
 		provider.getNetwork().then((networkID) => {
 			if (networkID.chainId === 4 || networkID.chainId === 97){
 				setChainID("Testnet");
-			} else if (networkID.chainId === 1 || networkID.chainId === 96) {
+			} else if (networkID.chainId === 1 || networkID.chainId === 56) {
 				setChainID("Mainnet");
 			}
 		})
