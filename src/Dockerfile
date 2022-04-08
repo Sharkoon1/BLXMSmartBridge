@@ -1,5 +1,4 @@
-FROM node:16.13.2
-RUN apt-get update || : && apt-get install python -y
+FROM nikolaik/python-nodejs:latest
 WORKDIR /app
 COPY . .
 RUN npm install
