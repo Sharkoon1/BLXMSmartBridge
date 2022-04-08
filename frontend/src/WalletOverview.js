@@ -69,7 +69,7 @@ export default class WalletOverview extends Component {
 		const networkId = await provider.getNetwork()
 		if (networkId.chainId === 4 || networkId.chainId === 97) {
 			return "Testnet";
-		} else if (networkId.chainId === 1 || networkId.chainId === 96) {
+		} else if (networkId.chainId === 1 || networkId.chainId === 56) {
 			return "Mainnet";
 		}
 	}

@@ -94,6 +94,10 @@ class ArbitrageContract extends BaseContract {
 		return await this._contract.swapStableToBasic(amount, minAmountOut, {gasPrice: gasPrice, gasLimit: gasLimit});
 	}
 
+	async getArbitrageContractAddress(){
+		return await this._contract.address;
+	}
+
 }
 
 module.exports = ArbitrageContract;

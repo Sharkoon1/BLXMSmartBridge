@@ -217,6 +217,8 @@ class ArbitrageService {
 
 		this.adjustmentValueStableUsd = await this.getAdjustmentValueUsdWithFees(basicCheap, stableBsc, basicExpensive, stableEth, this.uniswapFees, this.pancakeswapFees);
 
+		console.log(this.adjustmentValueStableUsd.toString())
+
 		this.adjustmentValueStable = await this.convertUsdToStableBsc(this.adjustmentValueStableUsd);
 		this.adjustmentValueBasic = this.amountOut(this.pancakeswapFees, this.adjustmentValueStable, stableCheap, basicCheap);
 
@@ -227,10 +229,11 @@ class ArbitrageService {
 
 		logger.info(`Adjustment Value stable: ${this.adjustmentValueStable} ${this.pancakeswapTokenNames.stableTokenName}`);
 		logger.info(`Adjustment Value basic: ${this.adjustmentValueBasic} ${this.uniswapTokenNames.basicTokenName}`);
+		
+		this.setMaxSwapAmount(this.pancakeswapFees, stableCheap, basicCheap, this.pancakeswapTokenNames.stableTokenName, this.uniswapTokenNames.basicTokenName); //sets adjustmentValueStable & adjustmentValueBasic to the max amount set in the frontend under certain conditions
+		
 		logger.info(`BSC network: Buying ${this.adjustmentValueBasic} ${this.pancakeswapTokenNames.basicTokenName} with ${this.convertStableToUsdBsc(this.adjustmentValueStable)} USD`);
 		logger.info(`ETH network: Selling ${this.adjustmentValueBasic} ${this.uniswapTokenNames.basicTokenName} for ${this.convertStableToUsdEth(this.amountOut(this.uniswapFees, this.adjustmentValueBasic, basicExpensive, stableExpensive))} USD (without slippage)`);
-
-		this.setMaxSwapAmount(this.pancakeswapFees, stableCheap, basicCheap, this.pancakeswapTokenNames.stableTokenName, this.uniswapTokenNames.basicTokenName); //sets adjustmentValueStable & adjustmentValueBasic to the max amount set in the frontend under certain conditions
 
 		if (this.adjustmentValueStable.gt(this.bscArbitrageBalance.stable)) { // validate if arbitrage contract has enough stable tokens for swap
 			logger.warn("BSC: Arbitrage contract stable balance is less than adjustment value.");
@@ -318,11 +321,13 @@ class ArbitrageService {
 
 		logger.info(`Adjustment Value stable: ${this.adjustmentValueStable} ${this.uniswapTokenNames.stableTokenName}`);
 		logger.info(`Adjustment Value basic: ${this.adjustmentValueBasic}  ${this.pancakeswapTokenNames.basicTokenName}`);
+		
+		this.setMaxSwapAmount(this.uniswapFees, stableCheap, basicCheap, this.uniswapTokenNames.stableTokenName, this.pancakeswapTokenNames.basicTokenName); //sets adjustmentValueStable & adjustmentValueBasic to the max amount set in the frontend under certain conditions
+		
 		logger.info(`ETH network: Buying ${this.adjustmentValueBasic} ${this.uniswapTokenNames.basicTokenName} with ${this.convertStableToUsdEth(this.adjustmentValueStable)} USD`);
 		logger.info(`BSC network: Selling ${this.adjustmentValueBasic} ${this.pancakeswapTokenNames.basicTokenName} for ${this.convertStableToUsdBsc(this.amountOut(this.pancakeswapFees, this.adjustmentValueBasic, basicExpensive, stableExpensive))} USD (without slippage)`);
 
-		this.setMaxSwapAmount(this.uniswapFees, stableCheap, basicCheap, this.uniswapTokenNames.stableTokenName, this.pancakeswapTokenNames.basicTokenName); //sets adjustmentValueStable & adjustmentValueBasic to the max amount set in the frontend under certain conditions
-
+		
 		if (this.adjustmentValueStable.gt(this.ethArbitrageBalance.stable)) { // validate if arbitrage contract has enough stable tokens for swap
 			logger.warn("ETH: Arbitrage contract stable balance is less than the adjustment value.");
 			logger.warn(`Stable token balance: ${this.ethArbitrageBalance.stable}`);
@@ -424,7 +429,7 @@ class ArbitrageService {
 
 		// convert stable to usd in case stable token is not usd
 		let stableUsdOut = this.convertStableToUsdEth(this.fromEthersToBigNumber(this.stableAmountOut));
-		let swapProfit = stableUsdOut.minus(this.adjustmentValueStableUsd).minus(transactionFees);
+		let swapProfit = stableUsdOut.minus(this.convertStableToUsdBsc(this.adjustmentValueStable)).minus(transactionFees);
 
 		logger.info(`BSC network: Gas price ${this.convertGweiToEther(this.gasPriceBsc)}`);
 		logger.info(`ETH network: Gas price ${this.convertGweiToEther(this.gasPriceEth)}`);
@@ -483,7 +488,7 @@ class ArbitrageService {
 
 		// convert stable to usd in case stable token is not usd
 		let stableUsdOut = this.convertStableToUsdBsc(this.fromEthersToBigNumber(this.stableAmountOut));
-		let swapProfit = stableUsdOut.minus(this.adjustmentValueStableUsd).minus(transactionFees);
+		let swapProfit = stableUsdOut.minus(this.convertStableToUsdEth(this.adjustmentValueStable)).minus(transactionFees);
 
 		logger.info(`ETH network: Gas price ${this.convertGweiToEther(this.gasPriceEth)}`);
 		logger.info(`BSC network: Gas price ${this.convertGweiToEther(this.gasPriceBsc)}`);
