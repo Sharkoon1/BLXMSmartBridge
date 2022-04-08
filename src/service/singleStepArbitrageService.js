@@ -52,7 +52,7 @@ class SingleStepArbitrageService{
                         logger.info(`BSC network: Current price = ${ArbitrageService.poolPriceBsc} USD/BLXM`);
                         ArbitrageService.getPriceDifference();
 
-                        logger.info("Next step: calculating aribtrage...");
+                        logger.info("Next step: calculating arbitrage...");
                     }
 
                     break;
