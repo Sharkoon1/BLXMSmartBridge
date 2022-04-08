@@ -548,8 +548,8 @@ class ArbitrageService {
 	convertUsdToStableBsc(stableUsd) {
 		// Convert stable reserves to usd prices for adjustment value
 		// leave it as usd, if it's already usd
-		if (this._oracleContractEth.stableTokenAddress.toLowerCase() !== constants["HUSD_ETH_TESTNET"].toLowerCase()
-			&& this._oracleContractEth.stableTokenAddress.toLowerCase() !== constants["USD_TOKEN_ADDRESS_ETH"].toLowerCase()) {
+		if (this._oracleContractBsc.stableTokenAddress.toLowerCase() !== constants["HUSD_BSC_TESTNET"].toLowerCase()
+			&& this._oracleContractBsc.stableTokenAddress.toLowerCase() !== constants["USD_TOKEN_ADDRESS_BSC"].toLowerCase()) {
 			stableUsd = stableUsd.dividedBy(this.usdExchangeRateBsc);
 		}
 
