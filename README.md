@@ -10,7 +10,6 @@ An .env file is needed otherwise the application won’t start. The .env file is
 ```
 PRIVATE_KEY_BSC=<PrivateKeyForBSCAdress>
 PRIVATE_KEY_ETH=<PrivateKeyForETHAdress>
-PRIVATE_KEY_BRIDGE=<BridgePrivateKey>
 MONGODB_URL=<DatabaseURL>
 TOKEN_SECRET=<JWTTokenSecret>
 JSON_RPC_API_KEY=<JSONRPCKeyMainnet>
