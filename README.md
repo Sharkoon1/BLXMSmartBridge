@@ -15,7 +15,7 @@ MONGODB_URL=<DatabaseURL>
 TOKEN_SECRET=<JWTTokenSecret>
 JSON_RPC_API_KEY=<JSONRPCKeyMainnet>
 JSON_RPC_API_KEY_TESTNET=<JSONRPCKeyTestnet>
-#NODE_ENV=production
+NODE_ENV=production
 ```
 When NODE_ENV=production is set the Smartbridge operates in BSC/ETH mainnet. 
 
