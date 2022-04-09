@@ -6,8 +6,8 @@ const constants = require("../constants");
 const { ethers } = require("ethers");
 const BigNumber = require("bignumber.js");
 const logger = require("../logger/logger");
-const ArbitrageService = require("../service/ArbitrageServicev2");
-const TokenContract = require("./TokenContract");
+const ArbitrageService = require("../service/arbitrageServiceV2");
+const TokenContract = require("./tokenContract");
 
 class OracleContract {
 	constructor(network, basicTokenAddress, stableTokenAddress) {
@@ -23,7 +23,7 @@ class OracleContract {
 			this.router = new ethers.Contract(constants["ROUTER_" + network + "_TESTNET"], routerAbi, this.signer);
 			this.arbitrageContract = new ethers.Contract(constants["ARBITRAGE_CONTRACT_ADDRESS_" + network + "_TESTNET"], arbitrageAbi, this.signer);
 		}
-		
+
 		this._wrappedTokenAddress = constants["WRAPPED_TOKEN_ADDRESS_" + network];
 		this._usdTokenAddress = constants["USD_TOKEN_ADDRESS_" + network];
 		this._usdTokenDecimals = 18;
@@ -31,7 +31,7 @@ class OracleContract {
 		this.network = network;
 		this.basicTokenAddress = basicTokenAddress;
 		this.stableTokenAddress = stableTokenAddress;
-		
+
 		this.factory = null;
 		this.liquidityPool = null;
 		this.liquidityPoolWrapped = null;
@@ -44,8 +44,7 @@ class OracleContract {
 		this.factory = new ethers.Contract(factoryAddress, factoryAbi, this.signer);
 		this.liquidityPoolAddress = await this.factory.getPair(this.basicTokenAddress, this.stableTokenAddress);
 		if(this.liquidityPoolAddress === ethers.constants.AddressZero) {
-			logger.error(this.network +  ": liquidity pool does not exist. For basic token address:" + this.basicTokenAddress 
-									   + "and stable token address: " +  this.stableTokenAddress);
+			logger.error(`${this.network}: liquidity pool does not exist. For basic token address:${this.basicTokenAddress}and stable token address: ${this.stableTokenAddress}`);
 		}
 		this.liquidityPool = new ethers.Contract(this.liquidityPoolAddress, liquidityPoolAbi, this.signer);
 
@@ -57,8 +56,7 @@ class OracleContract {
 			this.factory.getPair(newBasicAddress, this.stableTokenAddress).then((poolAddress) => {
 				this.liquidityPoolAddress = poolAddress;
 				if(this.liquidityPoolAddress === ethers.constants.AddressZero) {
-					logger.error(this.network +  ": liquidity pool does not exist. For basic token address:" + newBasicAddress 
-											   + "and stable token address: " +  this.stableTokenAddress);
+					logger.error(`${this.network}: liquidity pool does not exist. For basic token address:${newBasicAddress}and stable token address: ${this.stableTokenAddress}`);
 				}
 				this.liquidityPool = new ethers.Contract(this.liquidityPoolAddress, liquidityPoolAbi, this.signer);
 
@@ -72,8 +70,7 @@ class OracleContract {
 			this.factory.getPair(this.basicTokenAddress, newStableAddress).then((poolAddress) => {
 				this.liquidityPoolAddress = poolAddress;
 				if(this.liquidityPoolAddress === ethers.constants.AddressZero) {
-					logger.error(this.network +  ": liquidity pool does not exist. For basic token address:" + this.basicTokenAddress 
-											   + "and stable token address: " +  newStableAddress);
+					logger.error(`${this.network}: liquidity pool does not exist. For basic token address:${this.basicTokenAddress}and stable token address: ${newStableAddress}`);
 				}
 				this.liquidityPool = new ethers.Contract(this.liquidityPoolAddress, liquidityPoolAbi, this.signer);
 
@@ -89,7 +86,7 @@ class OracleContract {
 		try {
 			// Workaround since wrapped bnb pools in testnet are not dynamic and prices are not accurate.
 			// So we also have to use production pools to get the price in the testnet
-			if (process.env.NODE_ENV !== "production") { 	
+			if (process.env.NODE_ENV !== "production") {
 				let signer = this.getSigner();
 
 				let router = new ethers.Contract(constants["ROUTER_" + this.network], routerAbi, signer);
@@ -112,7 +109,7 @@ class OracleContract {
 		try {
 			// Workaround since wrapped bnb pools in testnet are not dynamic and prices are not accurate.
 			// So we also have to use production pools to get the price in the testnet
-			if (process.env.NODE_ENV !== "production") { 	
+			if (process.env.NODE_ENV !== "production") {
 				let signer = this.getSigner();
 				let router = new ethers.Contract(constants["ROUTER_" + this.network], routerAbi, signer);
 
@@ -140,7 +137,7 @@ class OracleContract {
 
 		let stableToken = poolReserves[0];
 		let basicToken = poolReserves[1];
-	
+
 		if(this.stableTokenAddress.toLowerCase() !== constants["HUSD_" + this.network + "_TESTNET"].toLowerCase()
 		&& this.stableTokenAddress.toLowerCase() !== constants["USD_TOKEN_ADDRESS_" + this.network].toLowerCase()) {
 			let stableUsdPrice = await this.getStableUsdPrice();
@@ -190,7 +187,7 @@ class OracleContract {
 	}
 
 	getSigner() {
-		if (process.env.NODE_ENV !== "production") { 	
+		if (process.env.NODE_ENV !== "production") {
 			let provider = new ethers.providers.StaticJsonRpcProvider(constants["PROVIDER_" + this.network]);
 			let signer = new ethers.Wallet(process.env["PRIVATE_KEY_" + this.network], provider);
 

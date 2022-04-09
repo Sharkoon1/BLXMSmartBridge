@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
-const PoolPrice = require("../models/PoolPrice");
-const DataBaseService = require("../service/DataBaseService");
+const PoolPrice = require("../models/poolPrice");
+const DataBaseService = require("../service/dataBaseService");
 const BigNumber = require("bignumber.js");
-const OracleContract = require("../contracts/OracleContract");
-const ArbitrageContract = require("../contracts/ArbitrageContract");
+const OracleContract = require("../contracts/oracleContract");
+const ArbitrageContract = require("../contracts/arbitrageContract");
 const TokenContract = require("../contracts/tokenContract");
 const ethers = require("ethers");
 
@@ -181,8 +181,7 @@ class DataService {
 			priceQuery.forEach(element => {
 				priceHistory.push(new BigNumber(element.PoolPrice));
 			});
-			let standardDeviation = priceHistory.length > 0 ? this.CalculateStandardDeviation(priceHistory) : 0;
-			return standardDeviation;
+			return priceHistory.length > 0 ? this.CalculateStandardDeviation(priceHistory) : 0;
 		} catch (err) {
 			console.log(err);
 			throw err;

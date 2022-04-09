@@ -1,10 +1,10 @@
 const apiResponse = require("../helpers/apiResponse");
-const User = require("../models/User");
+const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 
 /**
  * Authorize user wallets.
- * 
+ *
  * @returns {Object}
  */
 exports.login = [
@@ -18,24 +18,25 @@ exports.login = [
 			}
 
 			const userData = await User.findOne({ account });
-			
+
 			if (userData) {
 				// Create token
-				const token = jwt.sign(
-				  { user_id: userData._id, account: userData.account },
-				  	process.env.TOKEN_SECRET,
-				  {
-					expiresIn: "2h",
-				  }
+				let token;
+				token = jwt.sign(
+					{user_id: userData._id, account: userData.account},
+					process.env.TOKEN_SECRET,
+					{
+						expiresIn: "2h",
+					}
 				);
-		  
+
 				return apiResponse.successResponseWithData(res, "Login succesful.", {token: token});
 			}
 
 			return apiResponse.unauthorizedResponse(res, "Invalid credentials.");
 
 		} catch (err) {
-			//throw error in json response with status 500. 
+			//throw error in json response with status 500.
 			return apiResponse.ErrorResponse(res, err);
 		}
 	}
@@ -44,7 +45,7 @@ exports.login = [
 
 /**
  * Authorize user wallets.
- * 
+ *
  * @returns {Object}
  */
  /* exports.register = [
@@ -70,14 +71,14 @@ exports.login = [
 			);
 
 			DataBaseService.AddData({
-				account: account, 
+				account: account,
 				password: encryptedPassword,
 				isRegistered: true
 			}, User);
 
             return apiResponse.successResponse(res, "Registered succesfully");
 		} catch (err) {
-			//throw error in json response with status 500. 
+			//throw error in json response with status 500.
 			return apiResponse.ErrorResponse(res, err);
 		}
 	}
@@ -85,13 +86,13 @@ exports.login = [
 
 /**
  * Authorize user wallets.
- * 
+ *
  * @returns {Object}
  */
 /*  exports.isRegistered = [
 	async function (req, res) {
 		try {
-			const { account } = req.query.account;  
+			const { account } = req.query.account;
 
 			const userData = await User.findOne({ account });
 
@@ -101,7 +102,7 @@ exports.login = [
 
             return apiResponse.successResponseWithData(res, "Registered succesfully", {isRegistered: userData.isRegistered});
 		} catch (err) {
-			//throw error in json response with status 500. 
+			//throw error in json response with status 500.
 			return apiResponse.ErrorResponse(res, err);
 		}
 	}
