@@ -92,6 +92,27 @@ Serving!
                                                   
 ```
 
+### 6. Backend Production Build 
+---------------------------
+Run the following commands at /src to create a docker image:
+
+```
+docker build -t production .
+```
+
+To run the docker image as a container the exposed 
+
+```
+docker run -p 8080:8080 production
+... 
+
+App is running ...
+
+Press CTRL + C to stop the process.                                               
+```
+
+To map the containers port to a host port use the -p command, so the container is accessible from outside the container. (https://docs.docker.com/engine/reference/commandline/run/) 
+
 License
 -------
 
