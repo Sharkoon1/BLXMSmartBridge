@@ -3,6 +3,8 @@ import { ethers } from "ethers";
 import "./style/Navbar.css";
 import ReactDOM from "react-dom"
 import Dashboard from "./Dashboard";
+import UrlHandler from "./UrlHandler";
+import { get } from "./RequestHandler";
 
 export default function App() {
 
@@ -11,14 +13,16 @@ export default function App() {
 
 
 	useEffect(() => {
-		const provider = new ethers.providers.Web3Provider(window.ethereum);
-		provider.getNetwork().then((networkID) => {
-			if (networkID.chainId === 4 || networkID.chainId === 97){
-				setChainID("Testnet");
-			} else if (networkID.chainId === 1 || networkID.chainId === 56) {
+		var url = UrlHandler();
+
+		get(url + "api/environment/").then(result => {
+			if (result.data.isMainnet) {
 				setChainID("Mainnet");
 			}
-		})
+			else {
+				setChainID("Testnet");
+			}
+		});
 	});
 
 	//Display Single step 
