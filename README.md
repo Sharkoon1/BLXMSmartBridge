@@ -100,7 +100,7 @@ Run the following commands at /src to create a docker image:
 docker build -t production .
 ```
 
-To run the docker image as a container the exposed 
+To run the docker image as a container: 
 
 ```
 docker run -p 8080:8080 production
