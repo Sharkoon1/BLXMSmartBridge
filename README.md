@@ -59,6 +59,39 @@ You can now view frontend in the browser.
   On Your Network:  http://172.24.192.1:3000 
 ```
 
+### 4. Create .env file for production mode at /frontend
+---------------------------
+An .env file is needed in the frontend to set the production api url, otherwise it will be set to http://localhost:8080/ by default for development mode:
+
+```
+REACT_APP_API_URL=http://<API_URL>/
+```
+
+### 5. Frontend Production Build 
+---------------------------
+Run the following commands at /frontend:
+
+```
+npm run build
+```
+
+To Serve the production build run at /frontend: 
+
+```
+serve -s build
+
+... 
+
+Serving!           
+
+   │                                                   │
+   │   - Local:            http://localhost:3000       │
+   │   - On Your Network:  http://192.168.2.100:3000   │
+   │                                                   │
+   │   Copied local address to clipboard!              │
+                                                  
+```
+
 License
 -------
 
