@@ -2,7 +2,7 @@ export default function UrlHandler(){
 	let url;
 	switch (process.env.NODE_ENV) {
 		case 'production':
-			url = 'https://server-smart-bridge.herokuapp.com/';
+			url = process.env.REACT_APP_API_URL;
 			break;
 		case 'development':
 		default:
