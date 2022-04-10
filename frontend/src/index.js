@@ -1,25 +1,17 @@
-import React, { StrictMode, Component, Fragment, useState } from "react";
+import React, { StrictMode, Fragment, useState } from "react";
 import "./style/LoginPage.css"
 
 import ReactDOM from "react-dom";
 
 import "./style/index.css"
 import "./style/App.css";
-import App from "./App";
-import App1 from "./App1";
 import Navbar from "./Navbar";
-import Logs from "./Logs";
-import Buttons from "./Buttons";
 import SingleStep from "./SingleStep"
 import FullAutonomous from "./FullAutonomous";
 import AlertInfo from "./AlertInfo";
-import ErrorMessage from "./ErrorMessage";
-import ProgressOutline from "./ProgressOutline";
-import { post } from "./RequestHandler";
 
-import Dashboad from "./Dashboad";
+import Dashboard from "./Dashboard";
 import UrlHandler from "./UrlHandler";
-//import LoginPage from "./LoginPage";
 
 const connectWalletHandler = (setError, setOtherError) => {
 	if (window.ethereum && window.ethereum.isMetaMask) {
@@ -80,7 +72,7 @@ function RenderPages() {
 	const dashboardGraph = document.getElementById("root2");
 	ReactDOM.render(
 		<StrictMode>
-			<Dashboad />
+			<Dashboard />
 		</StrictMode>,
 		dashboardGraph
 	);

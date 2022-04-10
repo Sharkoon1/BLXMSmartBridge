@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import Logs from './Logs';
 import "./style/SingleStep.css"
 import Buttons from "./Buttons";

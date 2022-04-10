@@ -2,7 +2,7 @@ import React, { StrictMode, useState, useEffect } from "react";
 import { ethers } from "ethers";
 import "./style/Navbar.css";
 import ReactDOM from "react-dom"
-import Dashboad from "./Dashboad";
+import Dashboard from "./Dashboard";
 
 export default function App() {
 
@@ -60,7 +60,7 @@ export default function App() {
 
 		ReactDOM.render(
 			<StrictMode>
-				<Dashboad />
+				<Dashboard />
 			</StrictMode>,
 			root2
 		);
