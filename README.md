@@ -75,7 +75,7 @@ Run the following commands at /frontend:
 npm run build
 ```
 
-To Serve the production build run at /frontend: 
+To serve the production build run at /frontend: 
 
 ```
 serve -s build
