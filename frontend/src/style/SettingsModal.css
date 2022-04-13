@@ -15,6 +15,10 @@
     opacity: .5;
 }
 
+.setSlippage{
+    margin-top: 5%;
+}
+
 .modalContent{
     margin: 25px;
     color: black;

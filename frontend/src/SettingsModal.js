@@ -47,6 +47,15 @@ export default function SettingsModal() {
             <div className='modalContent'>
                 <h1 className='modalHeading'>Settings</h1>
                 <div className='modalSettings'>
+                        <h1><i>Set Arbitrage Interval </i></h1>
+                        <div className='setAbitrageInterval'>
+                            <input className='modalInput' type="number" onKeyDown={blockInvalidChar}></input>
+                            <button className='modalButton'>Apply</button>
+                        </div>
+
+
+                        {/*Set Slippage Percentage */}
+                        <hr id='setttingsHr'></hr>
                         <div className='setSlippage'> 
                             <h1><i>Set Slippage Percentage</i></h1>
                             <div> 
@@ -61,12 +70,15 @@ export default function SettingsModal() {
                                 </div> 
                                 <button className='modalButton' onClick={apply}>Apply</button>
                         </div>       
+
+                        {/*Set Max Swap Amount */}
                         <hr id='setttingsHr'></hr>
                         <div className='setMaxSwapAmount'>
                             <h1><i>Set Max Swap Amount</i></h1> 
                             <ToggleSwitch setAlert={setAlert} setError={setError}/>
                         </div>  
                         
+                        {/*Alerts */}
                         <AlertInfo className="alertInfo" message={alert}></AlertInfo>
                         <ErrorMessage message={error}></ErrorMessage>
                         

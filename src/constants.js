@@ -10,7 +10,7 @@ module.exports = Object.freeze({
     WRAPPED_TOKEN_ADDRESS_BSC: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c", // * WBNB address in BSC mainnet
     WRAPPED_TOKEN_ADDRESS_ETH: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", // * WETH address in ETH mainnet
     
-    USD_TOKEN_ADDRESS_ETH: "0xdac17f958d2ee523a2206206994597c13d831ec7", // * USDT address in ETH mainnet
+    USD_TOKEN_ADDRESS_ETH: "0xdAC17F958D2ee523a2206206994597C13D831ec7", // * USDT address in ETH mainnet
     USD_TOKEN_ADDRESS_BSC: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56", // * BUSD address in BSC mainnet
     
     ROUTER_ETH: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D", // * Router address in ETH mainnet
