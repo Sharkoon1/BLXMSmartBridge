@@ -1,6 +1,6 @@
 This Project was build in a hackthon weekend https://www.bwcon.de/de/aktuelles/detail/blockchain-hackathon-das-sind-die-gewinner 
 
-Winner of the mobility challenge and later on further developed for a MVP 
+Winner of the mobility challenge Team Melonswap and later on further developed for a MVP 
 
 Running the BLXM Smartbridge
 ===========================================
