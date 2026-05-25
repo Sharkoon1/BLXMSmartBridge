@@ -2,8 +2,13 @@
 
 An automated price-balancing bridge for the BLXM token across Binance Smart Chain (BSC) 
 and Ethereum. The system continuously monitors BLXM prices on both chains and 
-automatically bridges tokens to balance prices when they diverge. Includes a frontend 
-for live price monitoring and starting/stopping a bot.
+automatically bridges tokens to balance prices when they diverge.
+
+**Modes:**
+- **Single Step** — walk through price collection, arbitrage calculation, and swap execution one step at a time (useful for debugging)
+- **Full Autonomous** — runs continuously and triggers automatically when prices diverge
+
+Includes a frontend for live price monitoring, console logs, and bot controls.
 
 Winner of the Mobility Challenge at the [BWCON Blockchain Hackathon](https://www.bwcon.de/de/aktuelles/detail/blockchain-hackathon-das-sind-die-gewinner) 
 (Team Melonswap), later developed into an MVP.
