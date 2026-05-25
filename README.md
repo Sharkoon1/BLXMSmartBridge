@@ -5,7 +5,7 @@ and Ethereum. The system continuously monitors BLXM prices on both chains and
 automatically bridges tokens to balance prices when they diverge.
 
 **Modes:**
-- **Single Step** — walk through price collection, arbitrage calculation, and swap execution one step at a time (useful for debugging)
+- **Single Step** — walk through price collection, arbitrage calculation, and swap execution one step at a time for debugging purpose
 - **Full Autonomous** — runs continuously and triggers automatically when prices diverge
 
 Includes a frontend for live price monitoring, console logs, and bot controls.
