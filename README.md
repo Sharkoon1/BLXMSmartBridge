@@ -1,6 +1,12 @@
-This Project was build in a hackthon weekend https://www.bwcon.de/de/aktuelles/detail/blockchain-hackathon-das-sind-die-gewinner 
+# BLXMSmartBridge
 
-Winner of the mobility challenge Team Melonswap and later on further developed for a MVP 
+An automated price-balancing bridge for the BLXM token across Binance Smart Chain (BSC) 
+and Ethereum. The system continuously monitors BLXM prices on both chains and 
+automatically bridges tokens to balance prices when they diverge. Includes a frontend 
+for live price monitoring and starting/stopping the bot.
+
+Winner of the Mobility Challenge at the [BWCON Blockchain Hackathon](https://www.bwcon.de/de/aktuelles/detail/blockchain-hackathon-das-sind-die-gewinner) 
+(Team Melonswap), later developed into an MVP.
 
 Running the BLXM Smartbridge
 ===========================================
