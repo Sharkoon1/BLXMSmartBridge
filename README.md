@@ -9,7 +9,7 @@ Winner of the Mobility Challenge at the [BWCON Blockchain Hackathon](https://www
 (Team Melonswap), later developed into an MVP.
 
 <img width="1595" height="701" alt="WhatsApp Image 2026-05-25 at 08 10 29" src="https://github.com/user-attachments/assets/4bdcae3d-8d72-4f9c-94bf-1851f4481a9e" />
-<img width="1580" height="780" alt="WhatsApp Image 2026-05-25 at 08 08 54" src="https://github.com/user-attachments/assets/8c5d060c-b8ba-4401-b1c8-cc12d72ac903" />
+<img width="1600" height="762" alt="WhatsApp Image 2026-05-25 at 08 15 05" src="https://github.com/user-attachments/assets/f536157d-44af-47ba-8e64-1716c53515b9" />
 
 
 Running the BLXM Smartbridge
